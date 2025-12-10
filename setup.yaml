@@ -1,0 +1,26 @@
+graphs:
+  - name: "Lecture uses Book"
+    from_file: graphs/lecture.cypher
+    dependencies:
+      - "(c:Course)<-[t:TEACHES]-():c->t.usingBook"
+  - name: "No Socks 1"
+    from_file: graphs/nosocks.cypher
+    dependencies:
+      - "(e:Event):e.company,e.time->e.name"
+      - "(e:Event):e.company,e.time->e.venue"
+      - "(e:Event):e.name->e.company"
+      - "(e:Event):e.name,e.time->e.venue"
+      - "(e:Event):e.time,e.venue->e.name"
+     # - "(e:Event):e.company,e.time->e.company"
+  - name: "No Socks 2"
+    from_file: graphs/nosocks.cypher
+    dependencies:
+      - "(e:Event&Confirmed):e.company,e.time->e.name"
+      - "(e:Event&Confirmed):e.company,e.time->e.venue"
+      - "(e:Event&Confirmed):e.name->e.company"
+      - "(e:Event&Confirmed):e.name,e.time->e.venue"
+      - "(e:Event&Confirmed):e.time,e.venue->e.name"
+      - "(e:Event&Confirmed):e.name,e.company->e.time"
+  - name: "Northwind"
+    from_file: graphs/northwind/scripts/northwind.cypher
+    dependencies: []

@@ -1,0 +1,7 @@
+CREATE (d:Course {title: "Database Systems", language: "English"})
+CREATE (k:Lecturer {name: "Katja"})
+CREATE (j:Lecturer {name: "Johannes"})
+CREATE (m:Lecturer {name: "Maxime"})
+CREATE (k)-[:TEACHES {at: "2026-02-23", usingBook: "Alice"}]->(d)
+CREATE (j)-[:TEACHES {at: "2026-02-09", usingBook: "Alice"}]->(d)
+CREATE (m)-[:TEACHES {at: "2026-02-16", usingBook: "Alice"}]->(d)
