@@ -9,13 +9,15 @@ import pandas as pd
 
 from neo4j import GraphDatabase, RoutingControl, Result, Query
 from plotnine import *
+from dotenv import load_dotenv
+
 
 from slpgd import DependencySet
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# TODO: change to environment variables!!
+load_dotenv() # Required to get content of .env when not using Docker
 URI = "neo4j://localhost" if os.getenv("URI") is None else os.getenv("URI")
 USERNAME = "neo4j" if os.getenv("USERNAME") is None else os.getenv("USERNAME")
 PASSWORD = "neo4j" if os.getenv("PASSWORD") is None else os.getenv("PASSWORD")
@@ -36,6 +38,9 @@ metrics_df = pd.DataFrame(columns=[GRAPH_COL, METHOD_COL, METRIC_COL, VALUE_COL,
 
 
 def main():
+    neo4j_log = logging.getLogger("neo4j")
+    neo4j_log.setLevel(logging.ERROR)
+
     try:
         test_connection_to_neo4j()
     except neo4j.exceptions.ServiceUnavailable:
@@ -105,14 +110,15 @@ def perform_experiment_for_graph(graph: dict):
         with GraphDatabase.driver(URI, auth=AUTH) as driver:
             driver.execute_query("MATCH (n) DETACH DELETE n")
         # 2. Insert denormalized graph
-        with open(graph["from_file"], 'r') as filename:
-            create_graph_queries_str = filename.read()
-            create_graph_queries = [s.strip() for s in (create_graph_queries_str.split(';')) if s.strip()]
+        # with open(graph["from_file"], 'r') as filename:
+            # create_graph_queries_str = filename.read()
+            # create_graph_queries = [s.strip() for s in (create_graph_queries_str.split(';')) if s.strip()]
 
-            with GraphDatabase.driver(URI, auth=AUTH).session(database=DATABASE) as session:
-                for query in create_graph_queries:
-                    print(query)
-                    session.run(query)
+            # with GraphDatabase.driver(URI, auth=AUTH).session(database=DATABASE) as session:
+                # for query in create_graph_queries:
+                #     session.run(query)
+        with GraphDatabase.driver(URI, auth=AUTH).session(database=DATABASE) as session:
+            session.run(f"CALL apoc.cypher.runFile(\"{graph['from_file']}\");")
 
         # 3. Get initial statistics
         get_graph_statistics(graph["name"], "denormalized") # None = no normalization performed yet --> TODO: Enum?
