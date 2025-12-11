@@ -39,7 +39,7 @@ metrics_df = pd.DataFrame(columns=[GRAPH_COL, METHOD_COL, METRIC_COL, VALUE_COL,
 
 def main():
     neo4j_log = logging.getLogger("neo4j")
-    neo4j_log.setLevel(logging.ERROR)
+    neo4j_log.setLevel(logging.WARNING)
 
     try:
         test_connection_to_neo4j()

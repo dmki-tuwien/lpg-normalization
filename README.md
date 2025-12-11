@@ -17,3 +17,6 @@ the command `git clone https://github.com/dmki-tuwien/lpg-normalization.git --re
 For the generation of the parser of the dependencies, ANTLR was used.
 ANTLR can be installed on macOS using Brew: `brew install antlr`.
 
+## Troubleshooting
+
+If the resulting plot misses metrics and only shows 0s, there most probably may ha
