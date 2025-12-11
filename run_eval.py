@@ -16,9 +16,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # TODO: change to environment variables!!
-URI = "neo4j://localhost"
-AUTH = ("neo4j", "johannes")
-DATABASE = "neo4j"
+URI = "neo4j://localhost" if os.getenv("URI") is None else os.getenv("URI")
+USERNAME = "neo4j" if os.getenv("USERNAME") is None else os.getenv("USERNAME")
+PASSWORD = "neo4j" if os.getenv("PASSWORD") is None else os.getenv("PASSWORD")
+AUTH = (USERNAME, PASSWORD)
+DATABASE = "neo4j" if os.getenv("DATABASE") is None else os.getenv("DATABASE")
+
 
 GRAPH_COL = "graph"
 METHOD_COL = "method"
