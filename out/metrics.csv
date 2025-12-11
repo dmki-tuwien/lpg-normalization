@@ -1,0 +1,33 @@
+graph,method,metric,value,timestamp,run_id
+Lecture uses Book,denormalized,NodeCount,4.0,2025-12-10 15:59:41.019351,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Lecture uses Book,denormalized,EdgeCount,3.0,2025-12-10 15:59:41.019351,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Lecture uses Book,denormalized,AvgNodePropCount,1.25,2025-12-10 15:59:41.019351,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Lecture uses Book,denormalized,AvgEdgePropCount,2.0,2025-12-10 15:59:41.019351,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Lecture uses Book,relational,NodeCount,4.0,2025-12-10 15:59:41.088205,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Lecture uses Book,relational,EdgeCount,3.0,2025-12-10 15:59:41.088205,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Lecture uses Book,relational,AvgNodePropCount,1.5,2025-12-10 15:59:41.088205,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Lecture uses Book,relational,AvgEdgePropCount,1.0,2025-12-10 15:59:41.088205,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 1,denormalized,NodeCount,3.0,2025-12-10 15:59:41.164313,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 1,denormalized,EdgeCount,2.0,2025-12-10 15:59:41.164313,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 1,denormalized,AvgNodePropCount,3.3333333333333335,2025-12-10 15:59:41.164313,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 1,denormalized,AvgEdgePropCount,0.0,2025-12-10 15:59:41.164313,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 1,relational,NodeCount,8.0,2025-12-10 15:59:41.282224,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 1,relational,EdgeCount,8.0,2025-12-10 15:59:41.282224,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 1,relational,AvgNodePropCount,2.0,2025-12-10 15:59:41.282224,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 1,relational,AvgEdgePropCount,0.0,2025-12-10 15:59:41.282224,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 2,denormalized,NodeCount,3.0,2025-12-10 15:59:41.436793,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 2,denormalized,EdgeCount,2.0,2025-12-10 15:59:41.436793,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 2,denormalized,AvgNodePropCount,3.3333333333333335,2025-12-10 15:59:41.436793,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 2,denormalized,AvgEdgePropCount,0.0,2025-12-10 15:59:41.436793,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 2,relational,NodeCount,6.0,2025-12-10 15:59:41.606463,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 2,relational,EdgeCount,5.0,2025-12-10 15:59:41.606463,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 2,relational,AvgNodePropCount,2.666666666666667,2025-12-10 15:59:41.606463,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+No Socks 2,relational,AvgEdgePropCount,0.0,2025-12-10 15:59:41.606463,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Northwind Orders,denormalized,NodeCount,1035.0,2025-12-10 15:59:41.968133,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Northwind Orders,denormalized,EdgeCount,3139.0,2025-12-10 15:59:41.968133,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Northwind Orders,denormalized,AvgNodePropCount,13.30531400966183,2025-12-10 15:59:41.968133,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Northwind Orders,denormalized,AvgEdgePropCount,3.4326218540936595,2025-12-10 15:59:41.968133,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Northwind Orders,relational,NodeCount,1930.0,2025-12-10 15:59:42.618233,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Northwind Orders,relational,EdgeCount,8119.0,2025-12-10 15:59:42.618233,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Northwind Orders,relational,AvgNodePropCount,5.03937823834196,2025-12-10 15:59:42.618233,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9
+Northwind Orders,relational,AvgEdgePropCount,1.3271338834831767,2025-12-10 15:59:42.618233,fb2aa3a3-6e4b-4d62-b582-ba9b0ea68ed9

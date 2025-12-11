@@ -1,6 +1,6 @@
 FROM python:3.13-bookworm
 
-WORKDIR /usr/src/app
+WORKDIR /
 
 RUN pip install --upgrade pip
 

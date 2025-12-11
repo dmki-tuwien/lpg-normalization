@@ -50,6 +50,8 @@ services:
       - .env
     volumes:
       - ./graphs:/graphs
+      - ./setup.yaml:/setup.yaml
+      - ./out:/out
     networks:
       - app-network
 
