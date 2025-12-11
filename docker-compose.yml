@@ -39,7 +39,7 @@ services:
   global-lpg-norm:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: eval.Dockerfile
     container_name: global-lpg-norm
     depends_on:
       neo4j:

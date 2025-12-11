@@ -65,8 +65,9 @@ def main():
                 size=10,
                 va='bottom'
             )
-                    + facet_grid(f"{GRAPH_COL} ~ {METRIC_COL}")
-                    + scale_y_continuous(limits=(0, max(metrics_df[VALUE_COL])*1.1))  # Set the new upper limit
+                    + facet_grid(f"{GRAPH_COL} ~ {METRIC_COL}", scales='free_y')
+           #         + scale_y_continuous(limits=(0, max(metrics_df[VALUE_COL])*1.1))  # Set the new upper limit
+                    + scale_y_continuous(expand=(0, 0, 0.1, 0))
                     + theme_bw()
                     + theme(axis_text_x=element_text(
                                 angle=45,
