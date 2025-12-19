@@ -19,7 +19,7 @@ services:
       - ./graphs-1:/var/lib/neo4j/import/graphs
       - ./out:/out
     pre_stop:
-      - command: chown -R --reference=/out /var/lib/neo4j/import/graphs
+      - command: chown -R --reference=/out /var/lib/neo4j/import/graphs && chmod -R --reference=/out /var/lib/neo4j/import/graphs
         user: root
         privileged: true
 
