@@ -2,6 +2,7 @@ services:
   neo4j:
     image: neo4j:2025.10
     container_name: neo4j
+    user: "${CURRENT_UID}:${CURRENT_GID}"
     ports:
       - "7474:7474"  # HTTP
       - "7687:7687"  # Bolt
