@@ -14,16 +14,21 @@ services:
 # There is no volume for persistence because we need the original graphs
     networks:
       - app-network
-    security_opt:
-      - no-new-privileges:true
     volumes:
-      - ./graphs:/var/lib/neo4j/import/graphs
+    #  - ./graphs:/var/lib/neo4j/import/graphs
+      - ./graphs-1:/var/lib/neo4j/import/graphs
+      - -/out:/out
+    pre_stop:
+      - command: sudo chown --reference=/out /var/lib/neo4j/import/graphs
+        user: root
+        privileged: true
+
     healthcheck:
-          test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1" ]
-          interval: 10s
-          timeout: 5s
-          retries: 5
-          start_period: 30s
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 #  dtgraph:
 #    image: ghcr.io/dmki-tuwien/dtgraph-rest
 #    container_name: dtgraph-rest
