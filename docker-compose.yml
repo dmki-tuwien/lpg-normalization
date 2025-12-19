@@ -17,7 +17,7 @@ services:
     volumes:
     #  - ./graphs:/var/lib/neo4j/import/graphs
       - ./graphs-1:/var/lib/neo4j/import/graphs
-      - -/out:/out
+      - ./out:/out
     pre_stop:
       - command: sudo chown --reference=/out /var/lib/neo4j/import/graphs
         user: root
