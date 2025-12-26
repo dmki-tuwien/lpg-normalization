@@ -15,8 +15,7 @@ services:
     networks:
       - app-network
     volumes:
-    #  - ./graphs:/var/lib/neo4j/import/graphs
-      - ./graphs-1:/var/lib/neo4j/import/graphs
+      - ./graphs:/var/lib/neo4j/import/graphs
       - ./out:/out
     pre_stop:
       - command: "chown -R --reference=/out /var/lib/neo4j/import/graphs"
