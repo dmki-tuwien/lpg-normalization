@@ -1,11 +1,9 @@
 """Python implementation of the SLPGDs for Labelled Property Grpahs (LPGs)"""
+
 from __future__ import annotations
 
-import abc
-import io
 import operator
-from collections import namedtuple
-from collections.abc import MutableSet
+from caseconverter import pascalcase
 from itertools import accumulate, pairwise, count
 from typing import Iterable, FrozenSet, NamedTuple, Callable
 
