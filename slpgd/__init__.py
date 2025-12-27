@@ -21,14 +21,14 @@ OrderAndSchema = NamedTuple(
 #       - implement GraphNative Normalization
 
 
-def _to_PascalCase(string: str) -> str:
-    return (
-        string.replace(".", " ")
-        .title()
-        .replace(" ", "")
-        .replace("(", "")
-        .replace(")", "")
-    )
+# def _to_PascalCase(string: str) -> str:
+#     return (
+#         string.replace(".", " ")
+#         .title()
+#         .replace(" ", "")
+#         .replace("(", "")
+#         .replace(")", "")
+#     )
 
 
 def _remove_properties_of_edge_endpoints(property_key: str, edge: Edge):
@@ -328,7 +328,7 @@ class DependencySet(set):
             match order_schema.order:
                 case 0:
                     # The schema is new --> will be new node attached to another node
-                    label = _to_PascalCase(" ".join(sorted(list(schema_after_norm))))
+                    label = pascalcase(" ".join(sorted(list(schema_after_norm))))
 
                     for prop in schema_after_norm:
                         var = prop.split(".")[0]
@@ -347,7 +347,7 @@ class DependencySet(set):
                             transformations.append(
                                 f"""
 MATCH {self.dependency_pattern} MERGE (y{i}:{label})  SET 
-{",\n".join(map(lambda x: f"y{i}.{_to_PascalCase(x)}= {x}", schema_after_norm))}
+{",\n".join(map(lambda x: f"y{i}.{pascalcase(x)}= {x}", schema_after_norm))}
 
 """
                             )
@@ -356,13 +356,13 @@ MATCH {self.dependency_pattern} MERGE (y{i}:{label})  SET
                                 f"""
 MATCH {self.dependency_pattern}, (x{i}:{label}) 
 WHERE 
-{" AND ".join(map(lambda x: f"{x}=x{i}.{_to_PascalCase(x)}", schema_after_norm))}
+{" AND ".join(map(lambda x: f"{x}=x{i}.{pascalcase(x)}", schema_after_norm))}
 MERGE (x{i})<-[:{label}]-({var})
 """
                             )
                             # <-[:{_to_PascalCase(prop)}]-({var})
                             new_pattern_list.append(
-                                f"(x{i}:{label})<-[:{_to_PascalCase(prop)}]-({var})"
+                                f"(x{i}:{label})<-[:{pascalcase(prop)}]-({var})"
                             )
                         #  break # create only one node for a relation!!!
                     query_vars_schema_dict[f"x{i}"] = schema_after_norm
@@ -433,7 +433,7 @@ RETURN COLLECT(DISTINCT key) AS props""",
                         transformations.append(
                             f"""
 MATCH {self.dependency_pattern} 
-SET {",\n".join(map(lambda prop: f"{var}.{_to_PascalCase(prop)} = {prop}", additional_props))} 
+SET {",\n".join(map(lambda prop: f"{var}.{pascalcase(prop)} = {prop}", additional_props))} 
                     """
                         )  # TODO: discuss whether to use the backtick and original name or the camelcase version
 
@@ -490,7 +490,7 @@ SET {",\n".join(map(lambda prop: f"{var}.{_to_PascalCase(prop)} = {prop}", addit
                         transformations.append(
                             f"""
 MATCH {self.dependency_pattern} 
-SET {",\n".join(map(lambda prop: f"{var}.{_to_PascalCase(prop)} = {prop}", additional_props))} 
+SET {",\n".join(map(lambda prop: f"{var}.{pascalcase(prop)} = {prop}", additional_props))} 
                                             """
                         )  # TODO: discuss whether to use the backtick and original name or the camelcase version
 
@@ -569,7 +569,7 @@ REMOVE {", ".join(properties_to_remove)}
                     if isinstance(dep.right, Property):
                         transformations.append(
                             f"""MATCH {self.dependency_pattern} 
-SET {next(iter(dep.left)).get_graph_object()}.{_to_PascalCase(str(dep.right))}
+SET {next(iter(dep.left)).get_graph_object()}.{pascalcase(str(dep.right))}
 REMOVE {dep.right}"""
                         )
                 case _:
