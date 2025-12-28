@@ -13,8 +13,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Global LPG Normalization'
-copyright = '2025, Johannes Schrott'
+project = 'PG-Norm: Native Property Graph Normal Forms'
+copyright = '2026, Johannes Schrott'
 author = 'Johannes Schrott'
 
 # -- General configuration ---------------------------------------------------
@@ -23,6 +23,7 @@ author = 'Johannes Schrott'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    'sphinx_mdinclude',
     'sphinx_paramlinks'
 ]
 
@@ -44,5 +45,12 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
+html_theme_options = {
+    "repository_provider": "github",
+    "repository_url": "https://github.com/dmki-tuwien/lpg-normalization",
+    "use_repository_button": True,
+}
+
+source_suffix = ['.rst', '.md']

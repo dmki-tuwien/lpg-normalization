@@ -8,3 +8,8 @@ PyYAML~=6.0.2
 ipython~=9.3.0
 plotnine~=0.15.1
 functional-dependencies~=1.3.0
+case-converter
+sphinx
+sphinx-mdinclude
+sphinx-book-theme
+sphinx-paramlinks
