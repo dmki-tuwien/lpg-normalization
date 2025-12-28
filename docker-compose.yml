@@ -1,6 +1,6 @@
 services:
   neo4j:
-    image: neo4j:2025.10
+    image: neo4j:2025.11
     container_name: neo4j
     ports:
       - "7474:7474"  # HTTP
@@ -46,6 +46,41 @@ services:
 #      start_period: 30s
 #    env_file:
 #      - .env
+  memgraph:
+    image: memgraph/memgraph-mage:latest
+    container_name: memgraph-mage
+#    pull_policy: always
+    ports:
+      - "7688:7687"
+      - "7444:7444"
+    command: [ "--log-level=TRACE", "--telemetry-enabled=false"]
+    healthcheck:
+      test: [ "CMD-SHELL", "echo 'RETURN 0;' | mgconsole || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 0s
+    networks:
+      - app-network
+#    environment:
+#      MEMGRAPH_USER: ${USERNAME}
+#      MEMGRAPH_PASSWORD: ${PASSWORD}
+
+  memgraph-lab:
+    image: memgraph/lab:latest
+    container_name: memgraph-lab
+ #   pull_policy: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      memgraph:
+        condition: service_healthy
+    networks:
+      - app-network
+    environment:
+      - QUICK_CONNECT_MG_HOST=memgraph
+      - QUICK_CONNECT_MG_PORT=7687
+
   global-lpg-norm:
     build:
       context: .
@@ -53,6 +88,8 @@ services:
     container_name: global-lpg-norm
     depends_on:
       neo4j:
+        condition: service_healthy
+      memgraph:
         condition: service_healthy
 #      dtgraph:
 #        condition: service_healthy
@@ -64,6 +101,14 @@ services:
       - ./out:/out
     networks:
       - app-network
+  docs-webserver:
+    image: nginx:latest
+    volumes:
+      - ./docs/_build/html:/usr/share/nginx/html:ro
+    ports:
+      - "8000:80"
+    profiles:
+      - docs
 
 
 volumes:

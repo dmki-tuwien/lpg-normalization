@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import abc
-import io
 from enum import Enum
 from functools import reduce
-from hashlib import sha256
 
 from antlr4 import *
 
@@ -20,6 +18,7 @@ class GraphObject(abc.ABC):
 
     :param symbol: The symbol of the variable of the graph object.
     :param labels: The labels of the graph object."""
+
     def __init__(self, symbol: str, labels: str):
         self.symbol: str = symbol
         self.labels: set[str] = set()
@@ -34,23 +33,25 @@ class GraphObject(abc.ABC):
 class Node(GraphObject):
     """Represents an LPG node.
 
-        :param symbol: The symbol of the variable of the node.
-        :param labels: The labels of the node."""
+    :param symbol: The symbol of the variable of the node.
+    :param labels: The labels of the node."""
+
     def __repr__(self):
         return f"{super().__repr__()}"
+
 
 class Edge(GraphObject):
     """Represents an LPG edge.
 
-        :param symbol: The symbol of the variable of the node.
-        :type symbol: str
-        :param labels: The labels of the node.
-        :type labels: str
-        :param src: The source :any:`Node` of the edge.
-        :type src: Node | None
-        :param tgt: The target :any:`Node` of the edge.
-        :type tgt: Node | None
-        """
+    :param symbol: The symbol of the variable of the node.
+    :type symbol: str
+    :param labels: The labels of the node.
+    :type labels: str
+    :param src: The source :any:`Node` of the edge.
+    :type src: Node | None
+    :param tgt: The target :any:`Node` of the edge.
+    :type tgt: Node | None
+    """
 
     def __init__(self, symbol: str, labels: str, src: Node | None, tgt: Node | None):
         self.src: Node | None = src
@@ -60,6 +61,7 @@ class Edge(GraphObject):
     def __repr__(self):
         return f"{super().__repr__()}"
 
+
 class Property:
     def __init__(self, key: str, graph_object: GraphObject):
         self.key: str = key
@@ -68,8 +70,10 @@ class Property:
     def __repr__(self):
         return f"{str(self.graphObject)}.{self.key}"
 
+
 class Pattern:
     """Represents the matching pattern of an SLPGD :any:`Dependency`."""
+
     def __init__(self, pattern: str, graph_objects: set[GraphObject]):
         self._pattern: str = pattern
         """The string representation of the pattern."""
@@ -87,8 +91,10 @@ class Pattern:
     def __hash__(self):
         return hash(str(self._pattern))
 
+
 class Reference:
     """Represents a reference to a property key contained in a graph object or to the graph object itself."""
+
     def __init__(self, reference: GraphObject | Property):
         self.reference: GraphObject | Property = reference
 
@@ -112,7 +118,9 @@ class Dependency:
 
     :param pattern: The pattern of the dependency.
     :param left: The left side of the dependency.
-    :param right: The right side of the dependency, i.e, the references that depend on the :paramref:`left` side of the dependency."""
+    :param right: The right side of the dependency, i.e, the references that depend on the :paramref:`left` side of the dependency.
+    """
+
     def __init__(self, pattern, left: set[Reference], right: Reference):
         self.pattern: Pattern = pattern
         self.left: set[Reference] = left
@@ -124,11 +132,13 @@ class Dependency:
     @property
     def is_trivial(self) -> bool:
         """:returns: whether the dependency is trivial, i.e., the reference on :paramref:`right` side is part of the set of references on the :paramref:`left` side of the dependency."""
-        return reduce(lambda x, y: x or y, map(lambda elem: self.right == elem, self.left))
+        return reduce(
+            lambda x, y: x or y, map(lambda elem: self.right == elem, self.left)
+        )
 
     @property
-    def is_global(self) -> bool:
-        """:returns: whether the dependency is global, i.e., it references more than one graph object."""
+    def is_inter_graph_object(self) -> bool:
+        """:returns: whether the dependency is an inter-graph object dependency, i.e., it references more than one graph object."""
         graph_objects: set[GraphObject] = set()
         for reference in self.left:
             graph_objects.add(reference.get_graph_object())
@@ -137,15 +147,16 @@ class Dependency:
         return len(graph_objects) > 1
 
     @property
-    def is_local(self) -> bool:
-        return not self.is_global
-
+    def is_intra_graph_object(self) -> bool:
+        """:returns: whether the dependency is an intra-graph object dependency, i.e., it references exactly one graph object."""
+        return not self.is_inter_graph_object
 
     @classmethod
     def from_string(cls, string: str) -> Dependency:
         """Parse a SLPGD dependency from a string.
 
-        :param string: The string representation of the SLPGD to create. Relies on this `syntax`."""
+        :param string: The string representation of the SLPGD to create. Relies on this `syntax`.
+        """
         # TODO: Insert proper link
         # TODO: put command for Antlr Generation into Docker!!
         # antlr4 -Dlanguage=Python3 -lib assets/gql-grammar/ -o slpgd/parser spgds.g4
@@ -154,7 +165,7 @@ class Dependency:
         stream = CommonTokenStream(lexer)
         parser = spgdsParser(stream)
         tree = parser.dependency()
-        listener = MySlpgdListener()
+        listener = _MySLPGDListener()
 
         walker = ParseTreeWalker()
         walker.walk(listener, tree)
@@ -162,10 +173,12 @@ class Dependency:
         return listener.dependency
 
 
-class MySlpgdListener(spgdsListener):
-    """Antlr listener for the SLPGDs."""
+class _MySLPGDListener(spgdsListener):
+    """`ANTLR listener <https://github.com/antlr/antlr4/blob/4.13.2/doc/listeners.md>`__ for the SLPGDs."""
 
-    GraphObjectType = Enum("GraphObjectType", [("Node",0), ("EdgeLeft",1), ("EdgeRight",2)])
+    GraphObjectType = Enum(
+        "GraphObjectType", [("Node", 0), ("EdgeLeft", 1), ("EdgeRight", 2)]
+    )
 
     def __init__(self):
         self.dependency: Dependency | None = None
@@ -173,25 +186,35 @@ class MySlpgdListener(spgdsListener):
         self._graph_object_types: list[self.GraphObjectType] = []
         self.stack: list = []
 
-    def exitElementPatternFiller(self, ctx:spgdsParser.ElementPatternFillerContext):
-      #  print(ctx.getText())
+    def exitElementPatternFiller(self, ctx: spgdsParser.ElementPatternFillerContext):
+        #  print(ctx.getText())
 
-        graph_object_type = self._graph_object_types[-1] # get the last entered graph object
+        graph_object_type = self._graph_object_types[
+            -1
+        ]  # get the last entered graph object
         if len(self._graph_object_types) > 1:
             prior_graph_object_type = self._graph_object_types[-2]
         else:
             prior_graph_object_type = None
 
         if ctx.getChildCount() == 2:
-            var_name_str = ctx.getChild(0).getText() # The first child is the variable declaration
-            labels_str = ctx.getChild(1).getChild(1).getText() # The second child of the second child is the string rep. of the graph object's labels
+            var_name_str = ctx.getChild(
+                0
+            ).getText()  # The first child is the variable declaration
+            labels_str = (
+                ctx.getChild(1).getChild(1).getText()
+            )  # The second child of the second child is the string rep. of the graph object's labels
         elif ctx.getChildCount() == 1:
             if not ctx.getChild(0).getText().startswith(":"):
-                var_name_str = ctx.getChild(0).getText() # It is the variable declaration
+                var_name_str = ctx.getChild(
+                    0
+                ).getText()  # It is the variable declaration
                 labels_str = None
             else:
                 var_name_str = None
-                labels_str = ctx.getChild(0).getChild(1).getText() # The second child of the child is the string rep. of the graph object's labels
+                labels_str = (
+                    ctx.getChild(0).getChild(1).getText()
+                )  # The second child of the child is the string rep. of the graph object's labels
         else:
             var_name_str, labels_str = None, None
 
@@ -207,35 +230,54 @@ class MySlpgdListener(spgdsListener):
             case self.GraphObjectType.EdgeLeft:
                 if len(self._variables) > 0:
                     assert isinstance(self._variables[-1], Node)
-                    self._variables.append(Edge(symbol=var_name_str, labels=labels_str,src=None, tgt=self._variables[-1]))
+                    self._variables.append(
+                        Edge(
+                            symbol=var_name_str,
+                            labels=labels_str,
+                            src=None,
+                            tgt=self._variables[-1],
+                        )
+                    )
             case self.GraphObjectType.EdgeRight:
                 if len(self._variables) > 0:
                     assert isinstance(self._variables[-1], Node)
-                    self._variables.append(Edge(symbol=var_name_str, labels=labels_str, src=self._variables[-1], tgt=None))
-        #print(self._variables)
+                    self._variables.append(
+                        Edge(
+                            symbol=var_name_str,
+                            labels=labels_str,
+                            src=self._variables[-1],
+                            tgt=None,
+                        )
+                    )
+        # print(self._variables)
 
-
-    def exitPathPatternList(self, ctx:spgdsParser.PathPatternListContext):
-        pattern = Pattern(ctx.getText(), set(self._variables)) #set(filter(lambda x: x is None, map(lambda go: go.symbol, self._variables))))
+    def exitPathPatternList(self, ctx: spgdsParser.PathPatternListContext):
+        pattern = Pattern(
+            ctx.getText(), set(self._variables)
+        )  # set(filter(lambda x: x is None, map(lambda go: go.symbol, self._variables))))
         self.stack.append(pattern)
 
-    def enterNodePattern(self, ctx:spgdsParser.NodePatternContext):
+    def enterNodePattern(self, ctx: spgdsParser.NodePatternContext):
         self._graph_object_types.append(self.GraphObjectType.Node)
 
-   # def enterEdgePattern(self, ctx:spgdsParser.EdgePatternContext):
-   #     self._latest_graph_object = Edge
+    # def enterEdgePattern(self, ctx:spgdsParser.EdgePatternContext):
+    #     self._latest_graph_object = Edge
 
-    def enterFullEdgePointingLeft(self, ctx:spgdsParser.FullEdgePointingLeftContext):
+    def enterFullEdgePointingLeft(self, ctx: spgdsParser.FullEdgePointingLeftContext):
         self._graph_object_types.append(self.GraphObjectType.EdgeLeft)
 
     def enterFullEdgePointingRight(self, ctx: spgdsParser.FullEdgePointingRightContext):
         self._graph_object_types.append(self.GraphObjectType.EdgeRight)
 
-    def exitReference(self, ctx:spgdsParser.ReferenceContext):
+    def exitReference(self, ctx: spgdsParser.ReferenceContext):
         graph_object_var = ctx.getChild(0).getText()
         if graph_object_var not in map(lambda x: x.symbol, self._variables):
-            raise ValueError(f"The used variable \"{graph_object_var}\" has not been matched!")
-        graph_object = next(filter(lambda x: x.symbol == graph_object_var, self._variables))
+            raise ValueError(
+                f'The used variable "{graph_object_var}" has not been matched!'
+            )
+        graph_object = next(
+            filter(lambda x: x.symbol == graph_object_var, self._variables)
+        )
         reference: Reference
         if len(ctx.children) == 3:
             reference = Reference(Property(ctx.getChild(2).getText(), graph_object))
@@ -244,17 +286,20 @@ class MySlpgdListener(spgdsListener):
             reference = Reference(graph_object)
         self.stack.append(reference)
 
-    def exitLeft(self, ctx:spgdsParser.LeftContext):
+    def exitLeft(self, ctx: spgdsParser.LeftContext):
         left: set[Reference] = set()
 
-        for i in range((len(ctx.children) // 2) + 1): # Division by 2 plus 1, as this is the actual number of references in the left side of the dependency (the children also include the commas between them i.e., a,b has a length of 3 but only 2 references
+        for i in range(
+            (len(ctx.children) // 2) + 1
+        ):  # Division by 2 plus 1, as this is the actual number of references in the left side of the dependency (the children also include the commas between them i.e., a,b has a length of 3 but only 2 references
             left.add(self.stack.pop())
 
         self.stack.append(left)
 
-    def exitDependency(self, ctx:spgdsParser.DependencyContext):
+    def exitDependency(self, ctx: spgdsParser.DependencyContext):
         right = self.stack.pop()
         left = self.stack.pop()
         pattern = self.stack.pop()
         self.dependency = Dependency(pattern, left, right)
-      #  print(self.dependency)
+
+    #  print(self.dependency)

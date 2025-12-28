@@ -559,7 +559,9 @@ REMOVE {", ".join(properties_to_remove)}
         transformations: list[str] = []
 
         # Global
-        global_deps: set[Dependency] = set(filter(lambda dep: dep.is_global, self))
+        global_deps: set[Dependency] = set(
+            filter(lambda dep: dep.is_inter_graph_object, self)
+        )
 
         # TODO: Add notion of trivial dep to paper!
 
@@ -576,7 +578,7 @@ REMOVE {dep.right}"""
                     pass
 
         # Local
-        local_deps = set(filter(lambda dep: dep.is_local, self))
+        local_deps = set(filter(lambda dep: dep.is_intra_graph_object, self))
 
         return (transformations, str(self.dependency_pattern))
 
