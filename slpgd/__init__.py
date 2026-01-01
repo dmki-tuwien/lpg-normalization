@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import operator
 from caseconverter import pascalcase
+from dtgraph import Rule
 from itertools import accumulate, pairwise, count
 from typing import Iterable, FrozenSet, NamedTuple, Callable
 
 import neo4j
+import re
 from functional_dependencies import FDSet, RelSchema, FD
 
 from .dependency import *
@@ -643,32 +645,104 @@ REMOVE {", ".join(properties_to_remove)}
 
     def get_transformations_graph_native(
         self, con: neo4j.Driver, database="neo4j", semantics: int = 1
-    ) -> tuple[list[str], str]:
-        transformations: list[str] = []
+    ) -> tuple[list[Rule], list[str], DependencySet]:
+        rules: list[Rule] = []
+        queries: list[str] = []
+        pattern = str(self.dependency_pattern).replace("&", ":")
+
+        i = 0
+        # Get canonical cover?
+
+        minimal_dep_set: DependencySet = self.get_minimal_cover()
+        transformed_dep_set: DependencySet = DependencySet(minimal_dep_set.copy())
 
         # Global
         global_deps: set[Dependency] = set(
-            filter(lambda dep: dep.is_inter_graph_object, self)
+            filter(lambda dep: dep.is_inter_graph_object, minimal_dep_set)
         )
 
         # TODO: Add notion of trivial dep to paper!
 
         for dep in global_deps:
-            match len(dep.left):
-                case 1:
-                    if isinstance(dep.right, Property):
-                        transformations.append(
-                            f"""MATCH {self.dependency_pattern} 
-SET {next(iter(dep.left)).get_graph_object()}.{pascalcase(str(dep.right))}
-REMOVE {dep.right}"""
-                        )
-                case _:
-                    pass
+#             match len(dep.left):
+#                 case 1:
+#                     if isinstance(dep.right, Property):
+#                         transformations.append(
+#                             f"""MATCH {self.dependency_pattern}
+# SET {next(iter(dep.left)).get_graph_object()}.{pascalcase(str(dep.right))}
+# REMOVE {dep.right}"""
+#                         )
+#                 case _:
+#                     pass
+            pass
 
-        # Local
-        local_deps = set(filter(lambda dep: dep.is_intra_graph_object, self))
+        # Local (ψ_L1 (psi_L1) and  ψ_L2 (psi_L2))
+        local_deps: set[Dependency] = set(filter(lambda dep: dep.is_intra_graph_object, minimal_dep_set))
+        for local_dep in local_deps:
+            local_dep_left_concat: str = ",".join(map(str, local_dep.left))
+            new_properties: str = ", ".join(map(lambda ref: f"{pascalcase(ref)} = {ref}", map(str, local_dep.get_references())))
+            new_label: str = pascalcase(" ".join(map(str, local_dep.get_references())))
 
-        return (transformations, str(self.dependency_pattern))
+            print(new_properties)
+
+            if local_dep.involves_only_nodes: # ψ_L1 (psi_L1)
+                node: Node = local_dep.right.reference.graphObject
+
+                rules.append(Rule(f'''
+MATCH {pattern} 
+GENERATE
+(x = ({local_dep_left_concat}):{new_label} {{
+    {new_properties}
+}})
+                ''')) # Create new nodes for dep., nodes with same values for properties on left side should be merged!
+
+                queries.insert(0, f"""
+MATCH {pattern} 
+MATCH (x{i}:{new_label})
+WHERE {" AND ".join(map(lambda ref: f"x{i}.{pascalcase(ref)} = {ref}", map(str, local_dep.get_references())))}
+MERGE ({node.symbol})-[:{new_label.upper()}]->(x{i})
+                """)
+
+                # Remove old redundant properties in the end
+                queries.append(f"""
+MATCH {pattern} 
+MATCH (x{i}:{new_label})
+REMOVE {", ".join(map(str, local_dep.get_references()))}
+                """)
+
+            if local_dep.involves_only_edges: # ψ_L2 (psi_L2)  --> Reification
+                edge: Edge = local_dep.right.reference.graphObject
+
+                # First reification
+                queries.append(f"""
+MATCH {pattern} 
+CREATE ({edge.src.symbol})-[:$("SRC"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
+CREATE (x{i})-[:$("TGT"+type({edge.symbol}))]->({edge.tgt.symbol})
+SET x{i} += properties({edge.symbol})
+DELETE {edge.symbol}
+                """)
+                pattern = re.sub(f"\\[{edge.symbol}\\]",f"[]->({edge.symbol})-[]", pattern)
+                print(pattern)
+                i += 1
+
+                # Then normalization
+                rules.append(Rule(f"""
+MATCH {pattern} 
+GENERATE
+(y = ({local_dep_left_concat}) :{new_label} {{{new_properties}}})
+                """)) # nodes with same values for properties on left side should be merged!
+
+                queries.append(f"""
+MATCH {pattern} 
+MATCH (x{i}:{new_label})
+WHERE {" AND ".join(map(lambda ref: f"x{i}.{pascalcase(ref)} = {ref}", map(str, local_dep.get_references())))}
+MERGE ({edge.symbol})-[:{new_label.upper()}]->(x{i})
+REMOVE {", ".join(map(str, local_dep.get_references()))}
+""") # Connect normalized nodes with reified nodes and remove redundant properties
+            i += 1
+        # print(rules)
+        print(queries)
+        return rules, queries, transformed_dep_set
 
     def __str__(self):
         return "\n".join(map(str, iter(self)))

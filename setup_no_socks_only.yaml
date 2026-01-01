@@ -1,0 +1,13 @@
+graphs:
+  - name: "No Socks 1"
+    from_file: graphs/nosocks.cypher
+    dependencies:
+      - "(e:Event):e.company,e.time->e.name"
+      - "(e:Event):e.company,e.time->e.venue"
+      - "(e:Event):e.name->e.company"
+      - "(e:Event):e.name,e.time->e.venue"
+      - "(e:Event):e.time,e.venue->e.name"
+     # - "(e:Event):e.company,e.time->e.company"
+    dependency_origin: "User provided"
+    source: "\\cite{skavantzos_third_2025}"
+

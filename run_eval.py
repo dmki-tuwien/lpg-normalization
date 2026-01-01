@@ -13,6 +13,7 @@ from plotnine import *
 from dotenv import load_dotenv
 
 import slpgd
+from normalize import perform_graph_native_normalization
 from slpgd import DependencySet
 
 logging.basicConfig(level=logging.INFO)
@@ -91,17 +92,21 @@ with open("setup.yaml", 'r') as file:
 
 def main():
 
-
     try:
         test_connection_to_neo4j()
     except neo4j.exceptions.ServiceUnavailable:
         logger.error("Could not connect to Neo4j")
         exit(1)
+    logger.info("✅ Connection to Neo4J was successful")
+
     try:
         test_connection_to_memgraph()
     except neo4j.exceptions.ServiceUnavailable:
         logger.error("Could not connect to Memgraph")
         exit(1)
+    logger.info("✅ Connection to Memgraph was successful")
+
+
 
     logger.info("Start experiments")
 
@@ -150,6 +155,7 @@ def main():
     per_graph_metrics_df.to_csv("out/metrics.csv", index=False)
 
     global per_dep_metrics_df
+    per_dep_metrics_df = per_dep_metrics_df.loc[per_dep_metrics_df[DATABASE_COL]=="Neo4J"]
     per_dep_metrics_df = per_dep_metrics_df.set_index([GRAPH_COL, DATABASE_COL, METHOD_COL, DEPENDENCY_COL])
     per_dep_metrics_df.to_csv("out/per_dep_metrics.csv")
     per_dep_metrics_df.style.format(precision=3).to_latex("out/per_dep_metrics.latex")
@@ -160,14 +166,19 @@ def perform_experiment_for_graph(graph: dict, database: str):
         case "memgraph":
             URI = MEMGRAPH_URI
             DATABASE = MEMGRAPH_DATABASE
+            USERNAME = None
+            PASSWORD = None
         case _:
             URI = NEO4J_URI
             DATABASE = NEO4J_DATABASE
+            USERNAME = "neo4j"
+            PASSWORD = "johannes"
+
     logger.info(f"\tPerform experiment with graph \"{graph['name']}\"")
 
     measured_denormalized = False
 
-    for method in ["relational"]: #,"slpgd1","slpgd2"]: #, "semantics1", "semantics2"]: # TODO: Enum?
+    for method in ["slpgd1"]: #,"slpgd1","slpgd2"]: #, "semantics1", "semantics2"]: # TODO: Enum?
         # 1. Clean up the database, as it may contain old data
         with GraphDatabase.driver(URI, auth=AUTH) as driver:
             driver.execute_query("MATCH (n) DETACH DELETE n")
@@ -187,7 +198,7 @@ def perform_experiment_for_graph(graph: dict, database: str):
 
                     with GraphDatabase.driver(URI).session(database=DATABASE) as session:
                         for query in create_graph_queries:
-                            print(query)
+                         #   print(query)
                             session.run(query)
             case _:
                 with GraphDatabase.driver(NEO4J_URI, auth=AUTH).session(database=DATABASE) as session:
@@ -208,22 +219,33 @@ def perform_experiment_for_graph(graph: dict, database: str):
 
 
         # 4. Perform normalization
+
         match method:
             case "relational":
-                provided_dependants = provided_dependencies.dependants
-                with GraphDatabase.driver(NEO4J_URI, auth=AUTH) as driver:
-                    dependencies = DependencySet.from_string_list(graph["dependencies"]).infer_structural_deps(driver, except_dependants=provided_dependants)
-                    # print(dependencies)
-                    transformations: list[str]
-                    new_pattern: str
-                    transformations, new_pattern = dependencies.get_transformations_rel_synthesize(driver)
-                    with driver.session(database=NEO4J_DATABASE) as session:
-                        for transformation in transformations:
-                        #    print(transformation)
-                        #    print(new_pattern)
-                            session.run(transformation)
+                # provided_dependants = provided_dependencies.dependants
+                # with GraphDatabase.driver(NEO4J_URI, auth=AUTH) as driver:
+                #     dependencies = DependencySet.from_string_list(graph["dependencies"]).infer_structural_deps(driver, except_dependants=provided_dependants)
+                #     # print(dependencies)
+                #     transformations: list[str]
+                #     new_pattern: str
+                #     transformations, new_pattern = dependencies.get_transformations_rel_synthesize(driver)
+                #     with driver.session(database=NEO4J_DATABASE) as session:
+                #         for transformation in transformations:
+                #         #    print(transformation)
+                #         #    print(new_pattern)
+                #             session.run(transformation)
 
                 pass
+            case "slpgd1" | "slpgd2":
+                semantics = 0
+                if method == "slpgd1":
+                    semantics = 1
+                else:
+                    semantics = 2
+
+                provided_dependencies = perform_graph_native_normalization(DATABASE, PASSWORD, URI, USERNAME, database,
+                                                                           provided_dependencies, semantics)
+
             case _:
                 pass
 
@@ -367,15 +389,18 @@ def get_graph_statistics(graph_name: str, method: str | None, database: str, dep
 
 
                 # µ7 == minimality
-                result = session.run(f"""
+                µ7c = f"""
 MATCH {str(dep.pattern).replace("&", ":")} WITH DISTINCT 
 {",".join(map(lambda left: str(left.to_query_string(database))+" AS x"+pascalcase(str(left)), dep.left))},
 {dep.right.to_query_string(database)+" AS x"+pascalcase(str(dep.right))}
 RETURN COUNT(*) AS res
-""")
+"""
+                #print(f"µ7 clusters\n=========={µ7c}")
+                result = session.run(µ7c)
                 record = result.single()
                 if record is not None:
                     c = record["res"]
+
 
                 result = session.run(f"""
 MATCH {str(dep.pattern).replace("&", ":")} WITH  
@@ -387,12 +412,14 @@ RETURN COUNT(*) AS res
                 if record is not None:
                     e = record["res"]
 
+                print("µ7c: ", µ7c)
+
                 minimality = 1 if e == 1 else (c - 1) / (e - 1)
 
                 # µ8
                 result = session.run(f"""
 MATCH {str(dep.pattern).replace("&", ":")} WITH  
-{",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))},
+
 {dep.right.to_query_string(database) + " AS x" + pascalcase(str(dep.right))}, count(*) AS red
 RETURN max(red) AS res
                                 """)

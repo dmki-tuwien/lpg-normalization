@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import operator
 from enum import Enum
 from functools import reduce
 
@@ -163,6 +164,8 @@ class Dependency:
 
         :param string: The string representation of the SLPGD to create. Relies on this `syntax`.
         """
+
+    #    print(f"DepSTR: {string}")
         # TODO: Insert proper link
         # TODO: put command for Antlr Generation into Docker!!
         # antlr4 -Dlanguage=Python3 -lib assets/gql-grammar/ -o slpgd/parser spgds.g4
@@ -179,13 +182,28 @@ class Dependency:
         return listener.dependency
 
     @property
+    def involves_only_edges(self) -> bool:
+        """:returns: whether the dependency only involves edges."""
+        graph_objects: set[GraphObject] = set()
+        for reference in self.left:
+            graph_objects.add(reference.get_graph_object())
+        graph_objects.add(self.right.get_graph_object())
+        return reduce(operator.and_, map(lambda go: isinstance(go, Edge), graph_objects))
+
+    @property
     def involves_only_nodes(self) -> bool:
         """:returns: whether the dependency only involves nodes."""
         graph_objects: set[GraphObject] = set()
         for reference in self.left:
             graph_objects.add(reference.get_graph_object())
         graph_objects.add(self.right.get_graph_object())
-        return sum(map(lambda go: isinstance(go, Node), graph_objects)) < 1
+        return reduce(operator.and_, map(lambda go: isinstance(go, Node), graph_objects))
+
+    def get_references(self) -> set[Reference]:
+        all_refs: set[Reference] = self.left.copy()
+        all_refs.add(self.right)
+
+        return all_refs
 
     def to_latex(self) -> str:
         """:return: A LaTeX representation of the dependency."""
@@ -319,5 +337,3 @@ class _MySLPGDListener(spgdsListener):
         left = self.stack.pop()
         pattern = self.stack.pop()
         self.dependency = Dependency(pattern, left, right)
-
-    #  print(self.dependency)
