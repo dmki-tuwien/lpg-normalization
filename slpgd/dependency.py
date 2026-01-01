@@ -112,6 +112,12 @@ class Reference:
             assert isinstance(self.reference, Property)
             return self.reference.graphObject
 
+    def to_query_string(self, database: str) -> str:
+        """:return: The string representation of the reference that can be used to query the provided database."""
+        if database == "memgraph" and isinstance(self.reference, GraphObject):
+            return f"id({str(self)})"
+        else:
+            return str(self)
 
 class Dependency:
     """Python implementation of an SLPGD.
@@ -172,6 +178,18 @@ class Dependency:
 
         return listener.dependency
 
+    @property
+    def involves_only_nodes(self) -> bool:
+        """:returns: whether the dependency only involves nodes."""
+        graph_objects: set[GraphObject] = set()
+        for reference in self.left:
+            graph_objects.add(reference.get_graph_object())
+        graph_objects.add(self.right.get_graph_object())
+        return sum(map(lambda go: isinstance(go, Node), graph_objects)) < 1
+
+    def to_latex(self) -> str:
+        """:return: A LaTeX representation of the dependency."""
+        return f"${",".join(map(lambda left: str(left.reference), self.left))} \\determ {str(self.right.reference)}$"
 
 class _MySLPGDListener(spgdsListener):
     """`ANTLR listener <https://github.com/antlr/antlr4/blob/4.13.2/doc/listeners.md>`__ for the SLPGDs."""

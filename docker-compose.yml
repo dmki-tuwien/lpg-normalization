@@ -54,6 +54,8 @@ services:
       - "7688:7687"
       - "7444:7444"
     command: [ "--log-level=TRACE", "--telemetry-enabled=false"]
+    volumes:
+      - ./graphs:/graphs
     healthcheck:
       test: [ "CMD-SHELL", "echo 'RETURN 0;' | mgconsole || exit 1" ]
       interval: 10s
@@ -80,7 +82,8 @@ services:
     environment:
       - QUICK_CONNECT_MG_HOST=memgraph
       - QUICK_CONNECT_MG_PORT=7687
-
+    profiles:
+      - docs
   global-lpg-norm:
     build:
       context: .

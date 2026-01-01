@@ -218,6 +218,68 @@ class DependencySet(set):
             )
         )
 
+    def is_in_global_normal_form(self) -> bool:
+        """:returns: :any:`True` when there is no inter-graph dependency, :any:`False` otherwise."""
+        return sum(map(lambda dep: dep.is_inter_graph_object, self)) == 0
+
+    def is_in_1nf(self, session: neo4j.Session) -> bool:
+        result = session.run(
+            "MATCH (n) WHERE apoc.meta.cypher.type(n.property) = 'LIST' RETURN count(n) AS res;"
+        )
+        record = result.single()
+        if record is not None:
+            return record["res"] < 1
+
+    def is_in_2nf(self, session: neo4j.Session) -> bool:
+        """:returns: Trivially returns :any:`True` if a graph is in 1NF, as for the LPG model we consider there cannot be any partial dependencies."""
+        return self.is_in_1nf(session) and True
+
+    def is_in_3nf(self, session: neo4j.Session) -> bool:
+        """:returns: :any:`True` if the graph is in 2NF and there is no transitive dependency between non-key properties its in 3nf."""
+        return self.is_in_2nf(session) and 1 > sum(
+            map(
+                lambda dep: sum(
+                    map(lambda ref: isinstance(ref.reference, Property), dep.left)
+                ),
+                filter(lambda dep: dep.is_intra_graph_object, iter(self)),
+            )
+        )
+
+    def is_in_bcnf(self, session: neo4j.Session) -> bool:
+        """:returns: :any:`True` if there are no transitive dependencies at all in the graph. """
+        return self.is_in_3nf(session)
+
+
+    def get_normal_form(self, session: neo4j.Session) -> str:
+        """
+        :param session: A session that is connected to a Neo4J compatible database
+        :returns: the normal form of the graph in the Neo4J compatible database under this set of dependencies."""
+        res: str
+        if self.is_in_global_normal_form():
+            res = "global GN-"
+        else:
+            res = "local GN-"
+
+        if self.is_in_bcnf(session):
+            res += "BCNF"
+        elif self.is_in_3nf(session):
+            res += "3NF"
+        elif self.is_in_2nf(session):
+            res += "2NF"
+        elif self.is_in_1nf(session):
+            res += "1NF"
+        else:
+            res += "0NF"
+
+        return res
+
+    @property
+    def lp_suitable(self) -> bool:
+        """:returns: :any:`True` when LP normalization (cf. <https://doi.org/10.1007/s00778-025-00902-2>) could be performed on this graph as its dependencies only target nodes and there are no inter graph dependencies."""
+        return self.is_in_global_normal_form() and 1 > sum(
+            map(lambda dep: dep.involves_only_nodes, iter(self))
+        )
+
     def _rel_schema_and_minimal_cover(self) -> RelSchema:
         set_of_rel_fds = FDSet()
         for dep in iter(self):

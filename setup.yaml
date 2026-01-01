@@ -3,6 +3,9 @@ graphs:
     from_file: graphs/lecture.cypher
     dependencies:
       - "(c:Course)<-[t:TEACHES]-():c->t.usingBook"
+    dependency_origin: "User provided"
+    source: "Self-created"
+
   - name: "No Socks 1"
     from_file: graphs/nosocks.cypher
     dependencies:
@@ -12,6 +15,9 @@ graphs:
       - "(e:Event):e.name,e.time->e.venue"
       - "(e:Event):e.time,e.venue->e.name"
      # - "(e:Event):e.company,e.time->e.company"
+    dependency_origin: "User provided"
+    source: "\\cite{skavantzos_third_2025}"
+
   - name: "No Socks 2"
     from_file: graphs/nosocks.cypher
     dependencies:
@@ -21,9 +27,14 @@ graphs:
       - "(e:Event&Confirmed):e.name,e.time->e.venue"
       - "(e:Event&Confirmed):e.time,e.venue->e.name"
       - "(e:Event&Confirmed):e.name,e.company->e.time"
+    dependency_origin: "User provided"
+    source: "\\cite{skavantzos_third_2025}"
+
   - name: "Northwind Orders"
     neo4j:
       from_file: graphs/northwind/scripts/northwind.cypher
+    #memgraph:
+    #  from_file: graphs/northwind_memgraph.cypher
     dependencies:
       - "(o:Order):o.shipCity,o.shipCountry->o.shipRegion"
       - "(o:Order):o.shipCity,o.shipAddress->o.shipCountry"
@@ -56,8 +67,21 @@ graphs:
       - "(o:Order):o.shipCountry,o.shipAddress,o.employeeID->o.shipName"
       - "(o:Order):o.customerID,o.employeeID->o.shipName"
       - "(o:Order):o.shipAddress,o.employeeID->o.shipName"
-  - name: "London Public Transport - Local only"
+    dependency_origin: "Mined by \\citet{skavantzos_third_2025}"
+    source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
+
+  - name: "London Public Transport"
     neo4j:
-      from_file: graphs/transport-for-london.cypher
+      from_file: graphs/london_neo4j.cypher
+  #  memgraph:
+  #    from_file: graphs/london_memgraph.cypher
     dependencies:
       - "(s:Station)-[c]->(t:Station):s.zone->s.zoneOriginal"
+      - "(s:Station)-[c]->(t:Station):c.line->c.color"
+    dependency_origin: "User provided"
+    source: "Extended based on \\url{https://github.com/neo4j-partners/neo4j-transport-for-london}"
+
+#  - name: "Offshore Entities"
+#    from_file: graphs/offshore.cypher
+#    dependencies:
+#      - "(e:Entity):e.jurisd_desc,e.lastEditTimestamp,e.sourceID->e.jurisdiction"
