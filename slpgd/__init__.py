@@ -223,12 +223,25 @@ class DependencySet(set):
         return sum(map(lambda dep: dep.is_inter_graph_object, self)) == 0
 
     def is_in_1nf(self, session: neo4j.Session) -> bool:
+        no_of_nodes_with_list = 0
+        no_of_edges_with_list = 0
+
         result = session.run(
-            "MATCH (n) WHERE apoc.meta.cypher.type(n.property) = 'LIST' RETURN count(n) AS res;"
+            "MATCH (n) WHERE any(key IN keys(n) WHERE apoc.meta.cypher.type(n[key]) = 'LIST') RETURN count(n) AS res;"
         )
         record = result.single()
         if record is not None:
-            return record["res"] < 1
+            no_of_nodes_with_list = record["res"]
+
+        result = session.run(
+            "MATCH ()-[e]-() WHERE any(key IN keys(e) WHERE apoc.meta.cypher.type(e[key]) = 'LIST') RETURN count(e) AS res;"
+        )
+        record = result.single()
+        if record is not None:
+            no_of_edges_with_list = record["res"]
+
+        return (no_of_nodes_with_list+no_of_edges_with_list) == 0
+
 
     def is_in_2nf(self, session: neo4j.Session) -> bool:
         """:returns: Trivially returns :any:`True` if a graph is in 1NF, as for the LPG model we consider there cannot be any partial dependencies."""
@@ -276,20 +289,33 @@ class DependencySet(set):
     @property
     def lp_suitable(self) -> bool:
         """:returns: :any:`True` when LP normalization (cf. <https://doi.org/10.1007/s00778-025-00902-2>) could be performed on this graph as its dependencies only target nodes and there are no inter graph dependencies."""
-        return self.is_in_global_normal_form() and 1 > sum(
-            map(lambda dep: dep.involves_only_nodes, iter(self))
-        )
+        return self.is_in_global_normal_form() and reduce(operator.and_, map(lambda dep: dep.involves_only_nodes, iter(self)))
 
     def _rel_schema_and_minimal_cover(self) -> RelSchema:
         set_of_rel_fds = FDSet()
         for dep in iter(self):
-            left = set(map(lambda x: str(x), dep.left))
+            left = set(map(str, dep.left))
             right = {str(dep.right)}
             set_of_rel_fds.add(FD(left, right))
 
         minimal_cover = set_of_rel_fds.basis()
         rel_schema = RelSchema(set_of_rel_fds.attributes(), minimal_cover)
         return rel_schema
+
+    def get_minimal_cover(self) -> DependencySet:
+        set_of_rel_fds = FDSet()
+        for dep in iter(self):
+            left = set(map(str, dep.left))
+            right = {str(dep.right)}
+            set_of_rel_fds.add(FD(left, right))
+
+        minimal_cover = set_of_rel_fds.basis()
+
+        mimimal_dep_list: list[str] = []
+        for fd in minimal_cover:
+            mimimal_dep_list.append(f"{self.dependency_pattern}:{", ".join(fd.lhs)} -> {", ".join(fd.rhs)}")
+        print(mimimal_dep_list)
+        return DependencySet.from_string_list(mimimal_dep_list)
 
     def get_transformations_rel_synthesize(
         self, con: neo4j.Driver, database="neo4j"
