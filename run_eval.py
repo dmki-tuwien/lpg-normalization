@@ -158,7 +158,7 @@ def main():
     per_dep_metrics_df = per_dep_metrics_df.loc[per_dep_metrics_df[DATABASE_COL]=="Neo4J"]
     per_dep_metrics_df = per_dep_metrics_df.set_index([GRAPH_COL, DATABASE_COL, METHOD_COL, DEPENDENCY_COL])
     per_dep_metrics_df.to_csv("out/per_dep_metrics.csv")
-    per_dep_metrics_df.style.format(precision=3).to_latex("out/per_dep_metrics.latex")
+    per_dep_metrics_df.style.format(precision=3).to_latex("out/per_dep_metrics.latex", hrules=True, clines="all;index", siunitx=True)
 
 
 def perform_experiment_for_graph(graph: dict, database: str):
@@ -403,16 +403,16 @@ RETURN COUNT(*) AS res
 
 
                 result = session.run(f"""
-MATCH {str(dep.pattern).replace("&", ":")} WITH  
-{",".join(map(lambda left: str(left.to_query_string(database))+" AS x"+pascalcase(str(left)), dep.left))},
-{dep.right.to_query_string(database)+" AS x"+pascalcase(str(dep.right))}
+MATCH {str(dep.pattern).replace("&", ":")} WITH DISTINCT 
+{",".join(map(lambda left: f"toString(id({left.get_graph_object().symbol}))+toStringOrNull({str(left.to_query_string(database))}) AS x{pascalcase(str(left))}", dep.left))},
+toString(id({dep.right.get_graph_object().symbol}))+toStringOrNull({dep.right.to_query_string(database)}) AS x{pascalcase(str(dep.right))}
 RETURN COUNT(*) AS res
                 """)
                 record = result.single()
                 if record is not None:
                     e = record["res"]
 
-                print("µ7c: ", µ7c)
+               # print("µ7c: ", µ7c)
 
                 minimality = 1 if e == 1 else (c - 1) / (e - 1)
 

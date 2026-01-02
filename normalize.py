@@ -12,9 +12,9 @@ from slpgd import DependencySet, Dependency, Node
 def perform_graph_native_normalization(DATABASE: str | None, PASSWORD: str | None, URI: str | None,
                                        USERNAME: str | None, database: Literal["memgraph"] | str,
                                        provided_dependencies: DependencySet, semantics: int) -> DependencySet:
-    con = Neo4jGraph(URI, database=DATABASE, username=USERNAME, password=PASSWORD)
 
-    AUTH = (USERNAME, PASSWORD)
+    con = Neo4jGraph(URI, database=DATABASE, username=USERNAME, password=PASSWORD)
+    auth = (USERNAME, PASSWORD)
 
     def _apply_transformation_rule(rule: Rule):
         transformation = Transformation([rule])
@@ -22,7 +22,7 @@ def perform_graph_native_normalization(DATABASE: str | None, PASSWORD: str | Non
         transformation.eject()
 
     def _apply_transformation_query(query: str):
-        with GraphDatabase.driver(URI, auth=AUTH if database == "neo4j" else None) as driver:
+        with GraphDatabase.driver(URI, auth=auth if database == "neo4j" else None) as driver:
             with driver.session(database=DATABASE) as session:
                 session.run(query)
 
@@ -30,8 +30,8 @@ def perform_graph_native_normalization(DATABASE: str | None, PASSWORD: str | Non
 
     print(semantics)
     i = 0
-    # Get canonical cover?
 
+    # Get canonical cover of dependencies
     minimal_dep_set: DependencySet = provided_dependencies.get_minimal_cover()
     transformed_deps_list: list[str] = []
 
@@ -57,7 +57,13 @@ def perform_graph_native_normalization(DATABASE: str | None, PASSWORD: str | Non
         #                     pass
         pass
 
-    # Local (ψ_L1 (psi_L1) and  ψ_L2 (psi_L2))
+
+
+
+    # # # # # # # # # # # # # # # # # # # # # # #
+    #  Local (ψ_L1 (psi_L1) and  ψ_L2 (psi_L2)) #
+    # # # # # # # # # # # # # # # # # # # # # # #
+
     local_deps: set[Dependency] = set(filter(lambda dep: dep.is_intra_graph_object, minimal_dep_set))
     for local_dep in local_deps:
         local_dep_left_concat: str = ",".join(map(str, local_dep.left))
@@ -65,9 +71,10 @@ def perform_graph_native_normalization(DATABASE: str | None, PASSWORD: str | Non
             map(lambda ref: f"{pascalcase(ref)} = {ref}", map(str, local_dep.get_references())))
         new_label: str = pascalcase(" ".join(map(str, local_dep.get_references())))
 
-        print(new_properties)
-
-        if local_dep.involves_only_nodes:  # ψ_L1 (psi_L1)
+        # # # # # # # # # #
+        #  ψ_L1 (psi_L1)  #
+        # # # # # # # # # #
+        if local_dep.involves_only_nodes:
             node: Node = local_dep.right.reference.graphObject
 
             _apply_transformation_rule(Rule(f'''
@@ -96,6 +103,10 @@ def perform_graph_native_normalization(DATABASE: str | None, PASSWORD: str | Non
 {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, local_dep.left)))}
 ->x{i}.{pascalcase(str(local_dep.right.reference))}""")
 
+
+        # # # # # # # # # #
+        #  ψ_L2 (psi_L2)  #
+        # # # # # # # # # #
         if local_dep.involves_only_edges:  # ψ_L2 (psi_L2)  --> Reification
             edge: Edge = local_dep.right.reference.graphObject
 
@@ -126,24 +137,9 @@ def perform_graph_native_normalization(DATABASE: str | None, PASSWORD: str | Non
 
         i += 1
 
-    # transformation_rules: list[Rule]
-    # queries: list[str]
-    # new_deps: DependencySet
-    #
-    # transformation_rules, queries, new_deps = provided_dependencies.get_transformations_graph_native(driver, semantics=1)
-
-    # for transformation in transformation_rules:
-    #     if isinstance(transformation, Rule):
-    #         transformation = Transformation([transformation])
-    #         transformation.apply_on(con)
-    #         transformation.eject()
-    #     else:
-    #         with GraphDatabase.driver(URI, auth=AUTH if database == "neo4j" else None) as driver:
-    #             with driver.session(database=DATABASE) as session:
-    #                 session.run(transformation)
 
     for query in cleanup_queries:
-        with GraphDatabase.driver(URI, auth=AUTH if database == "neo4j" else None) as driver:
+        with GraphDatabase.driver(URI, auth=auth if database == "neo4j" else None) as driver:
             with driver.session(database=DATABASE) as session:
                 session.run(query)
 
