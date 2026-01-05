@@ -4,17 +4,17 @@ from typing import Literal
 from caseconverter import pascalcase
 from dtgraph import Rule, Transformation
 from dtgraph.backend.neo4j.graph import Neo4jGraph
-from neo4j import GraphDatabase
+from neo4j import GraphDatabase, Driver
 
 from slpgd import DependencySet, Dependency, Node
 
 
-def perform_graph_native_normalization(DATABASE: str | None, PASSWORD: str | None, URI: str | None,
-                                       USERNAME: str | None, database: Literal["memgraph"] | str,
+def perform_graph_native_normalization(driver: Driver, database: Literal["memgraph"] | str,
                                        provided_dependencies: DependencySet, semantics: int) -> DependencySet:
 
-    con = Neo4jGraph(URI, database=DATABASE, username=USERNAME, password=PASSWORD)
-    auth = (USERNAME, PASSWORD)
+    # Create a DTGraph Neo4jGraph instance with a non-sense driver
+    con = Neo4jGraph("URI", database="DATABASE", username="USERNAME", password="PASSWORD")
+    con.driver = driver # Replace the driver with the actual driver
 
     def _apply_transformation_rule(rule: Rule):
         transformation = Transformation([rule])

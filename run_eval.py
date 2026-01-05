@@ -1,36 +1,34 @@
 import logging
 import os
 import time
-import uuid
 
-from caseconverter import pascalcase
 import yaml
 import pandas as pd
+
+from caseconverter import pascalcase
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.wait_strategies import LogMessageWaitStrategy
+from testcontainers.neo4j import Neo4jContainer
 
-from neo4j import GraphDatabase, Query
+from neo4j import GraphDatabase, Query, Driver, Neo4jDriver
 from plotnine import *
 from dotenv import load_dotenv
 
 import slpgd
+
+from constants import *
 from normalize import perform_graph_native_normalization
 from slpgd import DependencySet
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-neo4j_log = logging.getLogger("neo4j") # The logger used by the Neo4J Python driver (not to confuse with the actual Neo4J instance!)
+neo4j_log = logging.getLogger("neo4j")
+"""The logger used by the Neo4J Python driver. Not to confuse with actual Neo4J instances!"""
 neo4j_log.setLevel(logging.WARNING)
 
 load_dotenv() # Required to get content of .env when not using Docker
 
-CONTAINER_TIMEOUT = 30
-"""Timeout for Docker containers to come online after creation."""
-
-# Neo4J Authentication
-USERNAME = "neo4j" if os.getenv("USERNAME") is None else os.getenv("USERNAME")
-PASSWORD = "neo4j" if os.getenv("PASSWORD") is None else os.getenv("PASSWORD")
-AUTH = (USERNAME, PASSWORD)
+GRAPHS_PATH = os.getenv("GRAPHS_PATH")
 
 # Memgraph Connection
 MEMGRAPH_DATABASE = "memgraph" if os.getenv("MEMGRAPH_DATABASE") is None else os.getenv("MEMGRAPH_DATABASE")
@@ -41,32 +39,6 @@ NEO4J_URI = "neo4j://localhost" if os.getenv("NEO4J_URI") is None else os.getenv
 NEO4J_DATABASE = "neo4j" if os.getenv("NEO4J_DATABASE") is None else os.getenv("NEO4J_DATABASE")
 
 # Statistics and Metrics Export configuration
-AVG_RED_COUNT_COL = "m6_avg_red_count"
-DATABASE_COL = "database"
-DEPENDENCY_COL = "dependency"
-GRAPH_COL = "graph"
-GRAPH_SOURCE_COL = "graph_source"
-LP_POSSIBLE_COL = "lp_possible"
-MAX_RED_COUNT_COL = "m5_max_red_count"
-MAX_INC_COUNT_COL = "m8_max_inc_count"
-METHOD_COL = "method"
-METRIC_COL = "metric"
-MINIMALITY_COL = "m7_minimality"
-NO_INTER_GRAPH_DEPS_COL = "no_inter_deps"
-NO_INTRA_GRAPH_DEPS_COL = "no_intra_deps"
-ORIGIN_OF_DEPS_COL = "dep_origin"
-ORIGINAL_NF_COL = "original_nf"
-PDF_METADATA = {
-    # 'Title': '',
-    'Author': 'The Orb of Evaluation',
-    # 'Subject': '',
-    # 'Keywords': 'plotnine, python',
-    'Creator': 'The Dominion'
-}
-RUN_ID_COL = "run_id"
-RUN_ID = str(uuid.uuid4())
-TIMESTAMP_COL = "timestamp"
-VALUE_COL = "value"
 per_graph_metrics_df = pd.DataFrame(columns=[GRAPH_COL,
                                              METHOD_COL,
                                              METRIC_COL,
@@ -90,9 +62,9 @@ graph_overview_df = pd.DataFrame(columns=[GRAPH_COL,
                                           ORIGINAL_NF_COL,
                                           LP_POSSIBLE_COL])
 
+
 setup: dict
 """The configuration of the evaluation. Defines the used datasets and dependencies."""
-
 with open("setup.yaml", 'r') as file:
     setup = yaml.safe_load(file)
 
@@ -114,19 +86,25 @@ def main():
 
     test_docker_container_creation()
 
-    logger.info("Start evaluation")
+    logger.info("🚀 Start evaluation")
 
     if len(setup["graphs"]) < 1:
-        logger.error("No graphs found in setup.yaml")
+        logger.error("\"setup.yaml\" does not contain any graph.")
         exit(1)
 
     for database in ["neo4j", "memgraph"]:
         for graph in setup["graphs"]:
-            perform_experiment_for_graph(graph, database)
+            perform_evaluation(graph, database)
 
-    logger.info("Finished experiments")
+    logger.info("✅ Finished evaluation")
 
-    logger.info("Create plot and export CSV results.")
+    export_tables_and_plots()
+
+
+
+def export_tables_and_plots():
+    """Exports the computed statistics as CSV and LaTeX tables, as well as PDF plots (only per graph statistics)."""
+    logger.info("📊 Create plot and export CSV results.")
     plot_height = 2 * len(setup["graphs"])
     plot_metrics = (ggplot(per_graph_metrics_df, aes(x=METHOD_COL, y=VALUE_COL, fill=DATABASE_COL))
                     + geom_col(position="dodge")
@@ -137,21 +115,21 @@ def main():
                 va='bottom'
             )
                     + facet_grid(f"{GRAPH_COL} ~ {METRIC_COL}", scales='free_y')
-           #         + scale_y_continuous(limits=(0, max(metrics_df[VALUE_COL])*1.1))  # Set the new upper limit
+                    #         + scale_y_continuous(limits=(0, max(metrics_df[VALUE_COL])*1.1))  # Set the new upper limit
                     + scale_y_continuous(expand=(0, 0, 0.1, 0))
                     + theme_bw()
                     + theme(axis_text_x=element_text(
-                                angle=45,
-                                ha='right'
-                            ),
-                            figure_size=(8, plot_height)
-                        )
+                angle=45,
+                ha='right'
+            ),
+                figure_size=(8, plot_height)
+            )
                     )
 
     try:
         os.mkdir("out")
     except FileExistsError:
-        pass
+        pass  # It's fine if the output folder is already there :)
 
     plot_metrics.save("out/plot.pdf", metadata=PDF_METADATA, verbose=False)
 
@@ -161,33 +139,56 @@ def main():
     per_graph_metrics_df.to_csv("out/metrics.csv", index=False)
 
     global per_dep_metrics_df
-    per_dep_metrics_df = per_dep_metrics_df.loc[per_dep_metrics_df[DATABASE_COL]=="Neo4J"]
+    per_dep_metrics_df = per_dep_metrics_df.loc[per_dep_metrics_df[DATABASE_COL] == "Neo4J"]
     per_dep_metrics_df = per_dep_metrics_df.set_index([GRAPH_COL, DATABASE_COL, METHOD_COL, DEPENDENCY_COL])
     per_dep_metrics_df.to_csv("out/per_dep_metrics.csv")
-    per_dep_metrics_df.style.format(precision=3).to_latex("out/per_dep_metrics.latex", hrules=True, clines="all;index", siunitx=True)
+    per_dep_metrics_df.style.format(precision=3).to_latex("out/per_dep_metrics.latex", hrules=True, clines="all;index",
+                                                          siunitx=True)
 
 
-def perform_experiment_for_graph(graph: dict, database: str):
-    match database:
-        case "memgraph":
-            URI = MEMGRAPH_URI
-            DATABASE = MEMGRAPH_DATABASE
-            USERNAME = None
-            PASSWORD = None
-        case _:
-            URI = NEO4J_URI
-            DATABASE = NEO4J_DATABASE
-            USERNAME = "neo4j"
-            PASSWORD = "johannes"
+def perform_evaluation(graph: dict, database: str):
+    logger.info(f"\tPerform experiment with graph \"{graph['name']}\" and database \"{database}\".")
 
-    logger.info(f"\tPerform experiment with graph \"{graph['name']}\"")
+    DATABASE = database
+    container: DockerContainer | Neo4jContainer
+    """A testcontainer Container of Neo4j or Memgraph. By using it in a \"with\" clause, testcontainers automatically cleans used containers up."""
+    driver: Driver
+    """A Neo4J driver connected to the database running in :any:`container`."""
 
-    measured_denormalized = False
+    for method in ["slpgd"]:  # ,"slpgd1","slpgd2"]: #, "semantics1", "semantics2"]: # TODO: Enum?
+        # 1. Get a fresh database container
+        if database == "memgraph":
+            container = DockerContainer("memgraph:3.7.2")
+        else:
+            assert database == "neo4j"
+            container = Neo4jContainer("neo4j:2025.11")
+            container.with_volume_mapping(GRAPHS_PATH, "/tmp/graphs") #"/var/lib/neo4j/import/graphs")
 
-    for method in ["slpgd1"]: #,"slpgd1","slpgd2"]: #, "semantics1", "semantics2"]: # TODO: Enum?
-        # 1. Clean up the database, as it may contain old data
-        with GraphDatabase.driver(URI, auth=AUTH) as driver:
-            driver.execute_query("MATCH (n) DETACH DELETE n")
+            start_sh: str = ""
+
+            # Copy the required file(s) into the newly created Neo4J container
+            if "from_file" in graph.keys():
+                start_sh += f"cp /tmp/{graph['from_file']} /var/lib/neo4j/import/{graph['from_file']} && "
+            elif "neo4j" in graph.keys() and "from_file" in graph["neo4j"].keys():
+                start_sh += f"cp /tmp/{graph["neo4j"]['from_file']} /var/lib/neo4j/import/{graph["neo4j"]['from_file']} && "
+            elif "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
+                start_sh += f"cp /tmp/{graph["neo4j"]['from_dump']} /var/lib/neo4j/import/{graph["neo4j"]['from_dump']} && "
+
+            start_sh += f"chown -R neo4j:neo4j /var/lib/neo4j/import/ && "
+
+            if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
+                f"neo4j-admin load --from /var/lib/neo4j/import/{graph["neo4j"]['from_dump']} [--database \"database\"] && "
+
+            start_sh += "exec /startup/docker-entrypoint.sh neo4j"
+
+        with container:
+            if database == "memgraph":
+                uri = f"{container.get_container_host_ip()}:7687"
+                driver = GraphDatabase.driver(uri, auth=None)
+            else:
+                assert database == "neo4j"
+                print(container.get_connection_url())
+                driver = container.get_driver()
 
         # 2. Insert denormalized graph
         match database:
@@ -202,12 +203,12 @@ def perform_experiment_for_graph(graph: dict, database: str):
                     create_graph_queries_str = filename.read()
                     create_graph_queries = [s.strip() for s in (create_graph_queries_str.split(';')) if s.strip()]
 
-                    with GraphDatabase.driver(URI).session(database=DATABASE) as session:
+                    with driver.session(database=DATABASE) as session:
                         for query in create_graph_queries:
                          #   print(query)
                             session.run(query)
             case _:
-                with GraphDatabase.driver(NEO4J_URI, auth=AUTH).session(database=DATABASE) as session:
+                with driver.session(database=DATABASE) as session:
                     if "from_file" in graph.keys():
                         file = graph['from_file']
                     elif "neo4j" in graph.keys():
@@ -249,7 +250,7 @@ def perform_experiment_for_graph(graph: dict, database: str):
                 else:
                     semantics = 2
 
-                provided_dependencies = perform_graph_native_normalization(DATABASE, PASSWORD, URI, USERNAME, database,
+                provided_dependencies = perform_graph_native_normalization(driver, database,
                                                                            provided_dependencies, semantics)
 
             case _:
@@ -342,12 +343,12 @@ def get_graph_statistics(graph_name: str, method: str | None, database: str, dep
                 inter_deps_count = sum(map(lambda dep: dep.is_inter_graph_object, dependencies))
                 intra_deps_count = sum(map(lambda dep: dep.is_intra_graph_object, dependencies))
                 overview_res.append({GRAPH_COL: graph_name,
-                                      GRAPH_SOURCE_COL: graph_setup["source"] if "source" in graph_setup.keys() is not None else "unknwon",
-                                      NO_INTER_GRAPH_DEPS_COL: inter_deps_count,
-                                      NO_INTRA_GRAPH_DEPS_COL: intra_deps_count,
-                                      ORIGIN_OF_DEPS_COL: graph_setup["dependency_origin"] if "dependency_origin" in graph_setup.keys() is not None else "unknwon",
-                                      ORIGINAL_NF_COL: dependencies.get_normal_form(session),
-                                      LP_POSSIBLE_COL: "$\\checkmark$" if dependencies.lp_suitable else "$\\times$",
+                                     GRAPH_SOURCE_COL: graph_setup["source"] if "source" in graph_setup.keys() is not None else "unknwon",
+                                     NO_INTER_GRAPH_DEPS_COL: inter_deps_count,
+                                     NO_INTRA_GRAPH_DEPS_COL: intra_deps_count,
+                                     ORIGIN_OF_DEPS_COL: graph_setup["dependency_origin"] if "dependency_origin" in graph_setup.keys() is not None else "unknwon",
+                                     ORIGINAL_NF_COL: dependencies.get_normal_form(session),
+                                     LP_POSSIBLE_COL: "$\\checkmark$" if dependencies.lp_suitable else "$\\times$",
                                      })
         overview_df = pd.DataFrame(overview_res)
         global graph_overview_df
@@ -434,14 +435,14 @@ RETURN max(red) AS res
                     m8 = record["res"]
 
             dep_res.append({GRAPH_COL: graph_name,
-                                           DATABASE_COL: "Neo4J" if database == "neo4j" else "Memgraph",
-                                           DEPENDENCY_COL: dep.to_latex(),
-                                           METHOD_COL: method,
-                                           MAX_RED_COUNT_COL: m5,
-                                           AVG_RED_COUNT_COL: m6,
-                                           MINIMALITY_COL: minimality,
-                                           MAX_INC_COUNT_COL: m8,
-                                       })
+                            DATABASE_COL: "Neo4J" if database == "neo4j" else "Memgraph",
+                            DEPENDENCY_COL: dep.to_latex(),
+                            METHOD_COL: method,
+                            MAX_RED_COUNT_COL: m5,
+                            AVG_RED_COUNT_COL: m6,
+                            MINIMALITY_COL: minimality,
+                            MAX_INC_COUNT_COL: m8,
+                            })
             
     dep_df = pd.DataFrame(dep_res)
     global per_dep_metrics_df
@@ -478,7 +479,8 @@ def test_connection_to_memgraph(uri):
         driver.verify_connectivity()
 
 def test_docker_container_creation():
-    """Tests whether the `testcontainers` package is able to create Docker containers."""
+    """Tests whether the `testcontainers` package is able to create Docker containers.
+    If the creation files the evaluation is exited as no experiments can be run."""
     logging.info("Testing Docker container creation by creating a simple container that logs \"Hello World!\".")
     with DockerContainer("alpine").with_command("echo 'Hello world!' && tail -f /dev/null") as container:
         try:
