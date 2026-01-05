@@ -4,9 +4,10 @@ import time
 import uuid
 
 from caseconverter import pascalcase
-import neo4j.exceptions
 import yaml
 import pandas as pd
+from testcontainers.core.container import DockerContainer
+from testcontainers.core.wait_strategies import LogMessageWaitStrategy
 
 from neo4j import GraphDatabase, Query
 from plotnine import *
@@ -18,10 +19,13 @@ from slpgd import DependencySet
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-neo4j_log = logging.getLogger("neo4j")
+neo4j_log = logging.getLogger("neo4j") # The logger used by the Neo4J Python driver (not to confuse with the actual Neo4J instance!)
 neo4j_log.setLevel(logging.WARNING)
 
 load_dotenv() # Required to get content of .env when not using Docker
+
+CONTAINER_TIMEOUT = 30
+"""Timeout for Docker containers to come online after creation."""
 
 # Neo4J Authentication
 USERNAME = "neo4j" if os.getenv("USERNAME") is None else os.getenv("USERNAME")
@@ -57,7 +61,7 @@ PDF_METADATA = {
     'Author': 'The Orb of Evaluation',
     # 'Subject': '',
     # 'Keywords': 'plotnine, python',
-    'Creator': 'The Dominion'  # Optional, usually set by matplotlib
+    'Creator': 'The Dominion'
 }
 RUN_ID_COL = "run_id"
 RUN_ID = str(uuid.uuid4())
@@ -87,28 +91,30 @@ graph_overview_df = pd.DataFrame(columns=[GRAPH_COL,
                                           LP_POSSIBLE_COL])
 
 setup: dict
+"""The configuration of the evaluation. Defines the used datasets and dependencies."""
+
 with open("setup.yaml", 'r') as file:
     setup = yaml.safe_load(file)
 
 def main():
+    # try:
+    #     test_connection_to_neo4j()
+    # except neo4j.exceptions.ServiceUnavailable:
+    #     logger.error("Could not connect to Neo4j")
+    #     exit(1)
+    # logger.info("✅ Connection to Neo4J was successful")
+    #
+    # try:
+    #     test_connection_to_memgraph()
+    # except neo4j.exceptions.ServiceUnavailable:
+    #     logger.error("Could not connect to Memgraph")
+    #     exit(1)
+    # logger.info("✅ Connection to Memgraph was successful")
+    #
 
-    try:
-        test_connection_to_neo4j()
-    except neo4j.exceptions.ServiceUnavailable:
-        logger.error("Could not connect to Neo4j")
-        exit(1)
-    logger.info("✅ Connection to Neo4J was successful")
+    test_docker_container_creation()
 
-    try:
-        test_connection_to_memgraph()
-    except neo4j.exceptions.ServiceUnavailable:
-        logger.error("Could not connect to Memgraph")
-        exit(1)
-    logger.info("✅ Connection to Memgraph was successful")
-
-
-
-    logger.info("Start experiments")
+    logger.info("Start evaluation")
 
     if len(setup["graphs"]) < 1:
         logger.error("No graphs found in setup.yaml")
@@ -458,13 +464,30 @@ RETURN max(red) AS res
 
 
 
-def test_connection_to_neo4j():
-    with GraphDatabase.driver(NEO4J_URI, auth=AUTH) as driver:
+def test_connection_to_neo4j(uri: str, username: str = "neo4j", password: str = None):
+    """Tests whether a connection to the Neo4j database is successful.
+
+    :param uri: URI of the Neo4j database
+    :param username: Username
+    :param password: Password"""
+    with GraphDatabase.driver(uri, auth=(username,password)) as driver:
         driver.verify_connectivity()
 
-def test_connection_to_memgraph():
-    with GraphDatabase.driver(MEMGRAPH_URI) as driver:
+def test_connection_to_memgraph(uri):
+    with GraphDatabase.driver(uri) as driver:
         driver.verify_connectivity()
+
+def test_docker_container_creation():
+    """Tests whether the `testcontainers` package is able to create Docker containers."""
+    logging.info("Testing Docker container creation by creating a simple container that logs \"Hello World!\".")
+    with DockerContainer("alpine").with_command("echo 'Hello world!' && tail -f /dev/null") as container:
+        try:
+            container.waiting_for(LogMessageWaitStrategy("Hello world!"))
+        except Exception:
+            logging.error(f"Running the \"Hello World!\" Docker container failed.")
+            exit()
+    logging.info(f"The \"Hello World!\" Docker container was run successfully.")
+
 
 if __name__ == "__main__":
     main()
