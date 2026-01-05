@@ -9,11 +9,11 @@ from neo4j import GraphDatabase, Driver
 from slpgd import DependencySet, Dependency, Node
 
 
-def perform_graph_native_normalization(driver: Driver, database: Literal["memgraph"] | str,
+def perform_graph_native_normalization(driver: Driver, database: Literal["memgraph"] | str, DATABASE,
                                        provided_dependencies: DependencySet, semantics: int) -> DependencySet:
 
     # Create a DTGraph Neo4jGraph instance with a non-sense driver
-    con = Neo4jGraph("URI", database="DATABASE", username="USERNAME", password="PASSWORD")
+    con = Neo4jGraph("bolt://memgraph:7687", database="DATABASE", username="USERNAME", password="PASSWORD")
     con.driver = driver # Replace the driver with the actual driver
 
     def _apply_transformation_rule(rule: Rule):
@@ -22,9 +22,8 @@ def perform_graph_native_normalization(driver: Driver, database: Literal["memgra
         transformation.eject()
 
     def _apply_transformation_query(query: str):
-        with GraphDatabase.driver(URI, auth=auth if database == "neo4j" else None) as driver:
-            with driver.session(database=DATABASE) as session:
-                session.run(query)
+        with driver.session(database=DATABASE) as session:
+            session.run(query)
 
     pattern = str(provided_dependencies.dependency_pattern)
 
@@ -139,9 +138,8 @@ def perform_graph_native_normalization(driver: Driver, database: Literal["memgra
 
 
     for query in cleanup_queries:
-        with GraphDatabase.driver(URI, auth=auth if database == "neo4j" else None) as driver:
-            with driver.session(database=DATABASE) as session:
-                session.run(query)
+        with driver.session(database=DATABASE) as session:
+            session.run(query)
 
     provided_dependencies = DependencySet.from_string_list(list(map(lambda x: f"{pattern}:{x}", transformed_deps_list)))
     return provided_dependencies
