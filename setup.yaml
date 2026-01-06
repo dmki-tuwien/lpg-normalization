@@ -1,4 +1,17 @@
 graphs:
+  - name: "Rijden de Treinen"
+    neo4j:
+      from_dump: graphs/rijden.dump
+     # from_file: graphs/rijdendetreinen_neo4j.cypher
+    dependencies:
+      - "()-[t:STOPS_AT]->(s:Station):s.name->t.code"
+
+#  - name: "Offshore Entities"
+#    neo4j:
+#      from_dump: graphs/offshore.dump
+#    dependencies:
+#      - "(e:Entity):e.jurisdiction_description,e.lastEditTimestamp,e.sourceID->e.jurisdiction"
+
   - name: "Lecture uses Book"
     from_file: graphs/lecture.cypher
     dependencies:
@@ -74,14 +87,9 @@ graphs:
     neo4j:
       from_file: graphs/london_neo4j.cypher
   #  memgraph:
-  #    from_file: graphs/london_memgraph.cypher
+  #    from_file: graphs/london_memgraph.cypher --> I cant find the error here :(
     dependencies:
       - "(s:Station)-[c]->(t:Station):s.zone->s.zoneOriginal"
       - "(s:Station)-[c]->(t:Station):c.line->c.color"
     dependency_origin: "User provided"
     source: "Extended based on \\url{https://github.com/neo4j-partners/neo4j-transport-for-london}"
-
-#  - name: "Offshore Entities"
-#    from_file: graphs/offshore.cypher
-#    dependencies:
-#      - "(e:Entity):e.jurisd_desc,e.lastEditTimestamp,e.sourceID->e.jurisdiction"

@@ -50,10 +50,10 @@ per_dep_metrics_df = pd.DataFrame(columns=[GRAPH_COL,
                                            DATABASE_COL,
                                            DEPENDENCY_COL,
                                            METHOD_COL,
-                                           MAX_RED_COUNT_COL,
-                                           AVG_RED_COUNT_COL,
+                                           MAX_INC_COUNT_COL,
+                                           AVG_INC_COUNT_COL,
                                            MINIMALITY_COL,
-                                           MAX_INC_COUNT_COL])
+                                           RED_COUNT_COL])
 graph_overview_df = pd.DataFrame(columns=[GRAPH_COL,
                                           GRAPH_SOURCE_COL,
                                           NO_INTER_GRAPH_DEPS_COL,
@@ -92,7 +92,7 @@ def main():
         logger.error("\"setup.yaml\" does not contain any graph.")
         exit(1)
 
-    for database in ["memgraph", "neo4j"]:
+    for database in ["neo4j", "memgraph"]:
         for graph in setup["graphs"]:
             perform_evaluation(graph, database)
 
@@ -169,19 +169,9 @@ def perform_evaluation(graph: dict, database: str):
             container.with_env("NEO4J_apoc_import_file_enabled", "true")
 
             start_sh: str = "ls -la /var/lib/neo4j/import && cp -R /tmp/graphs /var/lib/neo4j/import &&"
-
-            # # Copy the required file(s) into the newly created Neo4J container
-            # if "from_file" in graph.keys():
-            #     start_sh += f"cp /tmp/{graph['from_file']} /var/lib/neo4j/import/{graph['from_file']} && "
-            # elif "neo4j" in graph.keys() and "from_file" in graph["neo4j"].keys():
-            #     start_sh += f"cp /tmp/{graph["neo4j"]['from_file']} /var/lib/neo4j/import/{graph["neo4j"]['from_file']} && "
-            # elif "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
-            #     start_sh += f"cp /tmp/{graph["neo4j"]['from_dump']} /var/lib/neo4j/import/{graph["neo4j"]['from_dump']} && "
-
             start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && ls -la /var/lib/neo4j/import && "
             if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
-                start_sh += f"neo4j-admin load --from /var/lib/neo4j/import/{graph["neo4j"]['from_dump']} [--database \"database\"] && "
-
+                start_sh += f"{{ cat /var/lib/neo4j/import/{graph["neo4j"]['from_dump']} | neo4j-admin database load --from-stdin neo4j --overwrite-destination=true ; }} && "
             start_sh += "exec /startup/docker-entrypoint.sh neo4j"
 
             container.with_command(f'bash -c "{start_sh}"')
@@ -189,8 +179,6 @@ def perform_evaluation(graph: dict, database: str):
         with container:
             if database == "memgraph":
                 uri = f"bolt://memgraph:7687"
-                print("Hi from memgraph path")
-
             with container.get_driver() if database == "neo4j" else GraphDatabase.driver(uri, auth=None) as driver:
 
                 # 2. Insert denormalized graph
@@ -217,12 +205,13 @@ def perform_evaluation(graph: dict, database: str):
                         with driver.session(database=DATABASE) as session:
                             if "from_file" in graph.keys():
                                 file = graph['from_file']
-                            elif "neo4j" in graph.keys():
+                                session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
+                            elif "neo4j" in graph.keys() and "from_file" in graph["neo4j"].keys():
                                 file = graph['neo4j']['from_file']
+                                res = session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
+                                pass
                             else:
-                                break
-                            res = session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
-                            print(res)
+                                pass # the data has been loaded from the dump!
 
                 provided_dependencies = DependencySet.from_string_list(graph["dependencies"])
 
@@ -433,9 +422,9 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
             # µ8
             result = session.run(f"""
             MATCH {str(dep.pattern).replace("&", ":")} WITH  
-            
-            {dep.right.to_query_string(database) + " AS x" + pascalcase(str(dep.right))}, count(*) AS red
-            RETURN max(red) AS res
+            {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
+            count({dep.right.to_query_string(database)}) AS red WHERE red > 1
+            RETURN sum(red) AS res
                             """)
             record = result.single()
             if record is not None:
@@ -445,10 +434,10 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
                         DATABASE_COL: "Neo4J" if database == "neo4j" else "Memgraph",
                         DEPENDENCY_COL: dep.to_latex(),
                         METHOD_COL: method,
-                        MAX_RED_COUNT_COL: m5,
-                        AVG_RED_COUNT_COL: m6,
+                        MAX_INC_COUNT_COL: m5,
+                        AVG_INC_COUNT_COL: m6,
                         MINIMALITY_COL: minimality,
-                        MAX_INC_COUNT_COL: m8,
+                        RED_COUNT_COL: m8,
                         })
             
     dep_df = pd.DataFrame(dep_res)

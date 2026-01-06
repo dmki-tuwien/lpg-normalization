@@ -1,14 +1,13 @@
 import os
 import uuid
 
-AVG_RED_COUNT_COL = "m6_avg_red_count"
+AVG_INC_COUNT_COL = "m6_avg_inc_count"
 DATABASE_COL = "database"
 DEPENDENCY_COL = "dependency"
 GRAPH_COL = "graph"
 GRAPH_SOURCE_COL = "graph_source"
 LP_POSSIBLE_COL = "lp_possible"
-MAX_RED_COUNT_COL = "m5_max_red_count"
-MAX_INC_COUNT_COL = "m8_max_inc_count"
+MAX_INC_COUNT_COL = "m5_max_inc_count"
 METHOD_COL = "method"
 METRIC_COL = "metric"
 MINIMALITY_COL = "m7_minimality"
@@ -23,6 +22,7 @@ PDF_METADATA = {
     # 'Keywords': 'plotnine, python',
     'Creator': 'The Dominion'
 }
+RED_COUNT_COL = "m8_red_count"
 RUN_ID_COL = "run_id"
 RUN_ID = str(uuid.uuid4())
 TIMESTAMP_COL = "timestamp"
