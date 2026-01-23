@@ -10,6 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY run_eval.py run_eval.py
 COPY normalize.py normalize.py
 COPY constants.py constants.py
-COPY slpgd slpgd
+COPY gnfd gnfd
 
 CMD ["python", "run_eval.py"]

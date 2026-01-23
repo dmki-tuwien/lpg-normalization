@@ -14,11 +14,11 @@ from neo4j import GraphDatabase, Query, Driver, Neo4jDriver
 from plotnine import *
 from dotenv import load_dotenv
 
-import slpgd
+import gnfd
 
 from constants import *
 from normalize import perform_graph_native_normalization
-from slpgd import DependencySet
+from gnfd import DependencySet
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -45,6 +45,10 @@ per_graph_metrics_df = pd.DataFrame(columns=[GRAPH_COL,
                                              VALUE_COL,
                                              TIMESTAMP_COL,
                                              DATABASE_COL,
+                                             SUBSET_COL,
+                                             ALGORITHM_COL,
+                                             INTER_FIRST_COL,
+                                             MINIMUM_COVER_COL,
                                              RUN_ID_COL])
 per_dep_metrics_df = pd.DataFrame(columns=[GRAPH_COL,
                                            DATABASE_COL,
@@ -69,32 +73,21 @@ with open("setup.yaml", 'r') as file:
     setup = yaml.safe_load(file)
 
 def main():
-    # try:
-    #     test_connection_to_neo4j()
-    # except neo4j.exceptions.ServiceUnavailable:
-    #     logger.error("Could not connect to Neo4j")
-    #     exit(1)
-    # logger.info("✅ Connection to Neo4J was successful")
-    #
-    # try:
-    #     test_connection_to_memgraph()
-    # except neo4j.exceptions.ServiceUnavailable:
-    #     logger.error("Could not connect to Memgraph")
-    #     exit(1)
-    # logger.info("✅ Connection to Memgraph was successful")
-    #
-
     test_docker_container_creation()
 
     logger.info("🚀 Start evaluation")
 
     if len(setup["graphs"]) < 1:
-        logger.error("\"setup.yaml\" does not contain any graph.")
+        logger.error("🔥 \"setup.yaml\" does not contain any graph.")
         exit(1)
 
-    for database in ["neo4j", "memgraph"]:
+    for database in ["neo4j"]: #, "memgraph"]:
         for graph in setup["graphs"]:
-            perform_evaluation(graph, database)
+            for subset in  ["all"]: # ["within-node", "within-go", "inter-go", "all"]:
+                for algorithm in ["synthesis"]: #,"decomposition"]:
+                    for inter_first in [True]: #, False]:
+                        for ignore_min_cov in [True, False]:
+                            perform_evaluation(graph, database, subset, algorithm, inter_first, ignore_min_cov)
 
     logger.info("✅ Finished evaluation")
 
@@ -146,123 +139,107 @@ def export_tables_and_plots():
                                                           siunitx=True)
 
 
-def perform_evaluation(graph: dict, database: str):
-    logger.info(f"\tPerform experiment with graph \"{graph['name']}\" and database \"{database}\".")
-
+def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, inter_first: bool, ignore_min_cov: bool):
+    logger.info(f"\tPerform experiment with graph \"{graph['name']}\", database \"{database}\", subset \"{subset}\", algorithm \"{algorithm}\", inter dep.s first \"{inter_first}\", and minimal cover ignored \"{ignore_min_cov}\".")
+    if subset not in ["within-node", "within-go", "inter-go", "all"] or algorithm not in ["synthesis", "decomposition"]:
+        raise ValueError("Illegal argument used for calling \"perform_evaluation\"")
     DATABASE = database
     container: DockerContainer | Neo4jContainer
-    """A testcontainer Container of Neo4j or Memgraph. By using it in a \"with\" clause, testcontainers automatically cleans used containers up."""
+    """A testcontainer Container of Neo4j or an empty container if Memgraph is used. 
+    By using it in a \"with\" clause, testcontainers automatically cleans used containers up."""
     driver: Driver
     """A Neo4J driver connected to the database running in :any:`container`."""
 
-    for method in ["slpgd"]:  # ,"slpgd1","slpgd2"]: #, "semantics1", "semantics2"]: # TODO: Enum?
-        # 1. Get a fresh database container
+    # 1. Get a fresh database container
+    if database == "memgraph":
+        container = DockerContainer("alpine")
+    else:
+        assert database == "neo4j"
+        container = Neo4jContainer("neo4j:2025.11")
+        container.with_volume_mapping(GRAPHS_PATH, "/tmp/graphs") #"/var/lib/neo4j/import/graphs")
+        container.with_env("NEO4J_PLUGINS",'["apoc","apoc-extended"]')
+        container.with_env("NEO4J_dbms_security_procedures_unrestricted", "apoc.*")
+        container.with_env("NEO4J_apoc_export_file_enabled", "true")
+        container.with_env("NEO4J_apoc_import_file_enabled", "true")
+
+        start_sh: str = "ls -la /var/lib/neo4j/import && cp -R /tmp/graphs /var/lib/neo4j/import &&"
+        start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && ls -la /var/lib/neo4j/import && "
+        if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
+            start_sh += f"{{ cat /var/lib/neo4j/import/{graph["neo4j"]['from_dump']} | neo4j-admin database load --from-stdin neo4j --overwrite-destination=true ; }} && "
+        start_sh += "exec /startup/docker-entrypoint.sh neo4j"
+
+        container.with_command(f'bash -c "{start_sh}"')
+
+    with container:
         if database == "memgraph":
-            container = DockerContainer("alpine")
-        else:
-            assert database == "neo4j"
-            container = Neo4jContainer("neo4j:2025.11")
-            container.with_volume_mapping(GRAPHS_PATH, "/tmp/graphs") #"/var/lib/neo4j/import/graphs")
-            container.with_env("NEO4J_PLUGINS",'["apoc","apoc-extended"]')
-            container.with_env("NEO4J_dbms_security_procedures_unrestricted", "apoc.*")
-            container.with_env("NEO4J_apoc_export_file_enabled", "true")
-            container.with_env("NEO4J_apoc_import_file_enabled", "true")
+            uri = f"bolt://memgraph:7687"
 
-            start_sh: str = "ls -la /var/lib/neo4j/import && cp -R /tmp/graphs /var/lib/neo4j/import &&"
-            start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && ls -la /var/lib/neo4j/import && "
-            if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
-                start_sh += f"{{ cat /var/lib/neo4j/import/{graph["neo4j"]['from_dump']} | neo4j-admin database load --from-stdin neo4j --overwrite-destination=true ; }} && "
-            start_sh += "exec /startup/docker-entrypoint.sh neo4j"
+        with container.get_driver() if database == "neo4j" else GraphDatabase.driver(uri, auth=None) as driver:
+            # connects to
 
-            container.with_command(f'bash -c "{start_sh}"')
+            # 2. Insert denormalized graph if its loaded from a file
+            match database:
+                case "memgraph":
+                    # We do'n't have a fresh database for memgraph --> delete everything first!
+                    with driver.session(database=DATABASE) as session:
+                        session.run("MATCH (n) DETACH DELETE n")
+                    if "from_file" in graph.keys():
+                        file = graph['from_file']
+                    elif "memgraph" in graph.keys():
+                        file = graph['memgraph']['from_file']
+                    else:
+                        return
+                    with open(file, 'r') as filename:
+                        create_graph_queries_str = filename.read()
+                        create_graph_queries = [s.strip() for s in (create_graph_queries_str.split(';')) if s.strip()]
 
-        with container:
-            if database == "memgraph":
-                uri = f"bolt://memgraph:7687"
-            with container.get_driver() if database == "neo4j" else GraphDatabase.driver(uri, auth=None) as driver:
-
-                # 2. Insert denormalized graph
-                match database:
-                    case "memgraph":
-                        # We dont have a fresh database for memgraph --> delete everything first!
                         with driver.session(database=DATABASE) as session:
-                            session.run("MATCH (n) DETACH DELETE n")
+                            for query in create_graph_queries:
+                             #   print(query)
+                                session.run(query)
+                case _:
+                    with driver.session(database=DATABASE) as session:
                         if "from_file" in graph.keys():
                             file = graph['from_file']
-                        elif "memgraph" in graph.keys():
-                            file = graph['memgraph']['from_file']
+                            session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
+                        elif "neo4j" in graph.keys() and "from_file" in graph["neo4j"].keys():
+                            file = graph['neo4j']['from_file']
+                            res = session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
+                            pass
                         else:
-                            break
-                        with open(file, 'r') as filename:
-                            create_graph_queries_str = filename.read()
-                            create_graph_queries = [s.strip() for s in (create_graph_queries_str.split(';')) if s.strip()]
+                            pass # the data has been loaded from the dump!
 
-                            with driver.session(database=DATABASE) as session:
-                                for query in create_graph_queries:
-                                 #   print(query)
-                                    session.run(query)
-                    case _:
-                        with driver.session(database=DATABASE) as session:
-                            if "from_file" in graph.keys():
-                                file = graph['from_file']
-                                session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
-                            elif "neo4j" in graph.keys() and "from_file" in graph["neo4j"].keys():
-                                file = graph['neo4j']['from_file']
-                                res = session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
-                                pass
-                            else:
-                                pass # the data has been loaded from the dump!
+            provided_dependencies = DependencySet.from_string_list(graph["dependencies"])
 
-                provided_dependencies = DependencySet.from_string_list(graph["dependencies"])
+            if "minimal_cover" in graph.keys():
+                minimal_cover = DependencySet.from_string_list(graph["minimal_cover"])
+            else:
+                minimal_cover = None
 
-                measured_denormalized = False
+            measured_denormalized = False
 
-                # 3. Get initial statistics
-                get_graph_statistics(driver, graph["name"], "denormalized", database, provided_dependencies, measured_denormalized) # None = no normalization performed yet --> TODO: Enum?
-                measured_denormalized = True # Measurements for denomalized graphs have been taken and are not performed again
+            # 3. Get initial statistics
+            get_graph_statistics(driver, graph["name"], "denormalized", database, provided_dependencies, measured_denormalized, subset, algorithm, inter_first, ignore_min_cov) # None = no normalization performed yet --> TODO: Enum?
+            measured_denormalized = True # Measurements for denormalized graphs have been taken and are not performed again
+
+            normalized_deps, transformations = perform_graph_native_normalization(driver,
+                                                                       DATABASE,
+                                                                       provided_dependencies if ignore_min_cov or minimal_cover is None else minimal_cover, # a minimal cover is used if it is present and not to be ignored
+                                                                       dep_filter=subset,
+                                                                       ordered=inter_first)
 
 
-                # 4. Perform normalization
 
-                match method:
-                    case "relational":
-                        # provided_dependants = provided_dependencies.dependants
-                        # with GraphDatabase.driver(NEO4J_URI, auth=AUTH) as driver:
-                        #     dependencies = DependencySet.from_string_list(graph["dependencies"]).infer_structural_deps(driver, except_dependants=provided_dependants)
-                        #     # print(dependencies)
-                        #     transformations: list[str]
-                        #     new_pattern: str
-                        #     transformations, new_pattern = dependencies.get_transformations_rel_synthesize(driver)
-                        #     with driver.session(database=NEO4J_DATABASE) as session:
-                        #         for transformation in transformations:
-                        #         #    print(transformation)
-                        #         #    print(new_pattern)
-                        #             session.run(transformation)
+            # 5. Get statistics after normalization
+            get_graph_statistics(driver, graph["name"], f"{subset} {algorithm} interFirst{inter_first} ignoreMinCov{ignore_min_cov}", database, normalized_deps, measured_denormalized, subset, algorithm, inter_first, ignore_min_cov)
+            # TODO replace with transformed dependencies
 
-                        pass
-                    case "slpgd" | "slpgd2":
-                        semantics = 0
-                        if method == "slpgd":
-                            semantics = 1
-                        else:
-                            semantics = 2
-
-                        provided_dependencies = perform_graph_native_normalization(driver, database, DATABASE,
-                                                                                   provided_dependencies, semantics)
-
-                    case _:
-                        pass
-
-                # 5. Get statistics after normalization
-                get_graph_statistics(driver, graph["name"], method, database, provided_dependencies, measured_denormalized)
-                # TODO replace with transformed dependencies
-
-                #input("Press any key to continue...")
+            #input("Press any key to continue...")
 
     logger.info(f"\tFinished experiment with graph \"{graph['name']}\"")
 
 
-def get_graph_statistics(driver, graph_name: str, method: str | None, database: str, dependencies: DependencySet, measured_denormalized) -> None:
+def get_graph_statistics(driver, graph_name: str, method: str | None, database: str, dependencies: DependencySet, measured_denormalized, subset: str, algorithm: str, inter_first: bool, ignore_min_cov: bool) -> None:
     """
     Calculates statistics about graphs and stores them to global dataframes
     (`:any:graph_overview_df` and `:any:graph_statistics_df`).
@@ -272,8 +249,6 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
     :param database:
     :param measured_denormalized: Flag, whether statistics for denormalized graphs should be measured.
     """
-
-
 
     timestamp: int = 0
     if method != "denormalized":
@@ -317,6 +292,10 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
                                        METRIC_COL: statistic_def[0],
                                        VALUE_COL: record["res"],
                                        DATABASE_COL: database,
+                                       SUBSET_COL: subset,
+                                       ALGORITHM_COL: algorithm,
+                                       INTER_FIRST_COL: inter_first,
+                                       MINIMUM_COVER_COL: ignore_min_cov,
                                        RUN_ID_COL: RUN_ID
                                        })
 
@@ -336,13 +315,13 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
             record = result.single()
             if record is not None:
                 graph_setup = next(filter(lambda x: x["name"] == graph_name , setup["graphs"]))
-                dependencies = slpgd.DependencySet.from_string_list(graph_setup["dependencies"])
+                dependencies = gnfd.DependencySet.from_string_list(graph_setup["dependencies"])
                 inter_deps_count = sum(map(lambda dep: dep.is_inter_graph_object, dependencies))
-                intra_deps_count = sum(map(lambda dep: dep.is_intra_graph_object, dependencies))
+                within_deps_count = sum(map(lambda dep: dep.is_within_graph_object, dependencies))
                 overview_res.append({GRAPH_COL: graph_name,
                                      GRAPH_SOURCE_COL: graph_setup["source"] if "source" in graph_setup.keys() is not None else "unknwon",
                                      NO_INTER_GRAPH_DEPS_COL: inter_deps_count,
-                                     NO_INTRA_GRAPH_DEPS_COL: intra_deps_count,
+                                     NO_INTRA_GRAPH_DEPS_COL: within_deps_count,
                                      ORIGIN_OF_DEPS_COL: graph_setup["dependency_origin"] if "dependency_origin" in graph_setup.keys() is not None else "unknwon",
                                      ORIGINAL_NF_COL: dependencies.get_normal_form(session),
                                      LP_POSSIBLE_COL: "$\\checkmark$" if dependencies.lp_suitable else "$\\times$",
@@ -368,12 +347,13 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
 
 
             # µ5
-            result = session.run(f"""
-            MATCH {str(dep.pattern).replace("&", ":")} WITH  
+            mu5 = f"""
+            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
             {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
             count(*) AS red
             RETURN max(red) AS res
-                                            """)
+                                            """
+            result = session.run(mu5)
             record = result.single()
             if record is not None:
                 m5 = record["res"]
@@ -381,7 +361,7 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
 
             # µ6
             result = session.run(f"""
-            MATCH {str(dep.pattern).replace("&", ":")} WITH  
+            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
             {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
             count(*) AS red
             RETURN avg(red) AS res
@@ -391,24 +371,24 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
                 m6 = record["res"]
 
 
-            # µ7 == minimality
-            µ7c = f"""
-            MATCH {str(dep.pattern).replace("&", ":")} WITH DISTINCT 
+            # µ7 == minimality; as defined in "Lisa Ehrlinger and Wolfram Wöß. “A Novel Data Quality Metric for Minimality.” In Data Quality and Trust in Big Data, vol. 11235, Springer, 2019. https://doi.org/10.1007/978-3-030-19143-6_1."
+            mu7c = f"""
+            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH DISTINCT 
             {",".join(map(lambda left: str(left.to_query_string(database))+" AS x"+pascalcase(str(left)), dep.left))},
-            {dep.right.to_query_string(database)+" AS x"+pascalcase(str(dep.right))}
+            {",".join(map(lambda right: str(right.to_query_string(database))+" AS x"+pascalcase(str(right)), dep.right))}
             RETURN COUNT(*) AS res
             """
             #print(f"µ7 clusters\n=========={µ7c}")
-            result = session.run(µ7c)
+            result = session.run(mu7c)
             record = result.single()
             if record is not None:
                 c = record["res"]
 
 
             result = session.run(f"""
-            MATCH {str(dep.pattern).replace("&", ":")} WITH DISTINCT 
+            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH DISTINCT 
             {",".join(map(lambda left: f"toString(id({left.get_graph_object().symbol}))+toStringOrNull({str(left.to_query_string(database))}) AS x{pascalcase(str(left))}", dep.left))},
-            toString(id({dep.right.get_graph_object().symbol}))+toStringOrNull({dep.right.to_query_string(database)}) AS x{pascalcase(str(dep.right))}
+            {",".join(map(lambda right: f"toString(id({right.get_graph_object().symbol}))+toStringOrNull({str(right.to_query_string(database))}) AS x{pascalcase(str(right))}", dep.right))}
             RETURN COUNT(*) AS res
                             """)
             record = result.single()
@@ -420,15 +400,18 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
             minimality = 1 if e == 1 else (c - 1) / (e - 1)
 
             # µ8
-            result = session.run(f"""
-            MATCH {str(dep.pattern).replace("&", ":")} WITH  
+            query8 = f"""
+            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
             {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
-            count({dep.right.to_query_string(database)}) AS red WHERE red > 1
+            count({",".join(map(lambda right: f"{str(right.to_query_string(database))}", dep.right))}) AS red WHERE red > 1
             RETURN sum(red) AS res
-                            """)
+                            """
+            # result = session.run(query8)
             record = result.single()
             if record is not None:
                 m8 = record["res"]
+            else:
+                0
 
         dep_res.append({GRAPH_COL: graph_name,
                         DATABASE_COL: "Neo4J" if database == "neo4j" else "Memgraph",

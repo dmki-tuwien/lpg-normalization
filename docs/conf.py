@@ -32,7 +32,9 @@ autodoc_default_options = {
     # But with this it does show useless bases like `object`. What is one to do?
    'show-inheritance': True,
 }
-autodoc_typehints = "both"
+autodoc_typehints = "description"
+autodoc_typehints_description_target = "documented"
+
 intersphinx_mapping = {'python': ('https://docs.python.org/3.14', None),
                        'neo4j': ('https://neo4j.com/docs/api/python-driver/current/', None)}
 
