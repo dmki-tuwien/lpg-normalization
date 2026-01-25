@@ -66,8 +66,8 @@ graphs:
     #memgraph:
     #  from_file: graphs/northwind_memgraph.cypher
     dependencies:
-      - "(o:Order:shipCity&shipCountry)::o.shipCity,o.shipCountry=>o.shipRegion"
-      - "(o:Order:shipCity&shipAddress&customerID&shipRegion)::o.shipCity,o.shipAddress=>o.shipCountry,o.customerID,o.shipRegion"
+      - "(o:Order:shipCity&shipCountry&shipRegion)::o.shipCity,o.shipCountry=>o.shipRegion"
+      - "(o:Order:shipCity&shipAddress&shipCountry&customerID&shipRegion)::o.shipCity,o.shipAddress=>o.shipCountry,o.customerID,o.shipRegion"
       - "(o:Order:shipCountry&shipAddress&shipCity&customerID&shipRegion)::o.shipCountry,o.shipAddress=>o.shipCity,o.customerID,o.shipRegion"
       - "(o:Order:shipAddress&shipPostalCode)::o.shipAddress=>o.shipPostalCode"
       - "(o:Order:customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
