@@ -17,3 +17,4 @@ sphinx-paramlinks
 pyyaml
 pandas
 clingo~=5.8.0
+tqdm-loggable

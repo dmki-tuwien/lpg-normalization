@@ -13,6 +13,7 @@ from testcontainers.neo4j import Neo4jContainer
 from neo4j import GraphDatabase, Query, Driver, Neo4jDriver
 from plotnine import *
 from dotenv import load_dotenv
+from tqdm_loggable.auto import tqdm
 
 import gnfd
 
@@ -46,8 +47,6 @@ per_graph_metrics_df = pd.DataFrame(columns=[GRAPH_COL,
                                              TIMESTAMP_COL,
                                              DATABASE_COL,
                                              SUBSET_COL,
-                                             ALGORITHM_COL,
-                                             INTER_FIRST_COL,
                                              MINIMUM_COVER_COL,
                                              RUN_ID_COL])
 per_dep_metrics_df = pd.DataFrame(columns=[GRAPH_COL,
@@ -89,12 +88,12 @@ def main():
         logger.error("🔥 \"setup.yaml\" does not contain any graph.")
         exit(1)
 
-    for database in ["neo4j", "memgraph"]:
-        for graph in setup["graphs"]:
-            for subset in  ["all", "within-node", "within-go", "inter-go"]:
+    for database in tqdm(["neo4j", "memgraph"], desc="System"):
+        for graph in tqdm(setup["graphs"], desc="Graphs"):
+            for subset in  tqdm(["all", "within-node", "within-go", "inter-go"], desc="Dep. subset"):
                 for algorithm in ["synthesis"]: #,"decomposition"]:
                     for inter_first in [True]: #, False]:
-                        for ignore_min_cov in [True, False]:
+                        for ignore_min_cov in tqdm([True, False], desc="Min. cov."):
                             perform_evaluation(graph, database, subset, algorithm, inter_first, ignore_min_cov)
 
     logger.info("✅ Finished evaluation")
@@ -301,8 +300,6 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
                                        VALUE_COL: record["res"],
                                        DATABASE_COL: database,
                                        SUBSET_COL: subset,
-                                       ALGORITHM_COL: algorithm,
-                                       INTER_FIRST_COL: inter_first,
                                        MINIMUM_COVER_COL: ignore_min_cov,
                                        RUN_ID_COL: RUN_ID
                                        })
