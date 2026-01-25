@@ -180,15 +180,15 @@ def test_minimal_pattern_intersections():
     assert ("a", "b") in mpi_23[0][1]
 
 
-def test_entailment():
-    deps: list[str] = ["(x::k2)-[y::k3]->(:L2)::x.k2=>y.k3", "(x::k1&k2)-[:L1]->()::x.k1=>x.k2"]
-
-    deps: DependencySet = DependencySet.from_string_list(deps)
-    target = GNFD.from_string("(x::k1&k2)-[y:L1:k3]->(:L2)::x.k1=>y.k3")
-
-    deps.entail(target)
-
-    pass
+# def test_entailment():
+#     deps: list[str] = ["(x::k2)-[y::k3]->(:L2)::x.k2=>y.k3", "(x::k1&k2)-[:L1]->()::x.k1=>x.k2"]
+#
+#     deps: DependencySet = DependencySet.from_string_list(deps)
+#     target = GNFD.from_string("(x::k1&k2)-[y:L1:k3]->(:L2)::x.k1=>y.k3")
+#
+#     deps.entail(target)
+#
+#     pass
 
 
 

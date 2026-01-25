@@ -57,15 +57,23 @@ per_dep_metrics_df = pd.DataFrame(columns=[GRAPH_COL,
                                            MAX_INC_COUNT_COL,
                                            AVG_INC_COUNT_COL,
                                            MINIMALITY_COL,
+MINIMALITY_CLUSTER_COL,
+MINIMALITY_MATCHES_COL,
                                            RED_COUNT_COL])
 graph_overview_df = pd.DataFrame(columns=[GRAPH_COL,
                                           GRAPH_SOURCE_COL,
+NODE_COUNT_COL,
+EDGE_COUNT_COL,
+LABEL_COUNT_COL,
+TYPES_COUNT_COL,
                                           NO_INTER_GRAPH_DEPS_COL,
                                           NO_INTRA_GRAPH_DEPS_COL,
                                           ORIGIN_OF_DEPS_COL,
                                           ORIGINAL_NF_COL,
                                           LP_POSSIBLE_COL])
 
+# Keeps track if graph overview has been assessed
+_created_graph_overview: list = []
 
 setup: dict
 """The configuration of the evaluation. Defines the used datasets and dependencies."""
@@ -81,9 +89,9 @@ def main():
         logger.error("🔥 \"setup.yaml\" does not contain any graph.")
         exit(1)
 
-    for database in ["neo4j"]: #, "memgraph"]:
+    for database in ["neo4j", "memgraph"]:
         for graph in setup["graphs"]:
-            for subset in  ["all"]: # ["within-node", "within-go", "inter-go", "all"]:
+            for subset in  ["all", "within-node", "within-go", "inter-go"]:
                 for algorithm in ["synthesis"]: #,"decomposition"]:
                     for inter_first in [True]: #, False]:
                         for ignore_min_cov in [True, False]:
@@ -309,7 +317,9 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
     # # # # # # # # # # # # # # # # # # # # #
     # Retrieve overview on Graphs based on setup.yaml (--> Table 2 in Paper)
     # # # # # # # # # # # # # # # # # # # # #
-    if not measured_denormalized and database == "neo4j":
+    global _created_graph_overview
+    if not measured_denormalized and database == "neo4j" and graph_name not in _created_graph_overview:
+        _created_graph_overview.append(graph_name)
         with driver.session() as session:
             result = session.run("CALL apoc.meta.stats()")
             record = result.single()
@@ -319,10 +329,14 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
                 inter_deps_count = sum(map(lambda dep: dep.is_inter_graph_object, dependencies))
                 within_deps_count = sum(map(lambda dep: dep.is_within_graph_object, dependencies))
                 overview_res.append({GRAPH_COL: graph_name,
-                                     GRAPH_SOURCE_COL: graph_setup["source"] if "source" in graph_setup.keys() is not None else "unknwon",
+                                     GRAPH_SOURCE_COL: graph_setup["source"] if "source" in graph_setup.keys() is not None else "unknown",
+                                     NODE_COUNT_COL: record["nodeCount"] if "nodeCount" in record.keys() else "unknown",
+                                         EDGE_COUNT_COL: record["relCount"] if "relCount" in record.keys() else "unknown",
+                                     LABEL_COUNT_COL: record["labelCount"] if "labelCount" in record.keys() else "unknown",
+                                         TYPES_COUNT_COL: record["relTypeCount"] if "relTypeCount" in record.keys() else "unknown",
                                      NO_INTER_GRAPH_DEPS_COL: inter_deps_count,
                                      NO_INTRA_GRAPH_DEPS_COL: within_deps_count,
-                                     ORIGIN_OF_DEPS_COL: graph_setup["dependency_origin"] if "dependency_origin" in graph_setup.keys() is not None else "unknwon",
+                                     ORIGIN_OF_DEPS_COL: graph_setup["dependency_origin"] if "dependency_origin" in graph_setup.keys() is not None else "unknown",
                                      ORIGINAL_NF_COL: dependencies.get_normal_form(session),
                                      LP_POSSIBLE_COL: "$\\checkmark$" if dependencies.lp_suitable else "$\\times$",
                                      })
@@ -402,11 +416,11 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
             # µ8
             query8 = f"""
             {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
-            {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
-            count({",".join(map(lambda right: f"{str(right.to_query_string(database))}", dep.right))}) AS red WHERE red > 1
-            RETURN sum(red) AS res
+            {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left.union(dep.right)))}, 
+            count(*) AS red WHERE red > 1
+            RETURN sum(red-1) AS res
                             """
-            # result = session.run(query8)
+            result = session.run(query8)
             record = result.single()
             if record is not None:
                 m8 = record["res"]
@@ -420,6 +434,8 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
                         MAX_INC_COUNT_COL: m5,
                         AVG_INC_COUNT_COL: m6,
                         MINIMALITY_COL: minimality,
+                        MINIMALITY_CLUSTER_COL: c,
+                            MINIMALITY_MATCHES_COL: e,
                         RED_COUNT_COL: m8,
                         })
             

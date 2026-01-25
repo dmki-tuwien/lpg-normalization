@@ -51,6 +51,16 @@ class GraphObject(abc.ABC):
         else:
             self.properties: set[str] = properties
 
+    @property
+    def _gnfd_middle(self):
+        if len(self.labels) < 1 and len(self.properties) < 1:
+            middle = self.symbol
+        elif len(self.properties) < 1:
+            middle = f"{self.symbol}:{"&".join(self.labels)}"
+        else:
+            middle = f"{self.symbol}:{"&".join(self.labels)}:{"&".join(self.properties)}"
+        return middle
+
     def clingo_symbol(self) -> str:
         """Returns a symbol for use with clingo."""
 
@@ -69,10 +79,13 @@ class GraphObject(abc.ABC):
         """:returns: Whether 2 graph objects are equivalent"""
 
     def __str__(self):
-        if len(self.labels) < 1:
+        if len(self.labels) < 1 and len(self.properties) < 1:
             return self.symbol
+        elif len(self.properties) < 1:
+            return f"{self.symbol}:{"6".join(self.labels)}"
         else:
-            return f"{self.symbol}:{",".join(self.labels)}::{",".join(self.properties)}"
+            return f"{self.symbol}:{"6".join(self.labels)}:{",".join(self.properties)}"
+
         # TODO: should I use ampersand instead of comma?
 
 
@@ -301,7 +314,7 @@ class Node(GraphObject, Pattern):
         return self
 
     def __str__(self):
-        return f"({self.symbol}:{"&".join(self.labels)}:{"&".join(self.properties)})"
+        return f"({self._gnfd_middle})"
 
 
 class Edge(GraphObject, Pattern, abc.ABC):
@@ -405,7 +418,20 @@ class Edge(GraphObject, Pattern, abc.ABC):
         if len(self.labels) > 0:
             label_delim = ":"
 
-        return f"{tup_src_pattern[0]},({self.src.symbol})-[{self.symbol}{label_delim}{":".join(self.labels)}]->({self.tgt.symbol}),{tup_tgt_pattern[0]}", where
+        middle = f"({self.src.symbol})-[{self.symbol}{label_delim}{":".join(self.labels)}]->({self.tgt.symbol})"
+
+        # Don't match with every node! --> would result in a match with the cartesian product
+        src = tup_src_pattern[0]
+        tgt = tup_tgt_pattern[0]
+
+        if src == "()" and tgt == "()":
+            return middle, where
+        elif src == "()":
+            return f"{middle},{tgt}", where
+        elif tgt == "()":
+            return f"{src},{middle}", where
+
+        return f"{src},{middle},{tgt}", where
 
     def get_graph_object_with_symbol(self, symbol: str) -> GraphObject | None:
         if self.symbol == symbol and symbol != "":
@@ -530,7 +556,7 @@ class LeftEdge(Edge):
         pass
 
     def __str__(self):
-        return f"{str(self.tgt_pattern)}<-[{self.symbol}:{"&".join(self.labels)}:{"&".join(self.properties)}]-{str(self.src_pattern)}"
+        return f"{str(self.tgt_pattern)}<-[{self._gnfd_middle}]-{str(self.src_pattern)}"
 
 
 class RightEdge(Edge):
@@ -556,7 +582,7 @@ class RightEdge(Edge):
         pass
 
     def __str__(self):
-        return f"{str(self.src_pattern)}-[{self.symbol}]->{str(self.tgt_pattern)}"
+        return f"{str(self.src_pattern)}-[{self._gnfd_middle}]->{str(self.tgt_pattern)}"
 
 
 class PatternConcat(Pattern):
@@ -580,6 +606,11 @@ class PatternConcat(Pattern):
         tup_left_pattern = self.left.to_gql_match_where_tuple()
         tup_right_pattern = self.right.to_gql_match_where_tuple()
 
+        # Don't match with every node! --> would result in a match with the cartesian product
+        if tup_left_pattern[0] == "()":
+            return tup_right_pattern
+        elif tup_right_pattern[0] == "()":
+            return tup_left_pattern
 
         where = tup_left_pattern[1]
         if len(where) > 0 and len(tup_right_pattern[1]) > 0:

@@ -21,12 +21,12 @@ graphs:
 #    dependencies:
 #      - "(e:Entity):e.jurisdiction_description,e.lastEditTimestamp,e.sourceID->e.jurisdiction"
 
-#  - name: "Lecture uses Book" # can be parsed!
-#    from_file: graphs/lecture.cypher
-#    dependencies:
-#      - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
-#    dependency_origin: "User provided"
-#    source: "Self-created"
+  - name: "Lecture uses Book" # works
+    from_file: graphs/lecture.cypher
+    dependencies:
+      - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
+    dependency_origin: "User provided"
+    source: "Self-created"
 
   - name: "No Socks 1" # works
     from_file: graphs/nosocks.cypher
@@ -100,7 +100,7 @@ graphs:
 #    dependency_origin: "Mined by \\citet{skavantzos_third_2025}"
 #    source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
 #
-  - name: "London Public Transport"
+  - name: "London Public Transport" # works
     neo4j:
       from_file: graphs/london_neo4j.cypher
   #  memgraph:
