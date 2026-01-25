@@ -21,10 +21,10 @@ graphs:
     dependencies:
       - "(e:Entity:incorporation_date&jurisdiction_description&lastEditTimestamp&sourceID&jurisdiction)::e.jurisdiction_description,e.lastEditTimestamp,e.sourceID=>e.jurisdiction"
       - "(e:Entity:incorporation_date&jurisdiction_description&sourceID&valid_until&jurisdiction)::e.jurisdiction_description,e.sourceID,e.valid_until=>e.jurisdiction"
-      - "(e:Entity:incorporation_date&jurisdiction_description&valid_until&service_provider)::e.incorporation_date,jurisdiction_description,e.valid_until=>e.service_provider"
+      - "(e:Entity:incorporation_date&jurisdiction_description&valid_until&service_provider)::e.incorporation_date,e.jurisdiction_description,e.valid_until=>e.service_provider"
       - "(e:Entity:ibcRUC&jurisdiction_description&valid_until&service_provider)::e.jurisdiction_description,e.valid_until=>e.service_provider"
-      - "(e:Entity:ibcRUC&jurisdiction_description&lastEditTimestamp&service_provider)::e.jurisdiction_description,lastEditTimestamp=>e.service_provider"
-      - "(e:Entity:ibcRUC&jurisdiction&lastEditTimestamp&valid_until&sourceID)::e.jurisdiction,e.lastEditTimestamp,e.valid_until&e.sourceID"
+      - "(e:Entity:ibcRUC&jurisdiction_description&lastEditTimestamp&service_provider)::e.jurisdiction_description,e.lastEditTimestamp=>e.service_provider"
+      - "(e:Entity:ibcRUC&jurisdiction&lastEditTimestamp&valid_until&sourceID)::e.jurisdiction,e.lastEditTimestamp,e.valid_until=>e.sourceID"
       - "(e:Entity:country_codes&jurisdiction_description&lastEditTimestamp&sourceID&jurisdiction)::e.jurisdiction_description,e.lastEditTimestamp,e.sourceID=>e.jurisdiction"
       - "(e:Entity:countries&jurisdiction_description&lastEditTimestamp&sourceID&jurisdiction)::e.jurisdiction_description,e.lastEditTimestamp,e.sourceID=>e.jurisdiction"
       - "(e:Entity:country_codes&jurisdiction_description&sourceID&valid_until&jurisdiction)::e.jurisdiction_description,e.sourceID,e.valid_until=>e.jurisdiction"
