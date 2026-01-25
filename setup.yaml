@@ -60,45 +60,27 @@ graphs:
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 #
-#  - name: "Northwind Orders"
-#    neo4j:
-#      from_file: graphs/northwind/scripts/northwind.cypher
-#    #memgraph:
-#    #  from_file: graphs/northwind_memgraph.cypher
-#    dependencies:
-#      - "(o:Order):o.shipCity,o.shipCountry->o.shipRegion"
-#      - "(o:Order):o.shipCity,o.shipAddress->o.shipCountry"
-#      - "(o:Order):o.shipCity,o.shipAddress->o.customerID"
-#      - "(o:Order):o.shipCity,o.shipAddress->o.shipRegion"
-#      - "(o:Order):o.shipCountry,o.shipAddress->o.shipCity"
-#      - "(o:Order):o.shipCountry,o.shipAddress->o.customerID"
-#      - "(o:Order):o.shipCountry,o.shipAddress->o.shipRegion"
-#      - "(o:Order):o.shipAddress->o.shipPostalCode"
-#      - "(o:Order):o.customerID->o.shipCity"
-#      - "(o:Order):o.customerID->o.shipPostalCode"
-#      - "(o:Order):o.customerID->o.shipCountry"
-#      - "(o:Order):o.customerID->o.shipAddress"
-#      - "(o:Order):o.customerID->o.shipRegion"
-#      - "(o:Order):o.shipName->o.shipCity"
-#      - "(o:Order):o.shipName->o.shipPostalCode"
-#      - "(o:Order):o.shipName->o.shipCountry"
-#      - "(o:Order):o.shipName->o.shipAddress"
-#      - "(o:Order):o.shipName->o.customerID"
-#      - "(o:Order):o.shipName->o.shipRegion"
-#      - "(o:Order):o.shipCity,o.shipPostalCode->o.shipCountry"
-#      - "(o:Order):o.shipCity,o.shipPostalCode->o.shipRegion"
-#      - "(o:Order):o.shipPostalCode,o.shipCountry->o.shipCity"
-#      - "(o:Order):o.shipPostalCode,o.shipCountry->o.shipRegion"
-#      - "(o:Order):o.shipAddress->o.shipCity"
-#      - "(o:Order):o.shipAddress->o.shipCountry"
-#      - "(o:Order):o.shipAddress->o.customerID"
-#      - "(o:Order):o.shipAddress->o.shipRegion"
-#      - "(o:Order):o.shipCity,o.shipAddress,o.employeeID->o.shipName"
-#      - "(o:Order):o.shipCountry,o.shipAddress,o.employeeID->o.shipName"
-#      - "(o:Order):o.customerID,o.employeeID->o.shipName"
-#      - "(o:Order):o.shipAddress,o.employeeID->o.shipName"
-#    dependency_origin: "Mined by \\citet{skavantzos_third_2025}"
-#    source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
+  - name: "Northwind Orders"
+    neo4j:
+      from_file: graphs/northwind/scripts/northwind.cypher
+    #memgraph:
+    #  from_file: graphs/northwind_memgraph.cypher
+    dependencies:
+      - "(o:Order:shipCity&shipCountry)::o.shipCity,o.shipCountry=>o.shipRegion"
+      - "(o:Order:shipCity&shipAddress&customerID&shipRegion)::o.shipCity,o.shipAddress=>o.shipCountry,o.customerID,o.shipRegion"
+      - "(o:Order:shipCountry&shipAddress&shipCity&customerID&shipRegion)::o.shipCountry,o.shipAddress=>o.shipCity,o.customerID,o.shipRegion"
+      - "(o:Order:shipAddress&shipPostalCode)::o.shipAddress=>o.shipPostalCode"
+      - "(o:Order:customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
+      - "(o:Order:shipName&shipCity&shipPostalCode&shipCountry&shipAddress&customerID&shipRegion)::o.shipName=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.customerID,o.shipRegion"
+      - "(o:Order:shipCity&shipPostalCode&shipCountry&shipRegion)::o.shipCity,o.shipPostalCode=>o.shipCountry,o.shipRegion"
+      - "(o:Order:shipPostalCode&shipCountry&shipCity&shipRegion)::o.shipPostalCode,o.shipCountry=>o.shipCity,o.shipRegion"
+      - "(o:Order:shipPostalCode&shipAddress&shipCity&shipCountry&customerID&shipRegion)::o.shipAddress=>o.shipCity,o.shipCountry,o.customerID,o.shipRegion"
+      - "(o:Order:shipCity&shipAddress&employeeID&shipName)::o.shipCity,o.shipAddress,o.employeeID=>o.shipName"
+      - "(o:Order:shipCountry&shipAddress&employeeID&shipName)::o.shipCountry,o.shipAddress,o.employeeID=>o.shipName"
+      - "(o:Order:customerID&employeeID&shipName)::o.customerID,o.employeeID=>o.shipName"
+      - "(o:Order:shipPostalCode&shipAddress&employeeID&shipName)::o.shipAddress,o.employeeID=>o.shipName"
+    dependency_origin: "Mined by \\citet{skavantzos_third_2025}"
+    source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
 #
   - name: "London Public Transport" # works
     neo4j:
