@@ -15,11 +15,26 @@ graphs:
 #    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
 #    dependency_origin: "User provided"
 
-#  - name: "Offshore Entities"
-#    neo4j:
-#      from_dump: graphs/offshore.dump
-#    dependencies:
-#      - "(e:Entity):e.jurisdiction_description,e.lastEditTimestamp,e.sourceID->e.jurisdiction"
+  - name: "Offshore Entities"
+    neo4j:
+      from_dump: graphs/offshore.dump
+    dependencies:
+      - "(e:Entity:incorporation_date&jurisdiction_description&lastEditTimestamp&sourceID&jurisdiction)::e.jurisdiction_description,e.lastEditTimestamp,e.sourceID=>e.jurisdiction"
+      - "(e:Entity:incorporation_date&jurisdiction_description&sourceID&valid_until&jurisdiction)::e.jurisdiction_description,e.sourceID,e.valid_until=>e.jurisdiction"
+      - "(e:Entity:incorporation_date&jurisdiction_description&valid_until&service_provider)::e.incorporation_date,jurisdiction_description,e.valid_until=>e.service_provider"
+      - "(e:Entity:ibcRUC&jurisdiction_description&valid_until&service_provider)::e.jurisdiction_description,e.valid_until=>e.service_provider"
+      - "(e:Entity:ibcRUC&jurisdiction_description&lastEditTimestamp&service_provider)::e.jurisdiction_description,lastEditTimestamp=>e.service_provider"
+      - "(e:Entity:ibcRUC&jurisdiction&lastEditTimestamp&valid_until&sourceID)::e.jurisdiction,e.lastEditTimestamp,e.valid_until&e.sourceID"
+      - "(e:Entity:country_codes&jurisdiction_description&lastEditTimestamp&sourceID&jurisdiction)::e.jurisdiction_description,e.lastEditTimestamp,e.sourceID=>e.jurisdiction"
+      - "(e:Entity:countries&jurisdiction_description&lastEditTimestamp&sourceID&jurisdiction)::e.jurisdiction_description,e.lastEditTimestamp,e.sourceID=>e.jurisdiction"
+      - "(e:Entity:country_codes&jurisdiction_description&sourceID&valid_until&jurisdiction)::e.jurisdiction_description,e.sourceID,e.valid_until=>e.jurisdiction"
+      - "(e:Entity:countries&jurisdiction_description&sourceID&valid_until&jurisdiction)::e.jurisdiction_description,e.sourceID,e.valid_until=>e.jurisdiction"
+      - "(e:Entity:country_codes&sourceID&countries)::e.country_codes,e.sourceID=>e.countries"
+      - "(e:Entity:countries&sourceID&country_codes)::e.countries,e.sourceID=>e.country_codes"
+      - "(e:Entity:country_codes&valid_until&countries)::e.country_codes,e.valid_until=>e.countries"
+      - "(e:Entity:countries&valid_until&country_codes)::e.countries,e.valid_until=>e.country_codes"
+      - "(e:Entity:countries&jurisdiction_description&country_codes)::e.countries,e.jurisdiction_description=>e.country_codes"
+      - "(e:Entity:countries&jurisdiction&country_codes)::e.countries,e.jurisdiction=>e.country_codes"
 
   - name: "Lecture uses Book" # works
     from_file: graphs/lecture.cypher
