@@ -705,6 +705,8 @@ class Reference:
         self.reference: GraphObject | Property = reference
 
     def __str__(self):
+        if isinstance(self.reference, GraphObject):
+            return self.reference.symbol
         return f"{str(self.reference)}"
 
     def get_graph_object(self) -> GraphObject:
