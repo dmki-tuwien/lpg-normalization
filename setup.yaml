@@ -1,18 +1,18 @@
 graphs:
-#  - name: "Rijden de Treinen"
-#    neo4j:
-#      from_dump: graphs/rijden.dump
-#     # from_file: graphs/rijdendetreinen_neo4j.cypher
-#    dependencies:
-#      - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
-#      - "(ts:TrainService:number&type)::ts.number=>ts.type"
-#      - "(x::type&operator)-[:STOPS_AT]->()::x.type=>x.operator"
-#      - "(x::number&operator)-[:STOPS_AT]->()::x.number=>x.operator"
-#      - "(x:TrainService:serivceid)::x.serviceid=>x"
-#      - "()-[s:STOPS_AT:stopid]->()::s.stopid=>s"
-#      - "()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st"
-#    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
-#    dependency_origin: "User provided"
+  - name: "Rijden de Treinen"
+    neo4j:
+      from_dump: graphs/rijdendetreinen/rijdendetreinen.dump
+     # from_file: graphs/rijdendetreinen_neo4j.cypher
+    dependencies:
+      - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
+      - "(ts:TrainService:number&type)::ts.number=>ts.type"
+      - "(x::type&operator)-[:STOPS_AT]->()::x.type=>x.operator"
+      - "(x::number&operator)-[:STOPS_AT]->()::x.number=>x.operator"
+      - "(x:TrainService:serviceid)::x.serviceid=>x"
+      - "()-[s:STOPS_AT:stopid]->()::s.stopid=>s"
+      - "()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st"
+    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
+    dependency_origin: "User provided"
 
   - name: "Offshore Entities"
     neo4j:
