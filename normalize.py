@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import Literal
 
@@ -5,6 +6,8 @@ from caseconverter import pascalcase
 from dtgraph import Rule, Transformation
 from dtgraph.backend.neo4j.graph import Neo4jGraph
 from neo4j import GraphDatabase, Driver
+from tqdm_loggable.auto import tqdm
+
 
 from gnfd import DependencySet, GNFD, Node, Reference, Edge, GraphObject
 
@@ -387,12 +390,15 @@ DELETE {edge.symbol}
         i += 1
 
     transformation = Transformation(within_rules)
+    logging.info("Created transformations, start applying them")
     t = transformation.apply_on(con)
+    logging.info("Applied transformations, start clean up")
     transformation.eject()
+    logging.info("Finished transformations")
 
-    for inter_query in within_queries:
+    for inter_query in tqdm(within_queries, desc="Query"):
         _apply_transformation_query(inter_query)
-    for query in cleanup_queries:
+    for query in tqdm(cleanup_queries, desc="Cleanup"):
         with driver.session(database=database) as session:
             session.run(query)
 
