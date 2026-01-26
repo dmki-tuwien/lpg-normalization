@@ -196,6 +196,7 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
         with container.get_driver() if database == "neo4j" else GraphDatabase.driver(uri, auth=None) as driver:
             # connects to
 
+
             # 2. Insert denormalized graph if its loaded from a file
             match database:
                 case "memgraph":
@@ -238,9 +239,11 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
             measured_denormalized = False
 
             # 3. Get initial statistics
+            logger.info("Get statistics")
             get_graph_statistics(driver, graph["name"], "denormalized", database, provided_dependencies, measured_denormalized, subset, algorithm, inter_first, ignore_min_cov) # None = no normalization performed yet --> TODO: Enum?
             measured_denormalized = True # Measurements for denormalized graphs have been taken and are not performed again
 
+            logger.info("Start normalization")
             normalized_deps, transformations = perform_graph_native_normalization(driver,
                                                                        DATABASE,
                                                                        provided_dependencies if ignore_min_cov or minimal_cover is None else minimal_cover, # a minimal cover is used if it is present and not to be ignored
@@ -328,6 +331,7 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
     # # # # # # # # # # # # # # # # # # # # #
     global _created_graph_overview
     if not measured_denormalized and database == "neo4j" and graph_name not in _created_graph_overview:
+        logger.info("    Get graph overview")
         _created_graph_overview.append(graph_name)
         with driver.session() as session:
             result = session.run("CALL apoc.meta.stats()")
@@ -360,6 +364,7 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
     # # # # # # # # # # # # # # # # # # # # #
 
     for dep in dependencies:
+        logger.info(f"    Get per dep. metrics for {str(dep)}")
         with driver.session() as session:
             c = 0
             e = 0
@@ -370,6 +375,7 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
 
 
             # µ5
+            logger.info("        µ5")
             mu5 = f"""
             {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
             {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
@@ -383,6 +389,7 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
 
 
             # µ6
+            logger.info("        µ6")
             result = session.run(f"""
             {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
             {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
@@ -395,6 +402,7 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
 
 
             # µ7 == minimality; as defined in "Lisa Ehrlinger and Wolfram Wöß. “A Novel Data Quality Metric for Minimality.” In Data Quality and Trust in Big Data, vol. 11235, Springer, 2019. https://doi.org/10.1007/978-3-030-19143-6_1."
+            logger.info("        µ7 Clusters")
             mu7c = f"""
             {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH DISTINCT 
             {",".join(map(lambda left: str(left.to_query_string(database))+" AS x"+pascalcase(str(left)), dep.left))},
@@ -407,7 +415,7 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
             if record is not None:
                 c = record["res"]
 
-
+            logger.info("        µ7 Elements")
             result = session.run(f"""
             {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH DISTINCT 
             {",".join(map(lambda left: f"toString(id({left.get_graph_object().symbol}))+toStringOrNull({str(left.to_query_string(database))}) AS x{pascalcase(str(left))}", dep.left))},
@@ -423,6 +431,7 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
             minimality = 1 if e == 1 else (c - 1) / (e - 1)
 
             # µ8
+            logger.info("        µ8")
             query8 = f"""
             {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
             {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left.union(dep.right)))}, 
