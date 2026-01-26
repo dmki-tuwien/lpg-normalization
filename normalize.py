@@ -49,6 +49,7 @@ def perform_graph_native_normalization(driver: Driver, database,
 
 
     # Phase 0: Filter deps according to eval.
+    logging.info("Filter dependencies")
     match dep_filter:
         case "within-node":
             deps = DependencySet(filter(lambda dep: dep.is_within_node, deps))
