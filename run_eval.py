@@ -162,12 +162,18 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
         container = DockerContainer("alpine")
     else:
         assert database == "neo4j"
-        container = Neo4jContainer("neo4j:2025.11")
+        container = Neo4jContainer("neo4j:2025.12-enterprise")
         container.with_volume_mapping(GRAPHS_PATH, "/tmp/graphs") #"/var/lib/neo4j/import/graphs")
+        container.with_env("NEO4J_ACCEPT_LICENSE_AGREEMENT", "eval")
         container.with_env("NEO4J_PLUGINS",'["apoc","apoc-extended"]')
         container.with_env("NEO4J_dbms_security_procedures_unrestricted", "apoc.*")
         container.with_env("NEO4J_apoc_export_file_enabled", "true")
         container.with_env("NEO4J_apoc_import_file_enabled", "true")
+        container.with_env("NEO4J_AUTH", "neo4j/password")
+        # container.with_env("NEO4J_server_memory_heap_initial__size", "200G")
+        # container.with_env("NEO4J_server_memory_heap_max__size", "200G")
+        # container.with_env("NEO4J_server_memory_pagecache_size", "100G")
+        # container.with_kwargs(nano_cpus=int(40 * 1e9))  # 1 CPU = 1e9 nanocpus
 
         start_sh: str = "ls -la /var/lib/neo4j/import && cp -R /tmp/graphs /var/lib/neo4j/import &&"
         start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && ls -la /var/lib/neo4j/import && "
@@ -180,6 +186,12 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
     with container:
         if database == "memgraph":
             uri = f"bolt://memgraph:7687"
+        if database == "neo4j":
+            # Neo4J Enterprise is not immediately coming online (although logs say different things)
+            container.waiting_for(LogMessageWaitStrategy("db.clearQueryCaches():"))
+            # and even after this additional intermediate log message it takes further ~15 seconds
+            print("finished")
+            time.sleep(15)
 
         with container.get_driver() if database == "neo4j" else GraphDatabase.driver(uri, auth=None) as driver:
             # connects to
