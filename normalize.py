@@ -246,6 +246,8 @@ def perform_graph_native_normalization(driver: Driver, database,
     t = transformation.apply_on(con)
     transformation.eject()
 
+    print("", flush=True)
+
     for inter_query in inter_queries:
         _apply_transformation_query(inter_query)
 
