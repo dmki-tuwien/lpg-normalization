@@ -187,11 +187,12 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
         if database == "memgraph":
             uri = f"bolt://memgraph:7687"
         if database == "neo4j":
+            logger.info("Wait for Neo4J to clean query caches.")
             # Neo4J Enterprise is not immediately coming online (although logs say different things)
             container.waiting_for(LogMessageWaitStrategy("db.clearQueryCaches():"))
             # and even after this additional intermediate log message it takes further ~15 seconds
-            print("finished")
-            time.sleep(15)
+            logger.info("Wait 30 seconds for Neo4J to become responsive")
+            time.sleep(30)
 
         with container.get_driver() if database == "neo4j" else GraphDatabase.driver(uri, auth=None) as driver:
             # connects to
