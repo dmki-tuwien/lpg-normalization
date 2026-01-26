@@ -90,6 +90,7 @@ def perform_graph_native_normalization(driver: Driver, database,
                     if ("." in str(right_ref) and len(left) > 0 and
                             isinstance(right_ref.get_graph_object(), Node) and
                             (right_ref.get_graph_object() is left_go.src or right_ref.get_graph_object() is left_go.tgt)):
+                        logging.info("Ep -> Np")
 
                         merge_key_elements = list(map(str, left.union({right_ref})))
                         merge_key_elements.sort()
@@ -172,6 +173,8 @@ def perform_graph_native_normalization(driver: Driver, database,
                             isinstance(right_ref.get_graph_object(), Edge) and
                             (
                                     right_ref.get_graph_object().src is node or right_ref.get_graph_object().tgt is node)):
+                        logging.info("N -> Ep")
+
                         inter_queries.append(f"""
                             {inter_dep.pattern.to_gql_match_where_string()}
                             SET {left_go.symbol}.{pascalcase(str(right_ref))} = {right_ref}
@@ -193,6 +196,8 @@ def perform_graph_native_normalization(driver: Driver, database,
                             isinstance(right_ref.get_graph_object(), Edge) and
                             (
                                     right_ref.get_graph_object().src is node or right_ref.get_graph_object().tgt is node)):
+                        logging.info("Np -> Ep")
+
                         merge_key_elements = list(map(str, left.union({right_ref})))
                         merge_key_elements.sort()
                         within_merge_key: str = ",".join(merge_key_elements)
@@ -280,6 +285,7 @@ def perform_graph_native_normalization(driver: Driver, database,
         #  ψ_L1 (psi_L1)  #
         # # # # # # # # # #
         if within_dep.is_within_node and len(left) > 0 and len(right) > 0:
+            logging.info("Within n")
             node: Node = within_dep.right.pop().get_graph_object()
 
 
@@ -325,6 +331,8 @@ def perform_graph_native_normalization(driver: Driver, database,
         #  ψ_L2 (psi_L2)  #
         # # # # # # # # # #
         elif within_dep.is_within_edge and len(left) > 0 and len(right) > 0:  # ψ_L2 (psi_L2)  --> Reification
+            logging.info("Within e")
+
             edge: Edge = within_dep.right.pop().get_graph_object()
 
             # First reification
