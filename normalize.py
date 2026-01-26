@@ -3,8 +3,8 @@ import re
 from typing import Literal
 
 from caseconverter import pascalcase
-from dtgraph import Rule, Transformation
-from dtgraph.backend.neo4j.graph import Neo4jGraph
+# from dtgraph import Rule, Transformation
+# from dtgraph.backend.neo4j.graph import Neo4jGraph
 from neo4j import GraphDatabase, Driver
 from tqdm_loggable.auto import tqdm
 
@@ -27,9 +27,9 @@ def perform_graph_native_normalization(driver: Driver, database,
     """
 
 
-    # Create a DTGraph Neo4jGraph instance with a non-sense driver
-    con = Neo4jGraph("bolt://memgraph:7687", database="DATABASE", username="USERNAME", password="PASSWORD")
-    con.driver = driver # Replace the driver with the actual driver
+    # # Create a DTGraph Neo4jGraph instance with a non-sense driver
+    # con = Neo4jGraph("bolt://memgraph:7687", database="DATABASE", username="USERNAME", password="PASSWORD")
+    # con.driver = driver # Replace the driver with the actual driver
 
     """A local copy of the provided dependencies, that e.g., may be filtered."""
     deps = provided_dependencies
@@ -37,11 +37,11 @@ def perform_graph_native_normalization(driver: Driver, database,
     transformed_deps = DependencySet()
     applied_transformations: list[tuple[str,int]] = []
 
-    def _apply_transformation_rule(rule: Rule):
-        transformation = Transformation([rule])
-        t = transformation.apply_on(con)
-        transformation.eject()
-        return t
+    # def _apply_transformation_rule(rule: Rule):
+    #     transformation = Transformation([rule])
+    #     t = transformation.apply_on(con)
+    #     transformation.eject()
+    #     return t
 
     def _apply_transformation_query(query: str):
         with driver.session(database=database) as session:
@@ -98,7 +98,7 @@ def perform_graph_native_normalization(driver: Driver, database,
                         new_props = list(left.union({right_ref}))
                         new_props.sort(key=str)
                         new_properties: str = ", ".join(
-                            map(lambda ref: f"{pascalcase(ref)} = {ref}", map(str, new_props)))
+                            map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props)))
                         new_label: str = pascalcase(within_merge_key)
 
                         # First reification
@@ -117,11 +117,16 @@ def perform_graph_native_normalization(driver: Driver, database,
 
                         # Then normalization
                         # _apply_transformation_rule(
-                        inter_rules.append(Rule(f"""
-                                                {inter_dep.pattern.to_gql_match_where_string()} 
-                                                GENERATE
-                                                (y = ({within_merge_key}) :{new_label} {{{new_properties}}})
-                                                """))  # nodes with same values for properties on left side should be merged!
+                        # inter_rules.append(Rule(f"""
+                        #                         {inter_dep.pattern.to_gql_match_where_string()}
+                        #                         GENERATE
+                        #                         (y = ({within_merge_key}) :{new_label} {{{new_properties}}})
+                        #                         """))  # nodes with same values for properties on left side should be merged!
+
+                        inter_queries.append(f"""
+                        {inter_dep.pattern.to_gql_match_where_string()} 
+                        MERGE (newNode:{new_label} {{{new_properties}}})
+                        """)
 
                         inter_queries.append(f"""
                                                 {inter_dep.pattern.to_gql_match_where_string()} 
@@ -204,17 +209,22 @@ def perform_graph_native_normalization(driver: Driver, database,
                         new_props = list(left.union({right_ref}))
                         new_props.sort(key=str)
                         new_properties: str = ", ".join(
-                            map(lambda ref: f"{pascalcase(ref)} = {ref}", map(str, new_props)))
+                            map(lambda ref: f"{pascalcase(ref)}: {ref}", map(str, new_props)))
                         new_label: str = pascalcase(within_merge_key)
 
                         # count = _apply_transformation_rule(
-                        inter_rules.append(Rule(f'''
-                                                {inter_dep.pattern.to_gql_match_where_string()} 
-                                                GENERATE
-                                                (x = ({within_merge_key}):{new_label} {{
-                                                {new_properties}
-                                                }})
-                                                        '''))  # Create new nodes for dep., nodes with same values for properties on left side should be merged!
+                        # inter_rules.append(Rule(f'''
+                        #                         {inter_dep.pattern.to_gql_match_where_string()}
+                        #                         GENERATE
+                        #                         (x = ({within_merge_key}):{new_label} {{
+                        #                         {new_properties}
+                        #                         }})
+                        #                                 '''))  # Create new nodes for dep., nodes with same values for properties on left side should be merged!
+
+                        inter_queries.append(f"""
+{inter_dep.pattern.to_gql_match_where_string()} 
+MERGE (newNode:{new_label} {{{new_properties}}})
+""")
 
                         # _apply_transformation_query(
                         inter_queries.append(f"""
@@ -247,9 +257,9 @@ def perform_graph_native_normalization(driver: Driver, database,
                         applied_transformations.append(("inter3", 0))
         pass
 
-    transformation = Transformation(inter_rules)
-    t = transformation.apply_on(con)
-    transformation.eject()
+    # transformation = Transformation(inter_rules)
+    # t = transformation.apply_on(con)
+    # transformation.eject()
 
     print("", flush=True)
 
@@ -276,7 +286,7 @@ def perform_graph_native_normalization(driver: Driver, database,
         new_props = list(right.union(left))
         new_props.sort(key=str)
         new_properties: str = ", ".join(
-            map(lambda ref: f"{pascalcase(ref)} = {ref}", map(str, new_props)))
+            map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props)))
         new_label: str = pascalcase(within_merge_key)
 
         i += 1
@@ -289,14 +299,19 @@ def perform_graph_native_normalization(driver: Driver, database,
             node: Node = within_dep.right.pop().get_graph_object()
 
 
-            #count = _apply_transformation_rule(
-            within_rules.append(Rule(f'''
-                        {within_dep.pattern.to_gql_match_where_string()} 
-                        GENERATE
-                        (x = ({within_merge_key}):{new_label} {{
-                        {new_properties}
-                        }})
-                                '''))  # Create new nodes for dep., nodes with same values for properties on left side should be merged!
+            # #count = _apply_transformation_rule(
+            # within_rules.append(Rule(f'''
+            #             {within_dep.pattern.to_gql_match_where_string()}
+            #             GENERATE
+            #             (x = ({within_merge_key}):{new_label} {{
+            #             {new_properties}
+            #             }})
+            #                     '''))  # Create new nodes for dep., nodes with same values for properties on left side should be merged!
+
+            within_queries.append(f"""
+            {within_dep.pattern.to_gql_match_where_string()} 
+            MERGE (newNode:{new_label} {{{new_properties}}})
+            """)
 
             #_apply_transformation_query(
             within_queries.append(f"""
@@ -352,12 +367,16 @@ DELETE {edge.symbol}
 
             # Then normalization
             #_apply_transformation_rule(
-            within_rules.append(Rule(f"""
-                        {within_dep.pattern.to_gql_match_where_string()} 
-                        GENERATE
-                        (y = ({within_merge_key}) :{new_label} {{{new_properties}}})
-                        """))  # nodes with same values for properties on left side should be merged!
+            # within_rules.append(Rule(f"""
+            #             {within_dep.pattern.to_gql_match_where_string()}
+            #             GENERATE
+            #             (y = ({within_merge_key}) :{new_label} {{{new_properties}}})
+            #             """))  # nodes with same values for properties on left side should be merged!
 
+            within_queries.append(f"""
+            {within_dep.pattern.to_gql_match_where_string()} 
+            MERGE (newNode:{new_label} {{{new_properties}}})
+            """)
 
             within_queries.append(f"""
                         {within_dep.pattern.to_gql_match_where_string()} 
@@ -400,12 +419,12 @@ DELETE {edge.symbol}
 
         i += 1
 
-    transformation = Transformation(within_rules)
-    logging.info("Created transformations, start applying them")
-    t = transformation.apply_on(con)
-    logging.info("Applied transformations, start clean up")
-    transformation.eject()
-    logging.info("Finished transformations")
+    # transformation = Transformation(within_rules)
+    # logging.info("Created transformations, start applying them")
+    # t = transformation.apply_on(con)
+    # logging.info("Applied transformations, start clean up")
+    # transformation.eject()
+    # logging.info("Finished transformations")
 
     for inter_query in tqdm(within_queries, desc="Query"):
         _apply_transformation_query(inter_query)
