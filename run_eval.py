@@ -92,9 +92,8 @@ def main():
         for graph in tqdm(setup["graphs"], desc="Graphs"):
             for subset in  tqdm(["all", "within-node", "within-go", "inter-go"], desc="Dep. subset"):
                 for algorithm in ["synthesis"]: #,"decomposition"]:
-                    for inter_first in [True]: #, False]:
-                        for ignore_min_cov in tqdm([True, False], desc="Min. cov."):
-                            perform_evaluation(graph, database, subset, algorithm, inter_first, ignore_min_cov)
+                    for ignore_min_cov in tqdm([True, False], desc="Min. cov."):
+                        perform_evaluation(graph, database, subset, algorithm, ignore_min_cov)
 
     logger.info("✅ Finished evaluation")
 
@@ -146,8 +145,8 @@ def export_tables_and_plots():
                                                           siunitx=True)
 
 
-def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, inter_first: bool, ignore_min_cov: bool):
-    logger.info(f"\tPerform experiment with graph \"{graph['name']}\", database \"{database}\", subset \"{subset}\", algorithm \"{algorithm}\", inter dep.s first \"{inter_first}\", and minimal cover ignored \"{ignore_min_cov}\".")
+def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, ignore_min_cov: bool):
+    logger.info(f"\tPerform experiment with graph \"{graph['name']}\", database \"{database}\", subset \"{subset}\", algorithm \"{algorithm}\", and minimal cover ignored \"{ignore_min_cov}\".")
     if subset not in ["within-node", "within-go", "inter-go", "all"] or algorithm not in ["synthesis", "decomposition"]:
         raise ValueError("Illegal argument used for calling \"perform_evaluation\"")
     DATABASE = database
@@ -241,20 +240,19 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
 
             # 3. Get initial statistics
             logger.info("Get statistics")
-            get_graph_statistics(driver, graph["name"], "denormalized", database, provided_dependencies, measured_denormalized, subset, algorithm, inter_first, ignore_min_cov) # None = no normalization performed yet --> TODO: Enum?
+            get_graph_statistics(driver, graph["name"], "denormalized", database, provided_dependencies, measured_denormalized, subset, algorithm, ignore_min_cov) # None = no normalization performed yet --> TODO: Enum?
             measured_denormalized = True # Measurements for denormalized graphs have been taken and are not performed again
 
             logger.info("Start normalization")
             normalized_deps, transformations = perform_graph_native_normalization(driver,
                                                                        DATABASE,
                                                                        provided_dependencies if ignore_min_cov or minimal_cover is None else minimal_cover, # a minimal cover is used if it is present and not to be ignored
-                                                                       dep_filter=subset,
-                                                                       ordered=inter_first)
+                                                                       dep_filter=subset)
 
 
 
             # 5. Get statistics after normalization
-            get_graph_statistics(driver, graph["name"], f"{subset} {algorithm} interFirst{inter_first} ignoreMinCov{ignore_min_cov}", database, normalized_deps, measured_denormalized, subset, algorithm, inter_first, ignore_min_cov)
+            get_graph_statistics(driver, graph["name"], f"{subset} {algorithm} ignoreMinCov{ignore_min_cov}", database, normalized_deps, measured_denormalized, subset, algorithm, ignore_min_cov)
             # TODO replace with transformed dependencies
 
             #input("Press any key to continue...")
@@ -262,7 +260,7 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
     logger.info(f"\tFinished experiment with graph \"{graph['name']}\"")
 
 
-def get_graph_statistics(driver, graph_name: str, method: str | None, database: str, dependencies: DependencySet, measured_denormalized, subset: str, algorithm: str, inter_first: bool, ignore_min_cov: bool) -> None:
+def get_graph_statistics(driver, graph_name: str, method: str | None, database: str, dependencies: DependencySet, measured_denormalized, subset: str, algorithm: str, ignore_min_cov: bool) -> None:
     """
     Calculates statistics about graphs and stores them to global dataframes
     (`:any:graph_overview_df` and `:any:graph_statistics_df`).
