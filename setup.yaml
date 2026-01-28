@@ -6,11 +6,17 @@ graphs:
     dependencies:
       - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
       - "(ts:TrainService:number&type)::ts.number=>ts.type"
-      - "(x::type&operator)-[:STOPS_AT]->()::x.type=>x.operator"
       - "(x::number&operator)-[:STOPS_AT]->()::x.number=>x.operator"
       - "(x:TrainService:serviceid)::x.serviceid=>x"
       - "()-[s:STOPS_AT:stopid]->()::s.stopid=>s"
       - "()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st"
+    minimal_cover:
+      - "(ts:TrainService:number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::s.name=>t.code"
+      - "(ts:TrainService:number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.number=>ts.type"
+      - "(ts:TrainService:number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.number=>ts.operator"
+      - "(ts:TrainService:number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.serviceid=>ts"
+      - "(ts:TrainService:number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.stopid=>t"
+      - "(ts:TrainService:number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.departure,t.stopid=>s"
     source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
     dependency_origin: "User provided"
 
@@ -35,12 +41,12 @@ graphs:
 #      - "(e:Entity:countries&jurisdiction_description&country_codes)::e.countries,e.jurisdiction_description=>e.country_codes"
 #      - "(e:Entity:countries&jurisdiction&country_codes)::e.countries,e.jurisdiction=>e.country_codes"
 
-  - name: "Lecture uses Book" # works
-    from_file: graphs/lecture.cypher
-    dependencies:
-      - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
-    dependency_origin: "User provided"
-    source: "Self-created"
+#  - name: "Lecture uses Book" # works
+#    from_file: graphs/lecture.cypher
+#    dependencies:
+#      - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
+#    dependency_origin: "User provided"
+#    source: "Self-created"
 
   - name: "No Socks 1" # works
     from_file: graphs/nosocks.cypher
@@ -74,28 +80,28 @@ graphs:
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 #
-  - name: "Northwind Orders"
-    neo4j:
-      from_file: graphs/northwind/scripts/northwind.cypher
-    #memgraph:
-    #  from_file: graphs/northwind_memgraph.cypher
-    dependencies:
-      - "(o:Order:shipCity&shipCountry&shipRegion)::o.shipCity,o.shipCountry=>o.shipRegion"
-      - "(o:Order:shipCity&shipAddress&shipCountry&customerID&shipRegion)::o.shipCity,o.shipAddress=>o.shipCountry,o.customerID,o.shipRegion"
-      - "(o:Order:shipCountry&shipAddress&shipCity&customerID&shipRegion)::o.shipCountry,o.shipAddress=>o.shipCity,o.customerID,o.shipRegion"
-      - "(o:Order:shipAddress&shipPostalCode)::o.shipAddress=>o.shipPostalCode"
-      - "(o:Order:customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
-      - "(o:Order:shipName&shipCity&shipPostalCode&shipCountry&shipAddress&customerID&shipRegion)::o.shipName=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.customerID,o.shipRegion"
-      - "(o:Order:shipCity&shipPostalCode&shipCountry&shipRegion)::o.shipCity,o.shipPostalCode=>o.shipCountry,o.shipRegion"
-      - "(o:Order:shipPostalCode&shipCountry&shipCity&shipRegion)::o.shipPostalCode,o.shipCountry=>o.shipCity,o.shipRegion"
-      - "(o:Order:shipPostalCode&shipAddress&shipCity&shipCountry&customerID&shipRegion)::o.shipAddress=>o.shipCity,o.shipCountry,o.customerID,o.shipRegion"
-      - "(o:Order:shipCity&shipAddress&employeeID&shipName)::o.shipCity,o.shipAddress,o.employeeID=>o.shipName"
-      - "(o:Order:shipCountry&shipAddress&employeeID&shipName)::o.shipCountry,o.shipAddress,o.employeeID=>o.shipName"
-      - "(o:Order:customerID&employeeID&shipName)::o.customerID,o.employeeID=>o.shipName"
-      - "(o:Order:shipPostalCode&shipAddress&employeeID&shipName)::o.shipAddress,o.employeeID=>o.shipName"
-    dependency_origin: "Mined by \\citet{skavantzos_third_2025}"
-    source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
-#
+#  - name: "Northwind Orders"
+#    neo4j:
+#      from_file: graphs/northwind/scripts/northwind.cypher
+#    #memgraph:
+#    #  from_file: graphs/northwind_memgraph.cypher
+#    dependencies:
+#      - "(o:Order:shipCity&shipCountry&shipRegion)::o.shipCity,o.shipCountry=>o.shipRegion"
+#      - "(o:Order:shipCity&shipAddress&shipCountry&customerID&shipRegion)::o.shipCity,o.shipAddress=>o.shipCountry,o.customerID,o.shipRegion"
+#      - "(o:Order:shipCountry&shipAddress&shipCity&customerID&shipRegion)::o.shipCountry,o.shipAddress=>o.shipCity,o.customerID,o.shipRegion"
+#      - "(o:Order:shipAddress&shipPostalCode)::o.shipAddress=>o.shipPostalCode"
+#      - "(o:Order:customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
+#      - "(o:Order:shipName&shipCity&shipPostalCode&shipCountry&shipAddress&customerID&shipRegion)::o.shipName=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.customerID,o.shipRegion"
+#      - "(o:Order:shipCity&shipPostalCode&shipCountry&shipRegion)::o.shipCity,o.shipPostalCode=>o.shipCountry,o.shipRegion"
+#      - "(o:Order:shipPostalCode&shipCountry&shipCity&shipRegion)::o.shipPostalCode,o.shipCountry=>o.shipCity,o.shipRegion"
+#      - "(o:Order:shipPostalCode&shipAddress&shipCity&shipCountry&customerID&shipRegion)::o.shipAddress=>o.shipCity,o.shipCountry,o.customerID,o.shipRegion"
+#      - "(o:Order:shipCity&shipAddress&employeeID&shipName)::o.shipCity,o.shipAddress,o.employeeID=>o.shipName"
+#      - "(o:Order:shipCountry&shipAddress&employeeID&shipName)::o.shipCountry,o.shipAddress,o.employeeID=>o.shipName"
+#      - "(o:Order:customerID&employeeID&shipName)::o.customerID,o.employeeID=>o.shipName"
+#      - "(o:Order:shipPostalCode&shipAddress&employeeID&shipName)::o.shipAddress,o.employeeID=>o.shipName"
+#    dependency_origin: "Mined by \\citet{skavantzos_third_2025}"
+#    source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
+
   - name: "London Public Transport" # works
     neo4j:
       from_file: graphs/london_neo4j.cypher
