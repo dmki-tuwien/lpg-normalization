@@ -168,7 +168,7 @@ class Pattern(abc.ABC):
 
     @abstractmethod
     def get_graph_objects(self) -> set[GraphObject]:
-        """:returns: all graph objects, i.e., :any:`Node`s and :any:`Edge`s."""
+        """:returns: all graph objects, i.e., any :any:`Node` or :any:`Edge`."""
         pass
 
     def __str__(self):
@@ -733,6 +733,14 @@ class Reference:
             return f"elementId({self.reference.symbol})"
         else:
             return str(self)
+
+    @property
+    def is_property_variable(self):
+        return isinstance(self.reference, Property)
+
+    @property
+    def is_graph_object_variable(self):
+        return isinstance(self.reference, GraphObject)
 
 
 class GNFD:
