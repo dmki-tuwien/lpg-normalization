@@ -414,11 +414,13 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
             if record is not None:
                 c = record["res"]
 
+            id_func = "elementId" if database == "neo4j" else "id"
+
             logger.info("        µ7 Elements")
             result = session.run(f"""
             {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH DISTINCT 
-            {",".join(map(lambda left: f"toString(id({left.get_graph_object().symbol}))+toStringOrNull({str(left.to_query_string(database))}) AS x{pascalcase(str(left))}", dep.left))},
-            {",".join(map(lambda right: f"toString(id({right.get_graph_object().symbol}))+toStringOrNull({str(right.to_query_string(database))}) AS x{pascalcase(str(right))}", dep.right))}
+            {",".join(map(lambda left: f"toString({id_func}({left.get_graph_object().symbol}))+toStringOrNull({str(left.to_query_string(database))}) AS x{pascalcase(str(left))}", dep.left))},
+            {",".join(map(lambda right: f"toString({id_func}({right.get_graph_object().symbol}))+toStringOrNull({str(right.to_query_string(database))}) AS x{pascalcase(str(right))}", dep.right))}
             RETURN COUNT(*) AS res
                             """)
             record = result.single()

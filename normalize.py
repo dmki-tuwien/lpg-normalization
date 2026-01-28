@@ -77,23 +77,20 @@ def perform_graph_native_normalization(
             left_gos: set[GraphObject] = set(
                 map(lambda ref: ref.get_graph_object(), inter_dep.left)
             )
-            right_gos: set[GraphObject] = set(
-                map(lambda ref: ref.get_graph_object(), inter_dep.right)
-            )
 
             if (
                 len(left_gos) == 1
-            ):  # Multiple GOs are currently not supported for the left side
+            ):  # Multiple GOs are not supported for the left side
                 left_go = left_gos.pop()
                 if isinstance(left_go, Edge):
                     edge = left_go
                     for right_ref in inter_dep.right:
                         left: set[Reference] = set(
-                            filter(lambda ref: "." in str(ref), inter_dep.left)
+                            filter(lambda ref: ref.is_property_variable, inter_dep.left)
                         )
 
                         if (
-                            "." in str(right_ref)
+                            right_ref.is_property_variable
                             and len(left) > 0
                             and isinstance(right_ref.get_graph_object(), Node)
                             and (
@@ -116,38 +113,22 @@ def perform_graph_native_normalization(
                             )
                             new_label: str = pascalcase(within_merge_key)
 
-                            # First reification
-                            # _apply_transformation_query(
                             transformation_queries.append(
                                 f"""
-                            {inter_dep.pattern.to_gql_match_where_string()} 
-                            CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
-                            CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
-                            SET x{i} += properties({edge.symbol})
-                                                            """
+{inter_dep.pattern.to_gql_match_where_string()} 
+CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
+CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
+MERGE (newNode:{new_label} {{{new_properties}}})
+MERGE (x{i})-[:{new_label.upper()}]->(newNode)
+SET x{i} += properties({edge.symbol})"""
                             )  # relies on Neo4j >= 5.26
 
                             cleanup_queries.append(
                                 f"""
-                            {inter_dep.pattern.to_gql_match_where_string()}
-                            DELETE {edge.symbol}
+{inter_dep.pattern.to_gql_match_where_string()}
+DELETE {edge.symbol}
                             """
                             )
-
-                            # transformation_queries.append(
-                            #     f"""
-                            # {inter_dep.pattern.to_gql_match_where_string()}
-                            # MERGE (newNode:{new_label} {{{new_properties}}})
-                            # """
-                            # )
-
-                            transformation_queries.append(
-                                f"""
-                                                    {inter_dep.pattern.to_gql_match_where_string()} 
-                                                    MATCH (old:$(type({edge.symbol})))
-                                                    MERGE (old) - [:{new_label.upper()}]->(newNode:{new_label} {{{new_properties}}})
-                                                    """
-                            )  # Connect normalized nodes with reified nodes and remove redundant properties
 
 
                             right_ref_label_delim = (
@@ -155,16 +136,14 @@ def perform_graph_native_normalization(
                             )
                             cleanup_queries.append(
                                 f"""
-                                                                MATCH ({right_ref.get_graph_object().symbol}{right_ref_label_delim}{"&".join(right_ref.get_graph_object().labels)})
-                                                                REMOVE {right_ref}
-                                                                """
+MATCH ({right_ref.get_graph_object().symbol}{right_ref_label_delim}{"&".join(right_ref.get_graph_object().labels)})
+REMOVE {right_ref}"""
                             )  # Connect normalized nodes with reified nodes and remove redundant properties
 
                             cleanup_queries.append(
                                 f"""
-                                                    MATCH ({edge.symbol}) - [:{new_label.upper()}]->(x{i})
-                                                                            REMOVE {", ".join(map(str, left))}
-                                                                            """
+MATCH ({edge.symbol}) - [:{new_label.upper()}]->(x{i})
+REMOVE {", ".join(map(str, left))}"""
                             )  # Connect normalized nodes with reified nodes and remove redundant properties
 
                             transformed_deps_list.append(
@@ -180,8 +159,72 @@ def perform_graph_native_normalization(
                             )
 
                             applied_transformations.append(("inter1", 2))
-                        # if there is no "." in the reference on the right its just cardinality limiting
                         # if its no Node its more than one hop for sure
+
+                        elif (
+                            right_ref.is_graph_object_variable
+                            and len(left) > 0
+                            and isinstance(right_ref.get_graph_object(), Node)
+                            and (
+                                right_ref.get_graph_object() is left_go.src
+                                or right_ref.get_graph_object() is left_go.tgt
+                            )
+                        ):
+                            logging.info("Ep -> N")
+
+                            merge_key_elements = list(map(str, left))
+                            merge_key_elements.sort()
+                            within_merge_key: str = ",".join(merge_key_elements)
+                            new_props = list(left)
+                            new_props.sort(key=str)
+                            new_properties: str = ", ".join(
+                                map(
+                                    lambda ref: f"{pascalcase(ref)} : {ref}",
+                                    map(str, new_props),
+                                )
+                            )
+                            new_label: str = pascalcase(within_merge_key)
+
+                            transformation_queries.append(
+                                f"""
+{inter_dep.pattern.to_gql_match_where_string()} 
+CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
+CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
+MERGE (newNode:{new_label} {{{new_properties}}})
+MERGE (x{i})-[:{new_label.upper()}]->(newNode)
+SET x{i} += properties({edge.symbol})"""
+                            )  # relies on Neo4j >= 5.26
+
+                            cleanup_queries.append(
+                                f"""
+{inter_dep.pattern.to_gql_match_where_string()}
+DELETE {edge.symbol}"""
+                            )
+
+
+                            right_ref_label_delim = (
+                                ":" if len(right_ref.get_graph_object().labels) > 0 else ""
+                            )
+
+                            cleanup_queries.append(
+                                f"""
+MATCH ({edge.symbol})-[:{new_label.upper()}]->(x{i})
+REMOVE {", ".join(map(str, left))}"""
+                            )  # Connect normalized nodes with reified nodes and remove redundant properties
+
+                            transformed_deps_list.append(
+                                f"""
+                                                    ({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left.union({right_ref}))))})
+                                                    ::
+                                        {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left)))}
+                                        =>x{i}.{pascalcase(str(right_ref))}""".replace(
+                                    " ", ""
+                                ).replace(
+                                    "\n", ""
+                                )
+                            )
+
+                            applied_transformations.append(("inter1", 2))
                 elif isinstance(left_go, Node):
                     node = left_go
                     for right_ref in inter_dep.right:
@@ -208,15 +251,13 @@ def perform_graph_native_normalization(
 
                             transformation_queries.append(
                                 f"""
-                                {inter_dep.pattern.to_gql_match_where_string()}
-                                SET {left_go.symbol}.{pascalcase(str(right_ref))} = {right_ref}
-    """
+{inter_dep.pattern.to_gql_match_where_string()}
+SET {left_go.symbol}.{pascalcase(str(right_ref))} = {right_ref}"""
                             )
                             cleanup_queries.append(
                                 f"""
-                                                        {inter_dep.pattern.to_gql_match_where_string()}
-                                                        REMOVE {right_ref}
-                            """
+{inter_dep.pattern.to_gql_match_where_string()}
+REMOVE {right_ref}"""
                             )
                             node.properties.add(pascalcase(str(right_ref)))
                             right_ref.get_graph_object().properties.remove(
@@ -230,7 +271,7 @@ def perform_graph_native_normalization(
                             applied_transformations.append(("inter2", 2))
 
                         elif (
-                            "." in str(right_ref)
+                            right_ref.is_property_variable
                             and not left_is_go
                             and isinstance(right_ref.get_graph_object(), Edge)
                             and (
@@ -257,7 +298,8 @@ def perform_graph_native_normalization(
                             transformation_queries.append(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()} 
-MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode:{new_label} {{{new_properties}}})"""
+MERGE (newNode:{new_label} {{{new_properties}}})
+MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                             )  # Connect the new nodes with the existing nodes
 
                             #    pattern += f", ({node.symbol})-[:{new_label.upper()}]->(x{i}:{new_label})"
@@ -270,9 +312,8 @@ MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode:{new_label} {{{new_proper
                             )
                             cleanup_queries.append(
                                 f"""
-                                                    {cleanup_pattern} 
-                                                    REMOVE {", ".join(map(str, left.union({right_ref})))}
-                                                            """
+{cleanup_pattern} 
+REMOVE {", ".join(map(str, left.union({right_ref})))}"""
                             )
 
                             right_ref.get_graph_object().properties -= {right_ref}
@@ -293,12 +334,9 @@ MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode:{new_label} {{{new_proper
                             applied_transformations.append(("inter3", 0))
 
         elif dep.is_within_graph_object:
-            within_dep = dep
             # First filter References that are Graph Object IDs. We don't need them here as their occurrence is a sign for structurally implied or to limiting dep.s.
-            left: set[Reference] = set(filter(lambda ref: "." in str(ref), within_dep.left))
-            right: set[Reference] = set(
-                filter(lambda ref: "." in str(ref), within_dep.right)
-            )
+            left: set[Reference] = set(filter(lambda ref: ref.is_property_variable, dep.left))
+            right: set[Reference] = set(filter(lambda ref: ref.is_property_variable, dep.right))
 
             merge_key_elements = list(map(str, left.union(right)))
             merge_key_elements.sort()
@@ -315,47 +353,27 @@ MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode:{new_label} {{{new_proper
             # # # # # # # # # #
             #  ψ_L1 (psi_L1)  #
             # # # # # # # # # #
-            if within_dep.is_within_node and len(left) > 0 and len(right) > 0:
+            if dep.is_within_node and len(left) > 0 and len(right) > 0:
                 logging.info("Within n")
-                node: Node = within_dep.right.pop().get_graph_object()
-
-                # transformation_queries.append(
-                #     f"""
-                # {within_dep.pattern.to_gql_match_where_string()}
-                # MERGE (newNode:{new_label} {{{new_properties}}})
-                # """
-                # )
-                #
-                # # _apply_transformation_query(
-                # transformation_queries.append(
-                #     f"""
-                #             {within_dep.pattern.to_gql_match_where_string()}
-                #             MATCH (x{i}:{new_label})
-                #             WHERE {" AND ".join(map(lambda ref: f"x{i}.{pascalcase(ref)} = {ref}", map(str, right.union(left))))}
-                #             MERGE ({node.symbol})-[:{new_label.upper()}]->(x{i})
-                #                     """
-                # )  # Connect the new nodes with the existing nodes
+                node: Node = dep.right.pop().get_graph_object()
 
                 transformation_queries.append(
                     f"""
-{within_dep.pattern.to_gql_match_where_string()} 
+{dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
-MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)
-                                """
+MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                 )
-                #    pattern += f", ({node.symbol})-[:{new_label.upper()}]->(x{i}:{new_label})"
 
                 # Remove old redundant properties in the end
-                cleanup_pattern = within_dep.pattern.to_gql_match_where_string().split("WHERE")[0]
+                cleanup_pattern = dep.pattern.to_gql_match_where_string().split("WHERE")[0]
                 cleanup_queries.append(
                     f"""
 {cleanup_pattern} 
-REMOVE {", ".join(map(str, right.union(left)))}
-                                    """
+REMOVE {", ".join(map(str, right.union(left)))}"""
                 )
 
-                within_dep.pattern.properties -= right
-                within_dep.pattern.properties -= left
+                dep.pattern.properties -= right
+                dep.pattern.properties -= left
 
                 transformed_deps_list.append(
                     f"""
@@ -375,52 +393,26 @@ REMOVE {", ".join(map(str, right.union(left)))}
             #  ψ_L2 (psi_L2)  #
             # # # # # # # # # #
             elif (
-                within_dep.is_within_edge and len(left) > 0 and len(right) > 0
+                dep.is_within_edge and len(left) > 0 and len(right) > 0
             ):  # ψ_L2 (psi_L2)  --> Reification
                 logging.info("Within e")
 
-                edge: Edge = within_dep.right.pop().get_graph_object()
+                edge: Edge = dep.right.pop().get_graph_object()
 
-                # First reification
-                # _apply_transformation_query(
+                # Reification + create new node
                 transformation_queries.append(
                     f"""
-{within_dep.pattern.to_gql_match_where_string()} 
+{dep.pattern.to_gql_match_where_string()} 
 CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
 CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
 MERGE (newNode:{new_label} {{{new_properties}}})
 MERGE (x{i})-[:{new_label.upper()}]->(newNode)
 SET x{i} += properties({edge.symbol})"""
-                )  # relies on Neo4j >= 5.26
-
-                # transformation_queries.append(
-                #     f"""
-                # {within_dep.pattern.to_gql_match_where_string()}
-                # MERGE (newNode:{new_label} {{{new_properties}}})
-                # """
-                # )
-
-                # transformation_queries.append(
-                #     f"""
-                #             {within_dep.pattern.to_gql_match_where_string()}
-                #             MATCH (old:$(type({edge.symbol})))
-                #             MERGE (old)-[:{new_label.upper()}]->(newNode:{new_label} {{{new_properties}}})
-                #             """
-                # )  # Connect normalized nodes with reified nodes and remove redundant properties
-
-                # cleanup_pattern = within_dep.pattern.to_gql_match_where_string().split(
-                #     "WHERE"
-                # )[0]
-
-#                 cleanup_queries.append(
-#                     f"""
-# {cleanup_pattern}
-#                                         """
-#                 )  # Connect normalized nodes with reified nodes and remove redundant properties
+                )
 
                 cleanup_queries.append(
                     f"""
-{within_dep.pattern.to_gql_match_where_string()}
+{dep.pattern.to_gql_match_where_string()}
 REMOVE {", ".join(map(str, left.union(right)))}
 DELETE {edge.symbol}"""
                 )
