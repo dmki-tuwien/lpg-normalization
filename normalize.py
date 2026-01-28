@@ -32,6 +32,9 @@ def perform_graph_native_normalization(
     """A local copy of the provided dependencies that, e.g., may be filtered."""
     deps = provided_dependencies
 
+
+    """A list of strings of queries that create indices"""
+    index_queries: list[str] = []
     """A list of strings of the queries that perform the transformations"""
     transformation_queries: list[str] = []
     """A list of strings of the queries that """
@@ -113,6 +116,10 @@ def perform_graph_native_normalization(
                             )
                             new_label: str = pascalcase(within_merge_key)
 
+                            index_queries.append(
+                                f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left)))}) IS UNIQUE"
+                            )
+
                             transformation_queries.append(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()} 
@@ -120,8 +127,7 @@ CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.
 CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
 MERGE (newNode:{new_label} {{{new_properties}}})
 MERGE (x{i})-[:{new_label.upper()}]->(newNode)
-SET x{i} += properties({edge.symbol})"""
-                            )  # relies on Neo4j >= 5.26
+SET x{i} += properties({edge.symbol})""")  # relies on Neo4j >= 5.26
 
                             cleanup_queries.append(
                                 f"""
@@ -184,6 +190,10 @@ REMOVE {", ".join(map(str, left))}"""
                                 )
                             )
                             new_label: str = pascalcase(within_merge_key)
+
+                            index_queries.append(
+                                f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left)))}) IS UNIQUE"
+                            )
 
                             transformation_queries.append(
                                 f"""
@@ -294,6 +304,10 @@ REMOVE {right_ref}"""
                             )
                             new_label: str = pascalcase(within_merge_key)
 
+                            index_queries.append(
+f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left)))}) IS UNIQUE"
+                            )
+
                             # _apply_transformation_query(
                             transformation_queries.append(
                                 f"""
@@ -357,6 +371,10 @@ REMOVE {", ".join(map(str, left.union({right_ref})))}"""
                 logging.info("Within n")
                 node: Node = dep.right.pop().get_graph_object()
 
+                index_queries.append(
+                    f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left)))}) IS UNIQUE"
+                )
+
                 transformation_queries.append(
                     f"""
 {dep.pattern.to_gql_match_where_string()} 
@@ -399,6 +417,11 @@ REMOVE {", ".join(map(str, right.union(left)))}"""
 
                 edge: Edge = dep.right.pop().get_graph_object()
 
+                index_queries.append(
+f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left)))}) IS UNIQUE"
+                )
+
+
                 # Reification + create new node
                 transformation_queries.append(
                     f"""
@@ -438,11 +461,12 @@ REMOVE {", ".join(map(str, left.union(right)))}"""
 
         i += 1
 
+    for query in tqdm(index_queries, desc="  Indices"):
+        _apply_transformation_query(query)
     for query in tqdm(transformation_queries, desc="  Query"):
         _apply_transformation_query(query)
     for query in tqdm(cleanup_queries, desc="  Cleanup"):
-        with driver.session(database=database) as session:
-            session.run(query)
+        _apply_transformation_query(query)
 
     transformed_deps = DependencySet.from_string_list(transformed_deps_list)
 

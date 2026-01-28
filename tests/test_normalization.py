@@ -137,7 +137,7 @@ def test_graph_merge_exists(graph_merge):
     (["(a:A:x1)-[b:B]->(c:C)::b=>a.x1"],
      "MATCH (a:A)-[b:B]->(c:C) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NOT NULL AND b.y2 IS NOT NULL RETURN count(*) as count"), # Structurally implied --> nothing happens
     (["(a:A)-[b:B:y1]->(c:C)::b.y1=>a"],
-     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1]->(d:By1) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" RETURN count(*) as count"), 
+     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1]->(d:By1) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" RETURN count(*) as count"),
     (["(a:A:x1)-[b:B:y1]->(c:C)::b.y1=>a.x1"],
      "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:AX1BY1]->(d:Ax1by1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(*) as count"),
 
