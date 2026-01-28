@@ -5,8 +5,8 @@ graphs:
      # from_file: graphs/rijdendetreinen_neo4j.cypher
     dependencies:
       - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
-      - "(ts:TrainService:number&type)::ts.number=>ts.type"
-      - "(x::number&operator)-[:STOPS_AT]->()::x.number=>x.operator"
+      - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type"
+      - "(x::date&number&operator)-[:STOPS_AT]->()::x.number,x.date=>x.operator"
       - "(x:TrainService:serviceid)::x.serviceid=>x"
       - "()-[s:STOPS_AT:stopid]->()::s.stopid=>s"
       - "()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st"
