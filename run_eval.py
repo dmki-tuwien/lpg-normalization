@@ -138,7 +138,7 @@ def export_tables_and_plots():
     per_graph_metrics_df.to_csv("out/metrics.csv", index=False)
 
     global per_dep_metrics_df
-    per_dep_metrics_df = per_dep_metrics_df.loc[per_dep_metrics_df[DATABASE_COL] == "Neo4J"]
+   # per_dep_metrics_df = per_dep_metrics_df.loc[per_dep_metrics_df[DATABASE_COL] == "Neo4J"]
     per_dep_metrics_df = per_dep_metrics_df.set_index([GRAPH_COL, DATABASE_COL, METHOD_COL, DEPENDENCY_COL])
     per_dep_metrics_df.to_csv("out/per_dep_metrics.csv")
     per_dep_metrics_df.style.format(precision=3).to_latex("out/per_dep_metrics.latex", hrules=True, clines="all;index",
@@ -184,7 +184,7 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
 
     with container:
         if database == "memgraph":
-            uri = f"bolt://memgraph:7687"
+            uri = MEMGRAPH_URI
         if database == "neo4j":
             logger.info("Wait for Neo4J to clean query caches.")
             # Neo4J Enterprise is not immediately coming online (although logs say different things)
@@ -223,11 +223,9 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
                 case _:
                     with driver.session(database=DATABASE) as session:
                         if "from_file" in graph.keys():
-                            file = graph['from_file']
-                            session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
+                            session.run(f"CALL apoc.cypher.runFile(\"{graph['from_file']}\");")
                         elif "neo4j" in graph.keys() and "from_file" in graph["neo4j"].keys():
-                            file = graph['neo4j']['from_file']
-                            res = session.run(f"CALL apoc.cypher.runFile(\"{file}\");")
+                            session.run(f"CALL apoc.cypher.runFile(\"{graph['neo4j']['from_file']}\");")
                             pass
                         else:
                             pass # the data has been loaded from the dump!
@@ -243,7 +241,7 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
 
             # 3. Get initial statistics
             logger.info("Get statistics")
-            get_graph_statistics(driver, graph["name"], "denormalized", database, provided_dependencies, measured_denormalized, subset, algorithm, ignore_min_cov) # None = no normalization performed yet --> TODO: Enum?
+            get_graph_statistics(driver, graph["name"], "denormalized", database, provided_dependencies, measured_denormalized, subset, ignore_min_cov) # None = no normalization performed yet --> TODO: Enum?
             measured_denormalized = True # Measurements for denormalized graphs have been taken and are not performed again
 
             logger.info("Start normalization")
@@ -255,7 +253,7 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
 
 
             # 5. Get statistics after normalization
-            get_graph_statistics(driver, graph["name"], f"{subset} {algorithm} ignoreMinCov{ignore_min_cov}", database, normalized_deps, measured_denormalized, subset, algorithm, ignore_min_cov)
+            get_graph_statistics(driver, graph["name"], f"{subset} {algorithm} ignoreMinCov{ignore_min_cov}", database, normalized_deps, measured_denormalized, subset, ignore_min_cov)
             # TODO replace with transformed dependencies
 
             #input("Press any key to continue...")
@@ -263,7 +261,7 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
     logger.info(f"\tFinished experiment with graph \"{graph['name']}\"")
 
 
-def get_graph_statistics(driver, graph_name: str, method: str | None, database: str, dependencies: DependencySet, measured_denormalized, subset: str, algorithm: str, ignore_min_cov: bool) -> None:
+def get_graph_statistics(driver, graph_name: str, method: str | None, database: str, dependencies: DependencySet, measured_denormalized, subset: str, ignore_min_cov: bool) -> None:
     """
     Calculates statistics about graphs and stores them to global dataframes
     (`:any:graph_overview_df` and `:any:graph_statistics_df`).
@@ -294,16 +292,6 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
    #     ("NodePropCount", "MATCH (n) RETURN size(keys(properties(n))) AS res"),
    #     ("EdgePropCount", "MATCH ()-[e]->() RETURN size(keys(properties(e))) AS res"),
     ]
-
-
-
-    match database:
-        case "memgraph":
-            URI = MEMGRAPH_URI
-            DATABASE = MEMGRAPH_DATABASE
-        case _:
-            URI = NEO4J_URI
-            DATABASE = NEO4J_DATABASE
 
     with driver.session() as session:
         for statistic_def in statistics_def:
@@ -405,27 +393,26 @@ def get_graph_statistics(driver, graph_name: str, method: str | None, database: 
 
             # µ7 == minimality; as defined in "Lisa Ehrlinger and Wolfram Wöß. “A Novel Data Quality Metric for Minimality.” In Data Quality and Trust in Big Data, vol. 11235, Springer, 2019. https://doi.org/10.1007/978-3-030-19143-6_1."
             logger.info("        µ7 Clusters")
+
             mu7c = f"""
-            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH DISTINCT 
-            {",".join(map(lambda left: str(left.to_query_string(database))+" AS x"+pascalcase(str(left)), dep.left))},
-            {",".join(map(lambda right: str(right.to_query_string(database))+" AS x"+pascalcase(str(right)), dep.right))}
-            RETURN COUNT(*) AS res
-            """
+{dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
+RETURN count(DISTINCT {{
+{", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
+{", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
+}}) AS res"""
             #print(f"µ7 clusters\n=========={µ7c}")
             result = session.run(mu7c)
             record = result.single()
             if record is not None:
                 c = record["res"]
 
-            id_func = "elementId" if database == "neo4j" else "id"
-
             logger.info("        µ7 Elements")
             result = session.run(f"""
-            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH DISTINCT 
-            {",".join(map(lambda left: f"toString({id_func}({left.get_graph_object().symbol}))+toStringOrNull({str(left.to_query_string(database))}) AS x{pascalcase(str(left))}", dep.left))},
-            {",".join(map(lambda right: f"toString({id_func}({right.get_graph_object().symbol}))+toStringOrNull({str(right.to_query_string(database))}) AS x{pascalcase(str(right))}", dep.right))}
-            RETURN COUNT(*) AS res
-                            """)
+{dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
+RETURN count({{
+{", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
+{", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
+}}) AS res""")
             record = result.single()
             if record is not None:
                 e = record["res"]
