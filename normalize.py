@@ -34,11 +34,11 @@ def perform_graph_native_normalization(
 
 
     """A list of strings of queries that create indices"""
-    index_queries: list[str] = []
+    index_queries: set[str] = set()
     """A list of strings of the queries that perform the transformations"""
-    transformation_queries: list[str] = []
+    transformation_queries: set[str] = set()
     """A list of strings of the queries that """
-    cleanup_queries: list[str] = []
+    cleanup_queries: set[str] = set()
 
     """The set of dependencies after all transformations have been applied."""
     transformed_deps: DependencySet
@@ -116,7 +116,7 @@ def perform_graph_native_normalization(
                             )
                             new_label: str = pascalcase(within_merge_key)
 
-                            index_queries.append(
+                            index_queries.add(
                                 f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                             )
 
@@ -124,7 +124,7 @@ def perform_graph_native_normalization(
                                 map(lambda ref: f"{pascalcase(ref)} : {camelcase(ref)}", map(str, new_props))
                             )
 
-                            transformation_queries.append(
+                            transformation_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()} 
 CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
@@ -136,7 +136,7 @@ WITH newNode, collectx{i}
 UNWIND collectx{i} AS origx{i}
 CREATE (origx{i})-[:{new_label.upper()}]->(newNode)""")  # relies on Neo4j >= 5.26
 
-                            cleanup_queries.append(
+                            cleanup_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()}
 DELETE {edge.symbol}
@@ -147,13 +147,13 @@ DELETE {edge.symbol}
                             right_ref_label_delim = (
                                 ":" if len(right_ref.get_graph_object().labels) > 0 else ""
                             )
-                            cleanup_queries.append(
+                            cleanup_queries.add(
                                 f"""
 MATCH ({right_ref.get_graph_object().symbol}{right_ref_label_delim}{"&".join(right_ref.get_graph_object().labels)})
 REMOVE {right_ref}"""
                             )  # Connect normalized nodes with reified nodes and remove redundant properties
 
-                            cleanup_queries.append(
+                            cleanup_queries.add(
                                 f"""
 MATCH ({edge.symbol}) - [:{new_label.upper()}]->(x{i})
 REMOVE {", ".join(map(str, left_references))}"""
@@ -198,7 +198,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                             )
                             new_label: str = pascalcase(within_merge_key)
 
-                            index_queries.append(
+                            index_queries.add(
                                 f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                             )
 
@@ -206,7 +206,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 map(lambda ref: f"{pascalcase(ref)} : {camelcase(ref)}", map(str, new_props))
                             )
 
-                            transformation_queries.append(
+                            transformation_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()} 
 CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
@@ -220,7 +220,7 @@ CREATE (origx{i})-[:{new_label.upper()}]->(newNode)"""
                             )
 
 
-                            cleanup_queries.append(
+                            cleanup_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()}
 DELETE {edge.symbol}"""
@@ -231,7 +231,7 @@ DELETE {edge.symbol}"""
                                 ":" if len(right_ref.get_graph_object().labels) > 0 else ""
                             )
 
-                            cleanup_queries.append(
+                            cleanup_queries.add(
                                 f"""
 MATCH ({edge.symbol})-[:{new_label.upper()}]->(x{i})
 REMOVE {", ".join(map(str, left_references))}"""
@@ -274,13 +274,13 @@ REMOVE {", ".join(map(str, left_references))}"""
                         ):
                             logging.info("N -> Ep")
 
-                            transformation_queries.append(
+                            transformation_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()}
 WITH {left_go.symbol}, {right_ref} AS {camelcase(str(right_ref))}
 SET {left_go.symbol}.{pascalcase(str(right_ref))} = {camelcase(str(right_ref))}"""
                             )
-                            cleanup_queries.append(
+                            cleanup_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()}
 REMOVE {right_ref}"""
@@ -320,7 +320,7 @@ REMOVE {right_ref}"""
                             )
                             new_label: str = pascalcase(within_merge_key)
 
-                            index_queries.append(
+                            index_queries.add(
 f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                             )
 
@@ -329,7 +329,7 @@ f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{",
                             )
 
                             # _apply_transformation_query(
-                            transformation_queries.append(
+                            transformation_queries.add(
                                 f"""
 {dep.pattern.to_gql_match_where_string()} 
 WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
@@ -347,7 +347,7 @@ CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
                                     "WHERE"
                                 )[0]
                             )
-                            cleanup_queries.append(
+                            cleanup_queries.add(
                                 f"""
 {cleanup_pattern} 
 REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
@@ -395,7 +395,7 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
                 logging.info("Within n")
                 node: Node = dep.right.pop().get_graph_object()
 
-                index_queries.append(
+                index_queries.add(
                     f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                 )
 
@@ -403,7 +403,7 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
                     map(lambda ref: f"{pascalcase(ref)} : {camelcase(ref)}", map(str, new_props))
                 )
 
-                transformation_queries.append(
+                transformation_queries.add(
                     f"""
 {dep.pattern.to_gql_match_where_string()} 
 WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
@@ -415,7 +415,7 @@ CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
 
                 # Remove old redundant properties in the end
                 cleanup_pattern = dep.pattern.to_gql_match_where_string().split("WHERE")[0]
-                cleanup_queries.append(
+                cleanup_queries.add(
                     f"""
 {cleanup_pattern} 
 REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
@@ -447,7 +447,7 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
 
                 edge: Edge = dep.right.pop().get_graph_object()
 
-                index_queries.append(
+                index_queries.add(
 f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                 )
 
@@ -456,7 +456,7 @@ f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{",
                 )
 
                 # Reification + create new node
-                transformation_queries.append(
+                transformation_queries.add(
                     f"""
 {dep.pattern.to_gql_match_where_string()} 
 CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
@@ -469,14 +469,14 @@ UNWIND collectx{i} AS origx{i}
 CREATE (origx{i})-[:{new_label.upper()}]->(newNode)"""
                 )
 
-                cleanup_queries.append(
+                cleanup_queries.add(
                     f"""
 {dep.pattern.to_gql_match_where_string()}
 REMOVE {", ".join(map(str, all_references))}
 DELETE {edge.symbol}"""
                 )
 
-                cleanup_queries.append(f"""
+                cleanup_queries.add(f"""
 MATCH ({edge.symbol})-[:{new_label.upper()}]->(x{i})
 REMOVE {", ".join(map(str, all_references))}"""
                 )  # Connect normalized nodes with reified nodes and remove redundant properties
