@@ -169,12 +169,10 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
         container.with_env("NEO4J_apoc_export_file_enabled", "true")
         container.with_env("NEO4J_apoc_import_file_enabled", "true")
         container.with_env("NEO4J_AUTH", "neo4j/password")
-        container.with_env("NEO4J_server_memory_heap_initial__size", "200G")
-        container.with_env("NEO4J_server_memory_heap_max__size", "200G")
-        container.with_env("NEO4J_server_memory_pagecache_size", "100G")
-        container.with_env("NEO4J_server_thread__pool_global_size","40")
-        container.with_env("NEO4J_cypher_parallel__runtime_workers","40")
-        container.with_kwargs(nano_cpus=int(40 * 1e9))  # 1 CPU = 1e9 nanocpus
+        container.with_env("NEO4J_server_memory_heap_initial__size", "1G")
+        container.with_env("NEO4J_server_memory_heap_max__size", "1G")
+        container.with_env("NEO4J_server_memory_pagecache_size", "5G")
+        container.with_kwargs(nano_cpus=int(4 * 1e9))  # 1 CPU = 1e9 nanocpus
 
         start_sh: str = "ls -la /var/lib/neo4j/import && cp -R /tmp/graphs /var/lib/neo4j/import &&"
         start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && ls -la /var/lib/neo4j/import && "
