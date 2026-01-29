@@ -131,7 +131,7 @@ CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.
 CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
 SET x{i} += properties({edge.symbol})
 WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
-CREATE (newNode:{new_label} {{{new_properties}}})
+MERGE (newNode:{new_label} {{{new_properties}}})
 WITH newNode, collectx{i}
 UNWIND collectx{i} AS origx{i}
 CREATE (origx{i})-[:{new_label.upper()}]->(newNode)""")  # relies on Neo4j >= 5.26
@@ -213,7 +213,7 @@ CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.
 CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
 SET x{i} += properties({edge.symbol})
 WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
-CREATE (newNode:{new_label} {{{new_properties}}})
+MERGE (newNode:{new_label} {{{new_properties}}})
 WITH newNode, collectx{i}
 UNWIND collectx{i} AS origx{i}
 CREATE (origx{i})-[:{new_label.upper()}]->(newNode)"""
@@ -333,7 +333,7 @@ f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{",
                                 f"""
 {dep.pattern.to_gql_match_where_string()} 
 WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
-CREATE (newNode:{new_label} {{{new_properties}}})
+MERGE (newNode:{new_label} {{{new_properties}}})
 WITH newNode, collect{node.symbol}
 UNWIND collect{node.symbol} AS orig{node.symbol}
 CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
@@ -407,7 +407,7 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
                     f"""
 {dep.pattern.to_gql_match_where_string()} 
 WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
-CREATE (newNode:{new_label} {{{new_properties}}})
+MERGE (newNode:{new_label} {{{new_properties}}})
 WITH newNode, collect{node.symbol}
 UNWIND collect{node.symbol} AS orig{node.symbol}
 CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
@@ -463,7 +463,7 @@ CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.
 CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
 SET x{i} += properties({edge.symbol})
 WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
-CREATE (newNode:{new_label} {{{new_properties}}})
+MERGE (newNode:{new_label} {{{new_properties}}})
 WITH newNode, collectx{i}
 UNWIND collectx{i} AS origx{i}
 CREATE (origx{i})-[:{new_label.upper()}]->(newNode)"""
@@ -496,9 +496,9 @@ REMOVE {", ".join(map(str, all_references))}"""
                 applied_transformations.append(("within-edge", 2))
 
         i += 1
-
-    for query in tqdm(index_queries, desc="  Indices"):
-        _apply_transformation_query(query)
+    if database == "neo4j":
+        for query in tqdm(index_queries, desc="  Indices"):
+            _apply_transformation_query(query)
     for query in tqdm(transformation_queries, desc="  Query"):
         _apply_transformation_query(query)
     for query in tqdm(cleanup_queries, desc="  Cleanup"):
