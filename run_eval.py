@@ -190,8 +190,11 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
             # Neo4J Enterprise is not immediately coming online (although logs say different things)
             container.waiting_for(LogMessageWaitStrategy("db.clearQueryCaches():"))
             # and even after this additional intermediate log message it takes further ~15 seconds
-            logger.info("Wait 30 seconds for Neo4J to become responsive")
-            time.sleep(30)
+            if "from_dump" in graph["neo4j"].keys():
+                logger.info("Wait 30 seconds for Neo4J to become responsive")
+                time.sleep(30)
+            else:
+                time.sleep(1)
 
         with container.get_driver() if database == "neo4j" else GraphDatabase.driver(uri, auth=None) as driver:
             # connects to
