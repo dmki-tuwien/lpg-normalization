@@ -108,13 +108,13 @@ graphs:
   #  memgraph:
   #    from_file: graphs/london_memgraph.cypher --> I cant find the error here :(
     dependencies:
-      - "(s:Station:zone&zoneOriginal)::s.zone=>s.zoneOriginal"
+      - "(s:Station:zone&zoneOriginal)::s.zoneOriginal=>s.zone"
       - "(s:Station)-[c::line&color]->(t:Station)::c.line=>c.color"
       - "(s:Station:latitude&longitude&zone)::s.latitude,s.longitude=>s.zone"
       - "(s:Station:latitude&longitude)::s.latitude,s.longitude=>s"
     #  - line --> color type
     minimal_cover:
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c::line&color]->(t:Station)::s.zone=>s.zoneOriginal"
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c::line&color]->(t:Station)::s.zoneOriginal=>s.zone"
       - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c::line&color]->(t:Station)::c.line=>c.color"
       - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c::line&color]->(t:Station)::s.latitude,s.longitude=>s"
     #  - line --> color type
