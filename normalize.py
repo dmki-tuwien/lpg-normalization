@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from caseconverter import pascalcase, camelcase
 
@@ -121,20 +122,11 @@ def perform_graph_native_normalization(
                             )
 
                             new_properties: str = ", ".join(
-                                map(lambda ref: f"{pascalcase(ref)} : {camelcase(ref)}", map(str, new_props))
+                                map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                             )
 
-                            transformation_queries.add(
-                                f"""
-{inter_dep.pattern.to_gql_match_where_string()} 
-CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
-CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
-SET x{i} += properties({edge.symbol})
-WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
-MERGE (newNode:{new_label} {{{new_properties}}})
-WITH newNode, collectx{i}
-UNWIND collectx{i} AS origx{i}
-CREATE (origx{i})-[:{new_label.upper()}]->(newNode)""")  # relies on Neo4j >= 5.26
+                            reify_and_extract_to_new_node(edge, i, dep, new_label, new_properties, new_props,
+                                                          transformation_queries)
 
                             cleanup_queries.add(
                                 f"""
@@ -203,21 +195,11 @@ REMOVE {", ".join(map(str, left_references))}"""
                             )
 
                             new_properties: str = ", ".join(
-                                map(lambda ref: f"{pascalcase(ref)} : {camelcase(ref)}", map(str, new_props))
+                                map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                             )
 
-                            transformation_queries.add(
-                                f"""
-{inter_dep.pattern.to_gql_match_where_string()} 
-CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
-CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
-SET x{i} += properties({edge.symbol})
-WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
-MERGE (newNode:{new_label} {{{new_properties}}})
-WITH newNode, collectx{i}
-UNWIND collectx{i} AS origx{i}
-CREATE (origx{i})-[:{new_label.upper()}]->(newNode)"""
-                            )
+                            reify_and_extract_to_new_node(edge, i, dep, new_label, new_properties, new_props,
+                                                          transformation_queries)
 
 
                             cleanup_queries.add(
@@ -325,20 +307,24 @@ f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{",
                             )
 
                             new_properties: str = ", ".join(
-                                map(lambda ref: f"{pascalcase(ref)} : {camelcase(ref)}", map(str, new_props))
+                                map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                             )
 
                             # _apply_transformation_query(
-                            transformation_queries.add(
-                                f"""
-{dep.pattern.to_gql_match_where_string()} 
-WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
+#                             transformation_queries.add(
+#                                 f"""
+# {dep.pattern.to_gql_match_where_string()}
+# WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
+# MERGE (newNode:{new_label} {{{new_properties}}})
+# WITH newNode, collect{node.symbol}
+# UNWIND collect{node.symbol} AS orig{node.symbol}
+# CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
+#                             )
+                            transformation_queries.add(f"""
+                            {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
-WITH newNode, collect{node.symbol}
-UNWIND collect{node.symbol} AS orig{node.symbol}
-CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
+CREATE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                             )
-
                             #    pattern += f", ({node.symbol})-[:{new_label.upper()}]->(x{i}:{new_label})"
 
                             # Remove old redundant properties in the end
@@ -400,17 +386,21 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
                 )
 
                 new_properties: str = ", ".join(
-                    map(lambda ref: f"{pascalcase(ref)} : {camelcase(ref)}", map(str, new_props))
+                    map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                 )
 
-                transformation_queries.add(
-                    f"""
+#                 transformation_queries.add(
+#                     f"""
+# {dep.pattern.to_gql_match_where_string()}
+# WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
+# MERGE (newNode:{new_label} {{{new_properties}}})
+# WITH newNode, collect{node.symbol}
+# UNWIND collect{node.symbol} AS orig{node.symbol}
+# CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)""")
+                transformation_queries.add(f"""
 {dep.pattern.to_gql_match_where_string()} 
-WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
 MERGE (newNode:{new_label} {{{new_properties}}})
-WITH newNode, collect{node.symbol}
-UNWIND collect{node.symbol} AS orig{node.symbol}
-CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
+CREATE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                 )
 
                 # Remove old redundant properties in the end
@@ -452,22 +442,12 @@ f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{",
                 )
 
                 new_properties: str = ", ".join(
-                    map(lambda ref: f"{pascalcase(ref)} : {camelcase(ref)}", map(str, new_props))
+                    map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                 )
 
                 # Reification + create new node
-                transformation_queries.add(
-                    f"""
-{dep.pattern.to_gql_match_where_string()} 
-CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
-CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
-SET x{i} += properties({edge.symbol})
-WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
-MERGE (newNode:{new_label} {{{new_properties}}})
-WITH newNode, collectx{i}
-UNWIND collectx{i} AS origx{i}
-CREATE (origx{i})-[:{new_label.upper()}]->(newNode)"""
-                )
+                reify_and_extract_to_new_node(edge, i, dep, new_label, new_properties, new_props,
+                                              transformation_queries)
 
                 cleanup_queries.add(
                     f"""
@@ -507,3 +487,28 @@ REMOVE {", ".join(map(str, all_references))}"""
     transformed_deps = DependencySet.from_string_list(transformed_deps_list)
 
     return transformed_deps, applied_transformations
+
+
+def reify_and_extract_to_new_node(edge: Edge, i: int | Any, inter_dep: GNFD, new_label: str, new_properties: str,
+                                  new_props: list[Reference], transformation_queries: set[str]):
+    # the "naive" way of encoding it
+    transformation_queries.add(
+            f"""
+    {inter_dep.pattern.to_gql_match_where_string()} 
+    CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
+    CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
+    SET x{i} += properties({edge.symbol})
+    MERGE (newNode:{new_label} {{{new_properties}}})
+    MERGE (x{i})-[:{new_label.upper()}]->(newNode)""")
+    ## Uses less database hits but 10x more ram
+#     transformation_queries.add(
+#         f"""
+# {inter_dep.pattern.to_gql_match_where_string()}
+# CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
+# CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
+# SET x{i} += properties({edge.symbol})
+# WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
+# MERGE (newNode:{new_label} {{{new_properties}}})
+# WITH newNode, collectx{i}
+# UNWIND collectx{i} AS origx{i}
+# CREATE (origx{i})-[:{new_label.upper()}]->(newNode)""")
