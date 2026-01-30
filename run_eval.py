@@ -169,10 +169,10 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
         container.with_env("NEO4J_apoc_export_file_enabled", "true")
         container.with_env("NEO4J_apoc_import_file_enabled", "true")
         container.with_env("NEO4J_AUTH", "neo4j/password")
-        container.with_env("NEO4J_server_memory_heap_initial__size", "1G")
-        container.with_env("NEO4J_server_memory_heap_max__size", "1G")
-        container.with_env("NEO4J_server_memory_pagecache_size", "5G")
-        container.with_kwargs(nano_cpus=int(4 * 1e9))  # 1 CPU = 1e9 nanocpus
+        container.with_env("NEO4J_server_memory_heap_initial__size", "100G")
+        container.with_env("NEO4J_server_memory_heap_max__size", "100G")
+        container.with_env("NEO4J_server_memory_pagecache_size", "500G")
+        container.with_kwargs(nano_cpus=int(40 * 1e9))  # 1 CPU = 1e9 nanocpus
 
         start_sh: str = "ls -la /var/lib/neo4j/import && cp -R /tmp/graphs /var/lib/neo4j/import &&"
         start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && ls -la /var/lib/neo4j/import && "
@@ -191,8 +191,8 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
             container.waiting_for(LogMessageWaitStrategy("db.clearQueryCaches():"))
             # and even after this additional intermediate log message it takes further ~15 seconds
             if "from_dump" in graph["neo4j"].keys():
-                logger.info("Wait 30 seconds for Neo4J to become responsive")
-                time.sleep(30)
+                logger.info("Wait 1 minute for Neo4J to become responsive")
+                time.sleep(60)
             else:
                 time.sleep(1)
 
@@ -222,6 +222,12 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
                                 session.run(query)
                 case _:
                     with driver.session(database=DATABASE) as session:
+			res = session.run("""CALL dbms.listConfig() YIELD name, value 
+WHERE name CONTAINS 'memory.pagecache.size' 
+RETURN value"""
+                        record = res.single()
+                        if record is not None:
+                            logger.info(f"Available Pagecache Memory: {record['value']}")
                         if "from_file" in graph.keys():
                             session.run(f"CALL apoc.cypher.runFile(\"{graph['from_file']}\");")
                         elif "neo4j" in graph.keys() and "from_file" in graph["neo4j"].keys():
