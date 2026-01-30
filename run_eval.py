@@ -190,7 +190,7 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
             # Neo4J Enterprise is not immediately coming online (although logs say different things)
             container.waiting_for(LogMessageWaitStrategy("db.clearQueryCaches():"))
             # and even after this additional intermediate log message it takes further ~15 seconds
-            if "from_dump" in graph["neo4j"].keys():
+            if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
                 logger.info("Wait 1 minute for Neo4J to become responsive")
                 time.sleep(60)
             else:
@@ -222,12 +222,13 @@ def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, 
                                 session.run(query)
                 case _:
                     with driver.session(database=DATABASE) as session:
-			res = session.run("""CALL dbms.listConfig() YIELD name, value 
+                        res = session.run("""CALL dbms.listConfig() YIELD name, value 
 WHERE name CONTAINS 'memory.pagecache.size' 
-RETURN value"""
+RETURN value""")
                         record = res.single()
                         if record is not None:
                             logger.info(f"Available Pagecache Memory: {record['value']}")
+
                         if "from_file" in graph.keys():
                             session.run(f"CALL apoc.cypher.runFile(\"{graph['from_file']}\");")
                         elif "neo4j" in graph.keys() and "from_file" in graph["neo4j"].keys():
