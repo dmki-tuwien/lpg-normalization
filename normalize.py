@@ -323,7 +323,7 @@ f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{",
                             transformation_queries.add(f"""
                             {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
-CREATE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
+MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                             )
                             #    pattern += f", ({node.symbol})-[:{new_label.upper()}]->(x{i}:{new_label})"
 
@@ -400,7 +400,7 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
                 transformation_queries.add(f"""
 {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
-CREATE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
+MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                 )
 
                 # Remove old redundant properties in the end
