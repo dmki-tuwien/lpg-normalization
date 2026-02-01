@@ -100,9 +100,9 @@ graphs:
   - name: "S12 - University" # works
     from_file: graphs/lecture.cypher
     dependencies:
-      - "(c:Course)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
+      - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
     minimal_cover:
-      - "(c:Course)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
+      - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
     dependency_origin: "User provided"
 
   - name: "S3 - No Socks" # works
