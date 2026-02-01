@@ -10,6 +10,10 @@ from tqdm_loggable.auto import tqdm
 from gnfd import DependencySet, GNFD, Node, Reference, Edge, GraphObject
 
 
+
+
+
+
 def perform_graph_native_normalization(
     driver: Driver,
     database,
@@ -56,6 +60,26 @@ def perform_graph_native_normalization(
         with driver.session(database=database) as session:
             session.run(query)
 
+    def validate_dep(dep):
+        """Validates whether a functional dependency holds"""
+        with driver.session(database=database) as session:
+            query = f"""
+{dep.pattern.to_gql_match_where_string()}
+WITH DISTINCT
+{",".join(map(lambda ref: str(ref)+" AS "+camelcase(str(ref)), dep.left.union(dep.right)))}
+WITH
+{",".join(map(lambda ref: camelcase(str(ref)), dep.left))},
+COUNT([{",".join(map(lambda ref: camelcase(str(ref)), dep.right))}]) AS card
+RETURN avg(card) AS res
+
+"""
+            res = session.run(query)
+            record = res.single()
+            if record is not None:
+                if record["res"] != 1:
+                    raise ValueError(f"The dependency \"{str(dep)}\" is not functional!")
+
+
     # Phase 0: Filter deps according to parameter from evaluation.
     logging.info("Filter dependencies")
     match dep_filter:
@@ -76,6 +100,8 @@ def perform_graph_native_normalization(
     i = 0
 
     for dep in deps:
+        validate_dep(dep)
+
         if dep.is_inter_graph_object:
             inter_dep = dep
             left_gos: set[GraphObject] = set(
