@@ -179,10 +179,10 @@ REMOVE {", ".join(map(str, left_references))}"""
 
                             transformed_deps_list.append(
                                 f"""
-                                                    ({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
-                                                    ::
-                                        {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
-                                        =>x{i}.{pascalcase(str(right_ref))}""".replace(
+({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
+::
+{",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
+=>x{i}""".replace(
                                     " ", ""
                                 ).replace(
                                     "\n", ""
@@ -247,10 +247,10 @@ REMOVE {", ".join(map(str, left_references))}"""
 
                             transformed_deps_list.append(
                                 f"""
-                                                    ({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
-                                                    ::
-                                        {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
-                                        =>x{i}.{pascalcase(str(right_ref))}""".replace(
+({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
+::
+{",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
+=>x{i}""".replace(
                                     " ", ""
                                 ).replace(
                                     "\n", ""
@@ -298,9 +298,7 @@ REMOVE {right_ref}"""
                                 str(right_ref).split(".")[1]
                             )
                             transformed_deps_list.append(
-                                f"""
-    {inter_dep.pattern}::{node.symbol}=>{node.symbol}.{pascalcase(str(right_ref))}
-    """
+                                f"{inter_dep.pattern}::{node.symbol}=>{node.symbol}.{pascalcase(str(right_ref))}"
                             )
                             applied_transformations.append(("inter2", 2))
 
@@ -370,10 +368,10 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
 
                             transformed_deps_list.append(
                                 f"""
-                                        (x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
-                                        ::
-                            {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
-                            =>x{i}.{pascalcase(str(right_ref))}""".replace(
+(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
+::
+{",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
+=>x{i}""".replace(
                                     " ", ""
                                 ).replace(
                                     "\n", ""
@@ -415,14 +413,6 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
                     map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                 )
 
-#                 transformation_queries.add(
-#                     f"""
-# {dep.pattern.to_gql_match_where_string()}
-# WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
-# MERGE (newNode:{new_label} {{{new_properties}}})
-# WITH newNode, collect{node.symbol}
-# UNWIND collect{node.symbol} AS orig{node.symbol}
-# CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)""")
                 transformation_queries.add(f"""
 {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
@@ -441,10 +431,10 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
 
                 transformed_deps_list.append(
                     f"""
-                (x{i}:{new_label}:{"&".join(map(pascalcase, map(str, right_references.union(left_references))))})
-                ::
-    {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
-    =>{",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, right_references)))}""".replace(
+(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, right_references.union(left_references))))})
+::
+{",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
+=>x{i}""".replace(
                         " ", ""
                     ).replace(
                         "\n", ""
@@ -489,10 +479,10 @@ REMOVE {", ".join(map(str, all_references))}"""
 
                 transformed_deps_list.append(
                     f"""
-                            ({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, right_references.union(left_references))))})
-                            ::
-                {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
-                =>{",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, right_references)))}""".replace(
+({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, right_references.union(left_references))))})
+::
+{",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
+=>x{i}""".replace(
                         " ", ""
                     ).replace(
                         "\n", ""
