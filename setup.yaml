@@ -178,11 +178,10 @@ graphs:
       - "(s:Station)-[c::line&color]->(t:Station)::c.line=>c.color"
       - "(s:Station:latitude&longitude&zone)::s.latitude,s.longitude=>s.zone"
       - "(s:Station:latitude&longitude)::s.latitude,s.longitude=>s"
-    #  - line --> color type
+      - "()-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type"
     minimal_cover:
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c::line&color]->(t:Station)::s.zoneOriginal=>s.zone"
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c::line&color]->(t:Station)::c.line=>c.color"
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c::line&color]->(t:Station)::s.latitude,s.longitude=>s"
-    #  - line --> color type
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::s.zoneOriginal=>s.zone"
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::s.latitude,s.longitude=>s"
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::c.line=>c.color,c.type"
     dependency_origin: "User provided"
     source: "Extended based on \\url{https://github.com/neo4j-partners/neo4j-transport-for-london}"
