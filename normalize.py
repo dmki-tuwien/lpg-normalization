@@ -179,7 +179,7 @@ REMOVE {", ".join(map(str, left_references))}"""
 
                             transformed_deps_list.append(
                                 f"""
-({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
+(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
 ::
 {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
 =>x{i}""".replace(
@@ -247,7 +247,7 @@ REMOVE {", ".join(map(str, left_references))}"""
 
                             transformed_deps_list.append(
                                 f"""
-({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
+(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, left_references.union({right_ref}))))})
 ::
 {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
 =>x{i}""".replace(
@@ -479,7 +479,7 @@ REMOVE {", ".join(map(str, all_references))}"""
 
                 transformed_deps_list.append(
                     f"""
-({edge.symbol})-[:{new_label.upper()}]->(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, right_references.union(left_references))))})
+(x{i}:{new_label}:{"&".join(map(pascalcase, map(str, right_references.union(left_references))))})
 ::
 {",".join(map(lambda ref: f"x{i}.{pascalcase(ref)}", map(str, left_references)))}
 =>x{i}""".replace(
