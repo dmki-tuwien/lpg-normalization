@@ -89,6 +89,10 @@ RETURN avg(card) AS res
             deps = DependencySet(filter(lambda dep: dep.is_within_graph_object, deps))
         case "between-go":
             deps = DependencySet(filter(lambda dep: dep.is_inter_graph_object, deps))
+        case "node-left":
+            deps = DependencySet(filter(lambda dep: dep.is_within_node or isinstance(next(iter(dep.left)).get_graph_object(), Node), deps))
+        case "edge-left":
+            deps = DependencySet(filter(lambda dep: isinstance(next(iter(dep.left)).get_graph_object(), Edge), deps))
 
     if len(deps) == 0:
         return (
@@ -257,7 +261,6 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 )
                             )
 
-                            applied_transformations.append(("inter1", 2))
                 elif isinstance(left_go, Node):
                     node = left_go
                     for right_ref in inter_dep.right:
@@ -298,7 +301,7 @@ REMOVE {right_ref}"""
                                 str(right_ref).split(".")[1]
                             )
                             transformed_deps_list.append(
-                                f"{inter_dep.pattern}::{node.symbol}=>{node.symbol}.{pascalcase(str(right_ref))}"
+                                f"({node.symbol}:{"&".join(node.labels)}:{pascalcase(str(right_ref))})::{node.symbol}=>{node.symbol}.{pascalcase(str(right_ref))}"
                             )
                             applied_transformations.append(("inter2", 2))
 

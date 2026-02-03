@@ -88,9 +88,9 @@ def main():
         logger.error("🔥 \"setup.yaml\" does not contain any graph.")
         exit(1)
 
-    for database in tqdm(["neo4j", "memgraph"], desc="System"):
+    for database in tqdm(["neo4j"]):#, "memgraph"], desc="System"):
         for graph in tqdm(setup["graphs"], desc="Graphs"):
-            for subset in  tqdm(["all", "within-node", "within-go", "inter-go"], desc="Dep. subset"):
+            for subset in  tqdm(["all", "node-left", "edge-left"], desc="Dep. subset"):
                 for algorithm in ["synthesis"]: #,"decomposition"]:
                     for ignore_min_cov in tqdm([True, False], desc="Min. cov."):
                         perform_evaluation(graph, database, subset, algorithm, ignore_min_cov)
@@ -147,7 +147,7 @@ def export_tables_and_plots():
 
 def perform_evaluation(graph: dict, database: str, subset: str, algorithm: str, ignore_min_cov: bool):
     logger.info(f"\tPerform experiment with graph \"{graph['name']}\", database \"{database}\", subset \"{subset}\", algorithm \"{algorithm}\", and minimal cover ignored \"{ignore_min_cov}\".")
-    if subset not in ["within-node", "within-go", "inter-go", "all"] or algorithm not in ["synthesis", "decomposition"]:
+    if subset not in ["within-node", "within-go", "node-left", "edge-left", "all"] or algorithm not in ["synthesis", "decomposition"]:
         raise ValueError("Illegal argument used for calling \"perform_evaluation\"")
     DATABASE = database
     container: DockerContainer | Neo4jContainer
@@ -260,7 +260,7 @@ RETURN value""")
 
 
             # 5. Get statistics after normalization
-            get_graph_statistics(driver, graph["name"], f"{subset} {algorithm} ignoreMinCov{ignore_min_cov}", database, normalized_deps, measured_denormalized, subset, ignore_min_cov)
+            get_graph_statistics(driver, graph["name"], subset, database, normalized_deps, measured_denormalized, subset, ignore_min_cov)
             # TODO replace with transformed dependencies
 
             #input("Press any key to continue...")
