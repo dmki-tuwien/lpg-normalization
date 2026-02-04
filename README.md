@@ -1,7 +1,7 @@
-# PG-Norm: Native Property Graph Normal Forms
+# A Graph-Native Approach to Normalization
 
 Welcome to the documentation and [repository](https://github.com/dmki-tuwien/lpg-normalization)
-accompanying the paper "PG-Norm: Native Property Graph Normal Forms".
+accompanying the paper "A Graph-Native Approach to Normalization".
 
 Repository structure:
 * `docs/`: The documentation of the source code of this repository
