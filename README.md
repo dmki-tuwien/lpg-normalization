@@ -5,17 +5,18 @@ accompanying the paper "PG-Norm: Native Property Graph Normal Forms".
 
 Repository structure:
 * `docs/`: The documentation of the source code of this repository
-* `gnfd/`: A Python package that implements the Graph-Native Functional Dependencies
+* `gnfd/`: A Python package that implements the Graph Object Functional Dependencies
 * `graphs/`: Contains graphs that are normalized as part of the evaluation
 * `out/`: Contains the output of the evaluation as CSV files
 * `tests/`: Contains Python pytests for the dependencies and the normalization
 
 ## Getting Started
 
-Since this repository contains submodules for the 
-GQL grammar and the 
+Since this repository contains a submodule for the 
 [Northwind](https://github.com/neo4j-graph-examples/northwind) graph dataset, 
 the command `git clone https://github.com/dmki-tuwien/lpg-normalization.git --recurse-submodules` needs to be used. 
+
+Please also download all datasets as described in the `graphs/` folder before running the evaluation.
 
 Following the cloning of the repository run the command `docker compose build` to prepare the containers for the evaluation.
 
@@ -33,6 +34,3 @@ is used.
 On macOS ANTLR can be installed using [Homebrew](https://brew.sh/): 
 `brew install antlr`.
 
-## Troubleshooting
-
-If the resulting plot misses metrics and only shows 0s, there most probably may ha
