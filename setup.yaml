@@ -1,95 +1,187 @@
 graphs:
-  - name: "Rijden de Treinen"
+  - name: "S09 - Rijden de Treinen"
     neo4j:
-      from_dump: graphs/rijden.dump
+      from_dump: graphs/rijdendetreinen/rijdendetreinen_small.dump
      # from_file: graphs/rijdendetreinen_neo4j.cypher
     dependencies:
-      - "()-[t:STOPS_AT]->(s:Station):s.name->t.code"
+      - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
+      - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type"
+      - "(x::date&number&operator)-[:STOPS_AT]->()::x.number,x.date=>x.operator"
+      - "(x:TrainService:serviceid)::x.serviceid=>x"
+      - "()-[s:STOPS_AT:stopid]->()::s.stopid=>s"
+      - "()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st"
+    minimal_cover:
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::s.name=>t.code"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.number,ts.date=>ts.type,ts.operator"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.serviceid=>ts"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.stopid=>t"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.departure,t.stopid=>s"
+    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
+    dependency_origin: "User provided"
 
-#  - name: "Offshore Entities"
-#    neo4j:
-#      from_dump: graphs/offshore.dump
-#    dependencies:
-#      - "(e:Entity):e.jurisdiction_description,e.lastEditTimestamp,e.sourceID->e.jurisdiction"
+  - name: "S10 - Rijden de Treinen"
+    neo4j:
+      from_dump: graphs/rijdendetreinen/rijdendetreinen_small.dump
+      # from_file: graphs/rijdendetreinen_neo4j.cypher
+    dependencies:
+      - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
+      - "()-[t:STOPS_AT:code]->(s:Station:name)::t.code=>s.name"
+      - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type"
+      - "(x::date&number&operator)-[:STOPS_AT]->()::x.number,x.date=>x.operator"
+      - "(x:TrainService:serviceid)::x.serviceid=>x"
+      - "()-[s:STOPS_AT:stopid]->()::s.stopid=>s"
+      - "()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st"
+    minimal_cover:
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::s.name=>t.code"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.code=>s.name"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.number,ts.date=>ts.type,ts.operator"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.serviceid=>ts"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.stopid=>t"
+      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.departure,t.stopid=>s"
+    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
+    dependency_origin: "User provided"
 
-  - name: "Lecture uses Book"
+  - name: "S06 - Offshore"
+    neo4j:
+      from_dump: graphs/offshore.dump
+    dependencies:
+      - "(e:Entity:countries&service_provider&country_codes)::e.countries=>e.country_codes"
+      - "(e:Entity:jurisdiction_description&countries&country_codes)::e.countries,e.jurisdiction_description=>e.country_codes"
+      - "(e:Entity:service_provider&countries&country_codes)::e.country_codes=>e.countries"
+    minimal_cover:
+        - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.countries=>e.country_codes"
+        - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.country_codes=>e.countries"
+
+  - name: "S07 - Offshore"
+    neo4j:
+      from_dump: graphs/offshore.dump
+    dependencies:
+      - "(e:Entity:jurisdiction_description&countries&country_codes)::e.countries,e.jurisdiction_description=>e.country_codes"
+      - "(e:Entity:sourceID&countries&country_codes)::e.countries,e.sourceID=>e.country_codes"
+      - "(e:Entity:valid_until&countries&country_codes)::e.countries,e.valid_until=>e.country_codes"
+      - "(e:Entity:sourceID&countries&country_codes)::e.country_codes,e.sourceID=>e.countries"
+      - "(e:Entity:valid_until&countries&country_codes)::e.country_codes,e.valid_until=>e.countries"
+    minimal_cover:
+      - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.countries,e.jurisdiction_description=>e.country_codes"
+      - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.countries,e.sourceID=>e.country_codes"
+      - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.countries,e.valid_until=>e.country_codes"
+      - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.sourceID=>e.countries"
+      - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.valid_until=>e.countries"
+
+  - name: "S08 - Offshore"
+    neo4j:
+      from_dump: graphs/offshore.dump
+    dependencies:
+      - "(e:Entity:countries&service_provider&country_codes)::e.countries=>e.country_codes"
+      - "(e:Entity:jurisdiction_description&countries&country_codes)::e.countries,e.jurisdiction_description=>e.country_codes"
+      - "(e:Entity:service_provider&countries&country_codes)::e.country_codes=>e.countries"
+      - "(e:Entity:sourceID&countries&country_codes)::e.countries,e.sourceID=>e.country_codes"
+      - "(e:Entity:valid_until&countries&country_codes)::e.countries,e.valid_until=>e.country_codes"
+      - "(e:Entity:sourceID&countries&country_codes)::e.country_codes,e.sourceID=>e.countries"
+      - "(e:Entity:valid_until&countries&country_codes)::e.country_codes,e.valid_until=>e.countries"
+      - "(e:Entity:service_provider&sourceID&valid_until)::e.service_provider=>e.sourceID,e.valid_until"
+      - "(e:Entity:service_provider&sourceID&valid_until)::e.sourceID=>e.valid_until"
+      - "(e:Entity:service_provider&sourceID&valid_until)::e.valid_until=>e.sourceID"
+    minimal_cover:
+      - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.countries=>e.country_codes"
+      - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.country_codes=>e.countries"
+      - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.service_provider=>e.sourceID,e.valid_until"
+      - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.sourceID=>e.valid_until"
+      - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.valid_until=>e.sourceID"
+
+  - name: "S11 - University" # works
     from_file: graphs/lecture.cypher
     dependencies:
-      - "(c:Course)<-[t:TEACHES]-():c->t.usingBook"
+      - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
+    minimal_cover:
+      - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
     dependency_origin: "User provided"
-    source: "Self-created"
 
-  - name: "No Socks 1"
+  - name: "S12 - University" # works
+    from_file: graphs/lecture.cypher
+    dependencies:
+      - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
+    minimal_cover:
+      - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
+    dependency_origin: "User provided"
+
+  - name: "S03 - No Socks" # works
     from_file: graphs/nosocks.cypher
     dependencies:
-      - "(e:Event):e.company,e.time->e.name"
-      - "(e:Event):e.company,e.time->e.venue"
-      - "(e:Event):e.name->e.company"
-      - "(e:Event):e.name,e.time->e.venue"
-      - "(e:Event):e.time,e.venue->e.name"
+      - "(e:Event:company&time)::e.company,e.time=>e"
+      - "(e:Event:name&company)::e.name=>e.company"
+      - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
+    minimal_cover:
+      - "(e:Event:company&name&time&venue)::e.company,e.time=>e"
+      - "(e:Event:company&name&time&venue)::e.name=>e.company"
+      - "(e:Event:company&name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event:company&name&time&venue)::e.time,e.venue=>e.name"
      # - "(e:Event):e.company,e.time->e.company"
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
-
-  - name: "No Socks 2"
+  - name: "S04 - No Socks" # works
     from_file: graphs/nosocks.cypher
     dependencies:
-      - "(e:Event&Confirmed):e.company,e.time->e.name"
-      - "(e:Event&Confirmed):e.company,e.time->e.venue"
-      - "(e:Event&Confirmed):e.name->e.company"
-      - "(e:Event&Confirmed):e.name,e.time->e.venue"
-      - "(e:Event&Confirmed):e.time,e.venue->e.name"
-      - "(e:Event&Confirmed):e.name,e.company->e.time"
+      - "(e:Event:company&time&venue)::e.company,e.time=>e.venue"
+      #- "(e:Event:company&time)::e.company,e.time=>e"
+      - "(e:Event:name&company)::e.name=>e.company"
+      - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
+      # - "(e:Event):e.company,e.time->e.company"
+    minimal_cover:
+      - "(e:Event:company&name&time&venue)::e.company,e.time=>e.venue"
+      - "(e:Event:company&name&time&venue)::e.name=>e.company"
+      - "(e:Event:company&name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event:company&name&time&venue)::e.time,e.venue=>e.name"
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
-  - name: "Northwind Orders"
+  - name: "S05 - No Socks 2" #works
+    from_file: graphs/nosocks.cypher
+    dependencies:
+      - "(e:Event:company&time&venue)::e.company,e.time=>e"
+      - "(e:Event:name&company)::e.name=>e.company"
+      - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
+      - "(e:Event&Confirmed:name&company&time)::e.name,e.company=>e.time"
+    minimal_cover:
+      - "(e:Event&Confirmed:company&name&time&venue)::e.company,e.time=>e"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.name=>e.company"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.time,e.venue=>e.name"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.name,e.company=>e.time"
+    dependency_origin: "User provided"
+    source: "\\cite{skavantzos_third_2025}"
+
+  - name: "S02 - Northwind Orders"
     neo4j:
       from_file: graphs/northwind/scripts/northwind.cypher
     #memgraph:
     #  from_file: graphs/northwind_memgraph.cypher
     dependencies:
-      - "(o:Order):o.shipCity,o.shipCountry->o.shipRegion"
-      - "(o:Order):o.shipCity,o.shipAddress->o.shipCountry"
-      - "(o:Order):o.shipCity,o.shipAddress->o.customerID"
-      - "(o:Order):o.shipCity,o.shipAddress->o.shipRegion"
-      - "(o:Order):o.shipCountry,o.shipAddress->o.shipCity"
-      - "(o:Order):o.shipCountry,o.shipAddress->o.customerID"
-      - "(o:Order):o.shipCountry,o.shipAddress->o.shipRegion"
-      - "(o:Order):o.shipAddress->o.shipPostalCode"
-      - "(o:Order):o.customerID->o.shipCity"
-      - "(o:Order):o.customerID->o.shipPostalCode"
-      - "(o:Order):o.customerID->o.shipCountry"
-      - "(o:Order):o.customerID->o.shipAddress"
-      - "(o:Order):o.customerID->o.shipRegion"
-      - "(o:Order):o.shipName->o.shipCity"
-      - "(o:Order):o.shipName->o.shipPostalCode"
-      - "(o:Order):o.shipName->o.shipCountry"
-      - "(o:Order):o.shipName->o.shipAddress"
-      - "(o:Order):o.shipName->o.customerID"
-      - "(o:Order):o.shipName->o.shipRegion"
-      - "(o:Order):o.shipCity,o.shipPostalCode->o.shipCountry"
-      - "(o:Order):o.shipCity,o.shipPostalCode->o.shipRegion"
-      - "(o:Order):o.shipPostalCode,o.shipCountry->o.shipCity"
-      - "(o:Order):o.shipPostalCode,o.shipCountry->o.shipRegion"
-      - "(o:Order):o.shipAddress->o.shipCity"
-      - "(o:Order):o.shipAddress->o.shipCountry"
-      - "(o:Order):o.shipAddress->o.customerID"
-      - "(o:Order):o.shipAddress->o.shipRegion"
-      - "(o:Order):o.shipCity,o.shipAddress,o.employeeID->o.shipName"
-      - "(o:Order):o.shipCountry,o.shipAddress,o.employeeID->o.shipName"
-      - "(o:Order):o.customerID,o.employeeID->o.shipName"
-      - "(o:Order):o.shipAddress,o.employeeID->o.shipName"
-    dependency_origin: "Mined by \\citet{skavantzos_third_2025}"
+      - "(o:Order:orderID)::o.orderID=>o"
+      - "(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
+    minimal_cover:
+      - "(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.orderID=>o"
+      - "(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
+    dependency_origin: "\\citet{skavantzos_third_2025}"
     source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
 
-  - name: "London Public Transport"
+  - name: "S01 - London Public Transport" # works
     neo4j:
       from_file: graphs/london_neo4j.cypher
   #  memgraph:
   #    from_file: graphs/london_memgraph.cypher --> I cant find the error here :(
     dependencies:
-      - "(s:Station)-[c]->(t:Station):s.zone->s.zoneOriginal"
-      - "(s:Station)-[c]->(t:Station):c.line->c.color"
+      - "(s:Station:zone&zoneOriginal)::s.zoneOriginal=>s.zone"
+      - "(s:Station)-[c::line&color]->(t:Station)::c.line=>c.color"
+      - "(s:Station:latitude&longitude&zone)::s.latitude,s.longitude=>s.zone"
+      - "(s:Station:latitude&longitude)::s.latitude,s.longitude=>s"
+      - "()-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type"
+    minimal_cover:
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::s.zoneOriginal=>s.zone"
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::s.latitude,s.longitude=>s"
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::c.line=>c.color,c.type"
     dependency_origin: "User provided"
     source: "Extended based on \\url{https://github.com/neo4j-partners/neo4j-transport-for-london}"

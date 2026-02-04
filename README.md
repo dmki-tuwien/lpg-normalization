@@ -4,12 +4,11 @@ Welcome to the documentation and [repository](https://github.com/dmki-tuwien/lpg
 accompanying the paper "PG-Norm: Native Property Graph Normal Forms".
 
 Repository structure:
-* `assets/`: Contains files required by the normalization tool or during its development. This does not include source code.
 * `docs/`: The documentation of the source code of this repository
-* `graphs/`: Contains graphs to be normalized
-* `out/`: Contains the output of the evaluation
-* 
-* `spgds.g4`: Contains the ANTLRv4 Grammar of the dependencies
+* `gnfd/`: A Python package that implements the Graph-Native Functional Dependencies
+* `graphs/`: Contains graphs that are normalized as part of the evaluation
+* `out/`: Contains the output of the evaluation as CSV files
+* `tests/`: Contains Python pytests for the dependencies and the normalization
 
 ## Getting Started
 

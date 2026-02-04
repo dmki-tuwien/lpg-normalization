@@ -4,5 +4,5 @@
    :maxdepth: 2
    :caption: Contents:
 
-   slpgd/index
+   gnfd/index
 
