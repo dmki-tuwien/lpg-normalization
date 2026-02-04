@@ -1,6 +1,3 @@
-[submodule "assets/gql-grammar"]
-	path = assets/gql-grammar
-	url = https://github.com/opengql/grammar
 [submodule "graphs/northwind"]
 	path = graphs/northwind
 	url = https://github.com/neo4j-graph-examples/northwind.git
