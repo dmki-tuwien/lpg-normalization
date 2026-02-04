@@ -1,5 +1,5 @@
 graphs:
-  - name: "S9 - Rijden de Treinen"
+  - name: "S09 - Rijden de Treinen"
     neo4j:
       from_dump: graphs/rijdendetreinen/rijdendetreinen_small.dump
      # from_file: graphs/rijdendetreinen_neo4j.cypher
@@ -41,7 +41,7 @@ graphs:
     source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
     dependency_origin: "User provided"
 
-  - name: "S6 - Offshore"
+  - name: "S06 - Offshore"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -52,7 +52,7 @@ graphs:
         - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.countries=>e.country_codes"
         - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.country_codes=>e.countries"
 
-  - name: "S7 - Offshore"
+  - name: "S07 - Offshore"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -68,7 +68,7 @@ graphs:
       - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.sourceID=>e.countries"
       - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.valid_until=>e.countries"
 
-  - name: "S8 - Offshore"
+  - name: "S08 - Offshore"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -105,7 +105,7 @@ graphs:
       - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
     dependency_origin: "User provided"
 
-  - name: "S3 - No Socks" # works
+  - name: "S03 - No Socks" # works
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time)::e.company,e.time=>e"
@@ -120,7 +120,7 @@ graphs:
      # - "(e:Event):e.company,e.time->e.company"
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
-  - name: "S4 - No Socks" # works
+  - name: "S04 - No Socks" # works
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time&venue)::e.company,e.time=>e.venue"
@@ -137,7 +137,7 @@ graphs:
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
-  - name: "S5 - No Socks 2" #works
+  - name: "S05 - No Socks 2" #works
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time&venue)::e.company,e.time=>e"
@@ -154,7 +154,7 @@ graphs:
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
-  - name: "S2 - Northwind Orders"
+  - name: "S02 - Northwind Orders"
     neo4j:
       from_file: graphs/northwind/scripts/northwind.cypher
     #memgraph:
@@ -168,7 +168,7 @@ graphs:
     dependency_origin: "\\citet{skavantzos_third_2025}"
     source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
 
-  - name: "S1 - London Public Transport" # works
+  - name: "S01 - London Public Transport" # works
     neo4j:
       from_file: graphs/london_neo4j.cypher
   #  memgraph:
