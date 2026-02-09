@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css?v=dd72e65a" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
@@ -336,14 +336,14 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="normalize.perform_graph_native_normalization">
 <span class="sig-prename descclassname"><span class="pre">normalize.</span></span><span class="sig-name descname"><span class="pre">perform_graph_native_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">provided_dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#normalize.perform_graph_native_normalization" title="Link to this definition">#</a></dt>
-<dd><p>Performs graph native normalization under consideration of the provided parameters.</p>
+<dd><p>Performs graph-native normalization under consideration of the provided parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span class="target" id="normalize.perform_graph_native_normalization.params.driver"></span><strong>driver</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.driver">¶</a> (<a class="reference external" href="https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Driver" title="(in Neo4j Python Driver v6.1)"><em>neo4j.Driver</em></a>) – The connection to the graph database</p></li>
-<li><p><span class="target" id="normalize.perform_graph_native_normalization.params.database"></span><strong>database</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.database">¶</a> – The name of the database in which the to be normalized graph is contained</p></li>
+<li><p><span class="target" id="normalize.perform_graph_native_normalization.params.database"></span><strong>database</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.database">¶</a> – The name of the database in which the to be normalized graph is contained. Supported databases are: <code class="docutils literal notranslate"><span class="pre">&quot;neo4j&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;memgraph&quot;</span></code></p></li>
 <li><p><span class="target" id="normalize.perform_graph_native_normalization.params.provided_dependencies"></span><strong>provided_dependencies</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.provided_dependencies">¶</a> – The dependencies to be considered for the normalization</p></li>
-<li><p><span class="target" id="normalize.perform_graph_native_normalization.params.dep_filter"></span><strong>dep_filter</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.dep_filter">¶</a> – Whether only a subset of dependencies should be used. Possible values: <code class="docutils literal notranslate"><span class="pre">&quot;intra-node&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;intra-go&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;inter-go&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>.</p></li>
+<li><p><span class="target" id="normalize.perform_graph_native_normalization.params.dep_filter"></span><strong>dep_filter</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.dep_filter">¶</a> – Whether only a subset of dependencies should be used. Possible values: <code class="docutils literal notranslate"><span class="pre">&quot;within-node&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;within-go&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;between-go&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Type<span class="colon">:</span></dt>
