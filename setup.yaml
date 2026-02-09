@@ -1,8 +1,14 @@
+# Evaluation scenarios are list entries under the key `graphs`.
 graphs:
+  # Entries in this list must have the following fields:
+  # * "name": a string value denoting the name of the scenario
+  # * "dependencies" and "minimal_cover": lists of dependencies represented as strings
+  # * Either an entry "from_file" that contains a path, which points to a Cypher file that works with both, Neo4J and
+  #   Memgraph, or an entry "neo4j" that contains "from_file" or "from_dump", with the latter being a path pointing to
+  #   a Neo4J (Enterprise) database dump.
   - name: "S09 - Rijden de Treinen"
     neo4j:
       from_dump: graphs/rijdendetreinen/rijdendetreinen_small.dump
-     # from_file: graphs/rijdendetreinen_neo4j.cypher
     dependencies:
       - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
       - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type"
@@ -16,13 +22,12 @@ graphs:
       - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.serviceid=>ts"
       - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.stopid=>t"
       - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.departure,t.stopid=>s"
-    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
+    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2025-11.csv.gz}"
     dependency_origin: "User provided"
 
   - name: "S10 - Rijden de Treinen"
     neo4j:
       from_dump: graphs/rijdendetreinen/rijdendetreinen_small.dump
-      # from_file: graphs/rijdendetreinen_neo4j.cypher
     dependencies:
       - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
       - "()-[t:STOPS_AT:code]->(s:Station:name)::t.code=>s.name"
@@ -38,7 +43,7 @@ graphs:
       - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.serviceid=>ts"
       - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.stopid=>t"
       - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.departure,t.stopid=>s"
-    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2024.csv.gz}"
+    source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2025-11.csv.gz}"
     dependency_origin: "User provided"
 
   - name: "S06 - Offshore"
@@ -89,7 +94,7 @@ graphs:
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.sourceID=>e.valid_until"
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.valid_until=>e.sourceID"
 
-  - name: "S11 - University" # works
+  - name: "S11 - University"
     from_file: graphs/lecture.cypher
     dependencies:
       - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
@@ -97,7 +102,7 @@ graphs:
       - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
     dependency_origin: "User provided"
 
-  - name: "S12 - University" # works
+  - name: "S12 - University"
     from_file: graphs/lecture.cypher
     dependencies:
       - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
@@ -105,7 +110,7 @@ graphs:
       - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
     dependency_origin: "User provided"
 
-  - name: "S03 - No Socks" # works
+  - name: "S03 - No Socks"
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time)::e.company,e.time=>e"
@@ -117,18 +122,15 @@ graphs:
       - "(e:Event:company&name&time&venue)::e.name=>e.company"
       - "(e:Event:company&name&time&venue)::e.name,e.time=>e.venue"
       - "(e:Event:company&name&time&venue)::e.time,e.venue=>e.name"
-     # - "(e:Event):e.company,e.time->e.company"
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
   - name: "S04 - No Socks" # works
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time&venue)::e.company,e.time=>e.venue"
-      #- "(e:Event:company&time)::e.company,e.time=>e"
       - "(e:Event:name&company)::e.name=>e.company"
       - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
       - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
-      # - "(e:Event):e.company,e.time->e.company"
     minimal_cover:
       - "(e:Event:company&name&time&venue)::e.company,e.time=>e.venue"
       - "(e:Event:company&name&time&venue)::e.name=>e.company"
@@ -137,7 +139,7 @@ graphs:
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
-  - name: "S05 - No Socks 2" #works
+  - name: "S05 - No Socks 2"
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time&venue)::e.company,e.time=>e"
@@ -157,8 +159,6 @@ graphs:
   - name: "S02 - Northwind Orders"
     neo4j:
       from_file: graphs/northwind/scripts/northwind.cypher
-    #memgraph:
-    #  from_file: graphs/northwind_memgraph.cypher
     dependencies:
       - "(o:Order:orderID)::o.orderID=>o"
       - "(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
@@ -171,8 +171,6 @@ graphs:
   - name: "S01 - London Public Transport" # works
     neo4j:
       from_file: graphs/london_neo4j.cypher
-  #  memgraph:
-  #    from_file: graphs/london_memgraph.cypher --> I cant find the error here :(
     dependencies:
       - "(s:Station:zone&zoneOriginal)::s.zoneOriginal=>s.zone"
       - "(s:Station)-[c::line&color]->(t:Station)::c.line=>c.color"

@@ -20,6 +20,8 @@ Please also download all datasets as described in the `graphs/` folder before ru
 
 Following the cloning of the repository run the command `docker compose build` to prepare the containers for the evaluation.
 
+The evaluation scenarios are defined the file `setup.yaml`. For available configuration options, please refer to the comments in `setup.yaml`.
+
 The command `docker compose up --abort-on-container-exit` automatically sets up the databases,
 runs the evaluation, and 
 shuts down the database containers after the evaluation finished.
