@@ -1,0 +1,741 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; PG-Norm: Native Property Graph Normal Forms  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css?v=dd72e65a" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PG-Norm: Native Property Graph Normal Forms  documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="gnfd/index.html">Graph-Native Functional Dependencies</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gnfd/grammar.html">Grammar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gnfd/src.html">Source Code Reference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="normalization_src.html">Normalization</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/dmki-tuwien/lpg-normalization" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ 
+</div>
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.GraphObject.clingo_symbol">clingo_symbol() (gnfd.GraphObject method)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.Edge.contains_property">contains_property() (gnfd.Edge method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.contains_property">(gnfd.Node method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.contains_property">(gnfd.Pattern method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.contains_property">(gnfd.PatternConcat method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Edge.contains_var">contains_var() (gnfd.Edge method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.contains_var">(gnfd.Node method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.contains_var">(gnfd.Pattern method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.contains_var">(gnfd.PatternConcat method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="normalization_src.html#normalize.perform_graph_native_normalization.params.database">database (normalize.perform_graph_native_normalization parameter)</a>
+</li>
+      <li><a href="normalization_src.html#normalize.perform_graph_native_normalization.params.dep_filter">dep_filter (normalize.perform_graph_native_normalization parameter)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.DependencySet">DependencySet (class in gnfd)</a>
+</li>
+      <li><a href="normalization_src.html#normalize.perform_graph_native_normalization.params.driver">driver (normalize.perform_graph_native_normalization parameter)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Edge">Edge (class in gnfd)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Node.equals">equals() (gnfd.Node method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Pattern.equals">(gnfd.Pattern method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.GNFD.from_string">from_string() (gnfd.GNFD static method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.DependencySet.from_string_list">from_string_list() (gnfd.DependencySet class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Reference.get_graph_object">get_graph_object() (gnfd.Reference method)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.Edge.get_graph_object_with_symbol">get_graph_object_with_symbol() (gnfd.Edge method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.get_graph_object_with_symbol">(gnfd.Node method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.get_graph_object_with_symbol">(gnfd.Pattern method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.get_graph_object_with_symbol">(gnfd.PatternConcat method)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.Edge.get_graph_objects">get_graph_objects() (gnfd.Edge method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.get_graph_objects">(gnfd.Node method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.get_graph_objects">(gnfd.Pattern method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.get_graph_objects">(gnfd.PatternConcat method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.DependencySet.get_normal_form">get_normal_form() (gnfd.DependencySet method)</a>
+</li>
+      <li>
+    gnfd
+
+      <ul>
+        <li><a href="gnfd/src.html#module-gnfd">module</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.GNFD">GNFD (class in gnfd)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.Edge.go_equals">go_equals() (gnfd.Edge method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.GraphObject.go_equals">(gnfd.GraphObject method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Node.go_equals">(gnfd.Node method)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.GraphObject">GraphObject (class in gnfd)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.GraphObject.is_anonymous">is_anonymous() (gnfd.GraphObject method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.DependencySet.is_in_global_normal_form">is_in_global_normal_form() (gnfd.DependencySet method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Edge.contains_property.params.key">key (gnfd.Edge.contains_property parameter)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.contains_property.params.key">(gnfd.Node.contains_property parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.contains_property.params.key">(gnfd.Pattern.contains_property parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.contains_property.params.key">(gnfd.PatternConcat.contains_property parameter)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Edge.params.labels">labels (gnfd.Edge parameter)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.GraphObject.params.labels">(gnfd.GraphObject parameter)</a>
+</li>
+        <li><a href="normalization_src.html#normalize.Edge.params.labels">(normalize.Edge parameter)</a>
+</li>
+        <li><a href="normalization_src.html#normalize.GraphObject.params.labels">(normalize.GraphObject parameter)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.LeftEdge">LeftEdge (class in gnfd)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.LeftEdge.leftmost_node">leftmost_node (gnfd.LeftEdge property)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.leftmost_node">(gnfd.Node property)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.leftmost_node">(gnfd.Pattern property)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.leftmost_node">(gnfd.PatternConcat property)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.RightEdge.leftmost_node">(gnfd.RightEdge property)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.DependencySet.lp_suitable">lp_suitable (gnfd.DependencySet property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Edge.minimal_pattern_intersections">minimal_pattern_intersections() (gnfd.Edge method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.LeftEdge.minimal_pattern_intersections">(gnfd.LeftEdge method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Node.minimal_pattern_intersections">(gnfd.Node method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.minimal_pattern_intersections">(gnfd.Pattern method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.minimal_pattern_intersections">(gnfd.PatternConcat method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.RightEdge.minimal_pattern_intersections">(gnfd.RightEdge method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    module
+
+      <ul>
+        <li><a href="gnfd/src.html#module-gnfd">gnfd</a>
+</li>
+        <li><a href="normalization_src.html#module-normalize">normalize</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Node">Node (class in gnfd)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    normalize
+
+      <ul>
+        <li><a href="normalization_src.html#module-normalize">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Pattern">Pattern (class in gnfd)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.PatternConcat">PatternConcat (class in gnfd)</a>
+</li>
+      <li><a href="normalization_src.html#normalize.perform_graph_native_normalization">perform_graph_native_normalization() (in module normalize)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.Edge.params.properties">properties (gnfd.Edge parameter)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.GraphObject.params.properties">(gnfd.GraphObject parameter)</a>
+</li>
+        <li><a href="normalization_src.html#normalize.Edge.params.properties">(normalize.Edge parameter)</a>
+</li>
+        <li><a href="normalization_src.html#normalize.GraphObject.params.properties">(normalize.GraphObject parameter)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="normalization_src.html#normalize.perform_graph_native_normalization.params.provided_dependencies">provided_dependencies (normalize.perform_graph_native_normalization parameter)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Reference">Reference (class in gnfd)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.RightEdge">RightEdge (class in gnfd)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.LeftEdge.rightmost_node">rightmost_node (gnfd.LeftEdge property)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.rightmost_node">(gnfd.Node property)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.rightmost_node">(gnfd.Pattern property)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.rightmost_node">(gnfd.PatternConcat property)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.RightEdge.rightmost_node">(gnfd.RightEdge property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.DependencySet.get_normal_form.params.session">session (gnfd.DependencySet.get_normal_form parameter)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.Edge.src">src (gnfd.Edge property)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.LeftEdge.src">(gnfd.LeftEdge property)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.RightEdge.src">(gnfd.RightEdge property)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.Edge.params.src_pattern">src_pattern (gnfd.Edge parameter)</a>
+
+      <ul>
+        <li><a href="normalization_src.html#normalize.Edge.params.src_pattern">(normalize.Edge parameter)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.GNFD.from_string.params.string">string (gnfd.GNFD.from_string parameter)</a>
+</li>
+      <li><a href="gnfd/src.html#gnfd.Edge.params.symbol">symbol (gnfd.Edge parameter)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Edge.contains_property.params.symbol">(gnfd.Edge.contains_property parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Edge.contains_var.params.symbol">(gnfd.Edge.contains_var parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.GraphObject.params.symbol">(gnfd.GraphObject parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Node.contains_property.params.symbol">(gnfd.Node.contains_property parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Node.contains_var.params.symbol">(gnfd.Node.contains_var parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.contains_property.params.symbol">(gnfd.Pattern.contains_property parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.contains_var.params.symbol">(gnfd.Pattern.contains_var parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.contains_property.params.symbol">(gnfd.PatternConcat.contains_property parameter)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.contains_var.params.symbol">(gnfd.PatternConcat.contains_var parameter)</a>
+</li>
+        <li><a href="normalization_src.html#normalize.Edge.params.symbol">(normalize.Edge parameter)</a>
+</li>
+        <li><a href="normalization_src.html#normalize.GraphObject.params.symbol">(normalize.GraphObject parameter)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Edge.tgt">tgt (gnfd.Edge property)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.LeftEdge.tgt">(gnfd.LeftEdge property)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.RightEdge.tgt">(gnfd.RightEdge property)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.Edge.params.tgt_pattern">tgt_pattern (gnfd.Edge parameter)</a>
+
+      <ul>
+        <li><a href="normalization_src.html#normalize.Edge.params.tgt_pattern">(normalize.Edge parameter)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.Edge.to_clingo_tableau">to_clingo_tableau() (gnfd.Edge method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.to_clingo_tableau">(gnfd.Node method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.to_clingo_tableau">(gnfd.Pattern method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.to_clingo_tableau">(gnfd.PatternConcat method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gnfd/src.html#gnfd.Edge.to_gql_match_where_tuple">to_gql_match_where_tuple() (gnfd.Edge method)</a>
+
+      <ul>
+        <li><a href="gnfd/src.html#gnfd.Node.to_gql_match_where_tuple">(gnfd.Node method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.Pattern.to_gql_match_where_tuple">(gnfd.Pattern method)</a>
+</li>
+        <li><a href="gnfd/src.html#gnfd.PatternConcat.to_gql_match_where_tuple">(gnfd.PatternConcat method)</a>
+</li>
+      </ul></li>
+      <li><a href="gnfd/src.html#gnfd.Reference.to_query_string">to_query_string() (gnfd.Reference method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Johannes Schrott
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Johannes Schrott.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

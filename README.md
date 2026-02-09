@@ -20,13 +20,19 @@ Please also download all datasets as described in the `graphs/` folder before ru
 
 Following the cloning of the repository run the command `docker compose build` to prepare the containers for the evaluation.
 
-The command `docker compose up --abort-on-container-exit` runs the evaluation and automatically shuts down the database containers after the evaluation finished.
+The command `docker compose up --abort-on-container-exit` automatically sets up the databases,
+runs the evaluation, and 
+shuts down the database containers after the evaluation finished.
 
 If you want to run the evaluation and view the HTML documentation, run
 `docker compose --profile docs up`
 
-After running the Docker containers, the output of the evaluation, which is identical to the figures and tables used in the paper, 
-can be found in teh directory `out/`
+After running the Docker containers,
+the output of the evaluation, 
+which is the basis for the figures and tables used in the paper, 
+can be found in the directory `out/`.
+Additionally, 
+a Juypter Notebook `evaluation_tables_and_figures.ipynb` is provided for the further analysis of the evaluation results.
 
 ## Development
 For the generation of the parser of the dependencies, [ANTLR](https://www.antlr.org/) 

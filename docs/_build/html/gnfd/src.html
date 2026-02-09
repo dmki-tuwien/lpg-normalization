@@ -1,0 +1,1432 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Source Code Reference &#8212; PG-Norm: Native Property Graph Normal Forms  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gnfd/src';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Normalization" href="../normalization_src.html" />
+    <link rel="prev" title="Grammar" href="grammar.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">PG-Norm: Native Property Graph Normal Forms  documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Graph-Native Functional Dependencies</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="grammar.html">Grammar</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Source Code Reference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../normalization_src.html">Normalization</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/dmki-tuwien/lpg-normalization" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/gnfd/src.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Source Code Reference</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet"><code class="docutils literal notranslate"><span class="pre">DependencySet</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet.from_string_list"><code class="docutils literal notranslate"><span class="pre">DependencySet.from_string_list()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet.get_normal_form"><code class="docutils literal notranslate"><span class="pre">DependencySet.get_normal_form()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet.is_in_global_normal_form"><code class="docutils literal notranslate"><span class="pre">DependencySet.is_in_global_normal_form()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet.lp_suitable"><code class="docutils literal notranslate"><span class="pre">DependencySet.lp_suitable</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge"><code class="docutils literal notranslate"><span class="pre">Edge</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.contains_property"><code class="docutils literal notranslate"><span class="pre">Edge.contains_property()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.contains_var"><code class="docutils literal notranslate"><span class="pre">Edge.contains_var()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.get_graph_object_with_symbol"><code class="docutils literal notranslate"><span class="pre">Edge.get_graph_object_with_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.get_graph_objects"><code class="docutils literal notranslate"><span class="pre">Edge.get_graph_objects()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.go_equals"><code class="docutils literal notranslate"><span class="pre">Edge.go_equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">Edge.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.src"><code class="docutils literal notranslate"><span class="pre">Edge.src</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.tgt"><code class="docutils literal notranslate"><span class="pre">Edge.tgt</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.to_clingo_tableau"><code class="docutils literal notranslate"><span class="pre">Edge.to_clingo_tableau()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.to_gql_match_where_tuple"><code class="docutils literal notranslate"><span class="pre">Edge.to_gql_match_where_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GNFD"><code class="docutils literal notranslate"><span class="pre">GNFD</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GNFD.from_string"><code class="docutils literal notranslate"><span class="pre">GNFD.from_string()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GraphObject"><code class="docutils literal notranslate"><span class="pre">GraphObject</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GraphObject.clingo_symbol"><code class="docutils literal notranslate"><span class="pre">GraphObject.clingo_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GraphObject.go_equals"><code class="docutils literal notranslate"><span class="pre">GraphObject.go_equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GraphObject.is_anonymous"><code class="docutils literal notranslate"><span class="pre">GraphObject.is_anonymous()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge"><code class="docutils literal notranslate"><span class="pre">LeftEdge</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.leftmost_node"><code class="docutils literal notranslate"><span class="pre">LeftEdge.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">LeftEdge.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.rightmost_node"><code class="docutils literal notranslate"><span class="pre">LeftEdge.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.src"><code class="docutils literal notranslate"><span class="pre">LeftEdge.src</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.tgt"><code class="docutils literal notranslate"><span class="pre">LeftEdge.tgt</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node"><code class="docutils literal notranslate"><span class="pre">Node</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.contains_property"><code class="docutils literal notranslate"><span class="pre">Node.contains_property()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.contains_var"><code class="docutils literal notranslate"><span class="pre">Node.contains_var()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.equals"><code class="docutils literal notranslate"><span class="pre">Node.equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.get_graph_object_with_symbol"><code class="docutils literal notranslate"><span class="pre">Node.get_graph_object_with_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.get_graph_objects"><code class="docutils literal notranslate"><span class="pre">Node.get_graph_objects()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.go_equals"><code class="docutils literal notranslate"><span class="pre">Node.go_equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.leftmost_node"><code class="docutils literal notranslate"><span class="pre">Node.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">Node.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.rightmost_node"><code class="docutils literal notranslate"><span class="pre">Node.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.to_clingo_tableau"><code class="docutils literal notranslate"><span class="pre">Node.to_clingo_tableau()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.to_gql_match_where_tuple"><code class="docutils literal notranslate"><span class="pre">Node.to_gql_match_where_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern"><code class="docutils literal notranslate"><span class="pre">Pattern</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.contains_property"><code class="docutils literal notranslate"><span class="pre">Pattern.contains_property()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.contains_var"><code class="docutils literal notranslate"><span class="pre">Pattern.contains_var()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.equals"><code class="docutils literal notranslate"><span class="pre">Pattern.equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.get_graph_object_with_symbol"><code class="docutils literal notranslate"><span class="pre">Pattern.get_graph_object_with_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.get_graph_objects"><code class="docutils literal notranslate"><span class="pre">Pattern.get_graph_objects()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.leftmost_node"><code class="docutils literal notranslate"><span class="pre">Pattern.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">Pattern.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.rightmost_node"><code class="docutils literal notranslate"><span class="pre">Pattern.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.to_clingo_tableau"><code class="docutils literal notranslate"><span class="pre">Pattern.to_clingo_tableau()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.to_gql_match_where_tuple"><code class="docutils literal notranslate"><span class="pre">Pattern.to_gql_match_where_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat"><code class="docutils literal notranslate"><span class="pre">PatternConcat</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.contains_property"><code class="docutils literal notranslate"><span class="pre">PatternConcat.contains_property()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.contains_var"><code class="docutils literal notranslate"><span class="pre">PatternConcat.contains_var()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.get_graph_object_with_symbol"><code class="docutils literal notranslate"><span class="pre">PatternConcat.get_graph_object_with_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.get_graph_objects"><code class="docutils literal notranslate"><span class="pre">PatternConcat.get_graph_objects()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.leftmost_node"><code class="docutils literal notranslate"><span class="pre">PatternConcat.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">PatternConcat.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.rightmost_node"><code class="docutils literal notranslate"><span class="pre">PatternConcat.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.to_clingo_tableau"><code class="docutils literal notranslate"><span class="pre">PatternConcat.to_clingo_tableau()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.to_gql_match_where_tuple"><code class="docutils literal notranslate"><span class="pre">PatternConcat.to_gql_match_where_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Reference"><code class="docutils literal notranslate"><span class="pre">Reference</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Reference.get_graph_object"><code class="docutils literal notranslate"><span class="pre">Reference.get_graph_object()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Reference.to_query_string"><code class="docutils literal notranslate"><span class="pre">Reference.to_query_string()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge"><code class="docutils literal notranslate"><span class="pre">RightEdge</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.leftmost_node"><code class="docutils literal notranslate"><span class="pre">RightEdge.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">RightEdge.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.rightmost_node"><code class="docutils literal notranslate"><span class="pre">RightEdge.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.src"><code class="docutils literal notranslate"><span class="pre">RightEdge.src</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.tgt"><code class="docutils literal notranslate"><span class="pre">RightEdge.tgt</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-gnfd">
+<span id="source-code-reference"></span><h1>Source Code Reference<a class="headerlink" href="#module-gnfd" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.DependencySet">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">DependencySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.DependencySet" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference internal" href="#gnfd.GNFD" title="gnfd.gnfd.GNFD"><code class="xref py py-class docutils literal notranslate"><span class="pre">GNFD</span></code></a>]</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.DependencySet.from_string_list">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_string_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lst</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.DependencySet.from_string_list" title="Link to this definition">#</a></dt>
+<dd><p>Creates a <a class="reference internal" href="#gnfd.DependencySet" title="gnfd.DependencySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">DependencySet</span></code></a> from a list of dependencies encoded as strings.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.DependencySet.get_normal_form">
+<span class="sig-name descname"><span class="pre">get_normal_form</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.DependencySet.get_normal_form" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="gnfd.DependencySet.get_normal_form.params.session"></span><strong>session</strong><a class="paramlink headerlink reference internal" href="#gnfd.DependencySet.get_normal_form.params.session">¶</a> – A session that is connected to a Neo4J compatible database</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the normal form of the graph in the Neo4J compatible database under this set of dependencies.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.DependencySet.is_in_global_normal_form">
+<span class="sig-name descname"><span class="pre">is_in_global_normal_form</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.DependencySet.is_in_global_normal_form" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.14/library/constants.html#True" title="(in Python v3.14)"><code class="xref any docutils literal notranslate"><span class="pre">True</span></code></a> when there is no inter-graph dependency, <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#False" title="(in Python v3.14)"><code class="xref any docutils literal notranslate"><span class="pre">False</span></code></a> otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.DependencySet.lp_suitable">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">lp_suitable</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><a class="headerlink" href="#gnfd.DependencySet.lp_suitable" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.14/library/constants.html#True" title="(in Python v3.14)"><code class="xref any docutils literal notranslate"><span class="pre">True</span></code></a> when LP normalization (cf. &lt;<a class="reference external" href="https://doi.org/10.1007/s00778-025-00902-2">https://doi.org/10.1007/s00778-025-00902-2</a>&gt;) could be performed on this graph as its dependencies only target nodes and there are no inter graph dependencies.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.Edge">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">Edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a>, <a class="reference internal" href="#gnfd.Pattern" title="gnfd.gnfd.Pattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pattern</span></code></a>, <a class="reference external" href="https://docs.python.org/3.14/library/abc.html#abc.ABC" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Represents an abstract LPG edge without a direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="gnfd.Edge.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.Edge.params.symbol">¶</a> – The symbol of the variable of the edge.</p></li>
+<li><p><span class="target" id="gnfd.Edge.params.labels"></span><strong>labels</strong><a class="paramlink headerlink reference internal" href="#gnfd.Edge.params.labels">¶</a> – The labels of the edge.</p></li>
+<li><p><span class="target" id="gnfd.Edge.params.properties"></span><strong>properties</strong><a class="paramlink headerlink reference internal" href="#gnfd.Edge.params.properties">¶</a> – The properties of the edge.</p></li>
+<li><p><span class="target" id="gnfd.Edge.params.src_pattern"></span><strong>src_pattern</strong><a class="paramlink headerlink reference internal" href="#gnfd.Edge.params.src_pattern">¶</a> – The source <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> of the edge.</p></li>
+<li><p><span class="target" id="gnfd.Edge.params.tgt_pattern"></span><strong>tgt_pattern</strong><a class="paramlink headerlink reference internal" href="#gnfd.Edge.params.tgt_pattern">¶</a> – The target <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> of the edge.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Edge.contains_property">
+<span class="sig-name descname"><span class="pre">contains_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge.contains_property" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether the pattern contains a graph object whose variable symbol is <a class="reference internal" href="#gnfd.Edge.contains_property.params.symbol" title="gnfd.Edge.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> and which has a property <a class="reference internal" href="#gnfd.Edge.contains_property.params.key" title="gnfd.Edge.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">key</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="gnfd.Edge.contains_property.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.Edge.contains_property.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol which should be looked for in the pattern.</p></li>
+<li><p><span class="target" id="gnfd.Edge.contains_property.params.key"></span><strong>key</strong><a class="paramlink headerlink reference internal" href="#gnfd.Edge.contains_property.params.key">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The key of the property whose existence should be checked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.GraphObject"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a> having <a class="reference internal" href="#gnfd.Edge.contains_property.params.symbol" title="gnfd.Edge.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> as its symbol.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Edge.contains_var">
+<span class="sig-name descname"><span class="pre">contains_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge.contains_var" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether the pattern contains a graph object whose variable symbol is <a class="reference internal" href="#gnfd.Edge.contains_var.params.symbol" title="gnfd.Edge.contains_var"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="gnfd.Edge.contains_var.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.Edge.contains_var.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol which should be looked for in the pattern.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.GraphObject"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a> having <a class="reference internal" href="#gnfd.Edge.contains_var.params.symbol" title="gnfd.Edge.contains_var"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> as its symbol.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Edge.get_graph_object_with_symbol">
+<span class="sig-name descname"><span class="pre">get_graph_object_with_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge.get_graph_object_with_symbol" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a graph object with the given symbol</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Edge.get_graph_objects">
+<span class="sig-name descname"><span class="pre">get_graph_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge.get_graph_objects" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>all graph objects, i.e., any <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> or <a class="reference internal" href="#gnfd.Edge" title="gnfd.Edge"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)">set</a>[<a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Edge.go_equals">
+<span class="sig-name descname"><span class="pre">go_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge.go_equals" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether 2 graph objects are equivalent</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Edge.minimal_pattern_intersections">
+<span class="sig-name descname"><span class="pre">minimal_pattern_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge.minimal_pattern_intersections" title="Link to this definition">#</a></dt>
+<dd><p>Computes the minimal pattern intersection between this and the <a class="reference internal" href="#gnfd.Edge.minimal_pattern_intersections.params.other" title="gnfd.Edge.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of tuples consisting of (1) the pattern that is the minimal intersection between this and the <a class="reference internal" href="#gnfd.Edge.minimal_pattern_intersections.params.other" title="gnfd.Edge.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern and of (2) tuples denote variable correspondences between the patterns.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference internal" href="#gnfd.Pattern" title="gnfd.gnfd.Pattern"><em>Pattern</em></a>, <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)">set</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.Edge.src">
+<span class="property"><span class="k"><span class="pre">abstract</span></span><span class="w"> </span><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">src</span></span><a class="headerlink" href="#gnfd.Edge.src" title="Link to this definition">#</a></dt>
+<dd><p>:returns the source <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> of the edge</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.Edge.tgt">
+<span class="property"><span class="k"><span class="pre">abstract</span></span><span class="w"> </span><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tgt</span></span><a class="headerlink" href="#gnfd.Edge.tgt" title="Link to this definition">#</a></dt>
+<dd><p>:returns the target <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> of the edge</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Edge.to_clingo_tableau">
+<span class="sig-name descname"><span class="pre">to_clingo_tableau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge.to_clingo_tableau" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The pattern represented as clingo facts containing constants or variables.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Edge.to_gql_match_where_tuple">
+<span class="sig-name descname"><span class="pre">to_gql_match_where_tuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Edge.to_gql_match_where_tuple" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple where the first value denotes a GQL match and the second denotes a GQL where</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.GNFD">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">GNFD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.GNFD" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.14/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Denotes a GN-FD that consists of a <a class="reference internal" href="#gnfd.Pattern" title="gnfd.Pattern"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Pattern</span></code></a> and sets of <a class="reference internal" href="#gnfd.Reference" title="gnfd.Reference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Reference</span></code></a> that denote the right and left side of the descriptor of the GN-FD.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.GNFD.from_string">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.GNFD.from_string" title="Link to this definition">#</a></dt>
+<dd><p>Parse a GN-FD from a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="gnfd.GNFD.from_string.params.string"></span><strong>string</strong><a class="paramlink headerlink reference internal" href="#gnfd.GNFD.from_string.params.string">¶</a> – The string representation of the GN-FD to create. Relies on the grammar shown in <cite>gnfd.g4</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.GraphObject">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">GraphObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.GraphObject" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.14/library/abc.html#abc.ABC" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Abstract class representing an LPG graph object, i.e., a <a class="reference internal" href="#gnfd.Edge" title="gnfd.Edge"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a> or a <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="gnfd.GraphObject.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.GraphObject.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol of the variable of the graph object.</p></li>
+<li><p><span class="target" id="gnfd.GraphObject.params.labels"></span><strong>labels</strong><a class="paramlink headerlink reference internal" href="#gnfd.GraphObject.params.labels">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – The labels of the graph object.</p></li>
+<li><p><span class="target" id="gnfd.GraphObject.params.properties"></span><strong>properties</strong><a class="paramlink headerlink reference internal" href="#gnfd.GraphObject.params.properties">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – The properties of the graph object.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.GraphObject.clingo_symbol">
+<span class="sig-name descname"><span class="pre">clingo_symbol</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.GraphObject.clingo_symbol" title="Link to this definition">#</a></dt>
+<dd><p>Returns a symbol for use with clingo.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.GraphObject.go_equals">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">go_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.GraphObject.go_equals" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether 2 graph objects are equivalent</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.GraphObject.is_anonymous">
+<span class="sig-name descname"><span class="pre">is_anonymous</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.GraphObject.is_anonymous" title="Link to this definition">#</a></dt>
+<dd><p>A graph object is anonymous if it has no symbol.
+Anonymous graph objects cannot be used in the descriptor, i.e., the left and right side, of a <a class="reference internal" href="#gnfd.GNFD" title="gnfd.GNFD"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GNFD</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.LeftEdge">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">LeftEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.LeftEdge" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gnfd.Edge" title="gnfd.gnfd.Edge"><code class="xref py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a></p>
+<p>Represents an LPG edge directed to the left.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.LeftEdge.leftmost_node">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">leftmost_node</span></span><a class="headerlink" href="#gnfd.LeftEdge.leftmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the left most node of the pattern, i.e., the leaf of always choosing pattern 1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.LeftEdge.minimal_pattern_intersections">
+<span class="sig-name descname"><span class="pre">minimal_pattern_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.LeftEdge.minimal_pattern_intersections" title="Link to this definition">#</a></dt>
+<dd><p>Computes the minimal pattern intersection between this and the <a class="reference internal" href="#gnfd.LeftEdge.minimal_pattern_intersections.params.other" title="gnfd.LeftEdge.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of tuples consisting of (1) the pattern that is the minimal intersection between this and the <a class="reference internal" href="#gnfd.LeftEdge.minimal_pattern_intersections.params.other" title="gnfd.LeftEdge.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern and of (2) tuples denote variable correspondences between the patterns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.LeftEdge.rightmost_node">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rightmost_node</span></span><a class="headerlink" href="#gnfd.LeftEdge.rightmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the right most node of the pattern, i.e., the leaf of always choosing pattern 2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.LeftEdge.src">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">src</span></span><a class="headerlink" href="#gnfd.LeftEdge.src" title="Link to this definition">#</a></dt>
+<dd><p>:returns the source <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> of the edge</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.LeftEdge.tgt">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tgt</span></span><a class="headerlink" href="#gnfd.LeftEdge.tgt" title="Link to this definition">#</a></dt>
+<dd><p>:returns the target <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> of the edge</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.Node">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">Node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a>, <a class="reference internal" href="#gnfd.Pattern" title="gnfd.gnfd.Pattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pattern</span></code></a></p>
+<p>Represents an LPG node.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.contains_property">
+<span class="sig-name descname"><span class="pre">contains_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.contains_property" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether the pattern contains a graph object whose variable symbol is <a class="reference internal" href="#gnfd.Node.contains_property.params.symbol" title="gnfd.Node.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> and which has a property <a class="reference internal" href="#gnfd.Node.contains_property.params.key" title="gnfd.Node.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">key</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="gnfd.Node.contains_property.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.Node.contains_property.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol which should be looked for in the pattern.</p></li>
+<li><p><span class="target" id="gnfd.Node.contains_property.params.key"></span><strong>key</strong><a class="paramlink headerlink reference internal" href="#gnfd.Node.contains_property.params.key">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The key of the property whose existence should be checked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.GraphObject"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a> having <a class="reference internal" href="#gnfd.Node.contains_property.params.symbol" title="gnfd.Node.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> as its symbol.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.contains_var">
+<span class="sig-name descname"><span class="pre">contains_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.contains_var" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether the pattern contains a graph object whose variable symbol is <a class="reference internal" href="#gnfd.Node.contains_var.params.symbol" title="gnfd.Node.contains_var"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="gnfd.Node.contains_var.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.Node.contains_var.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol which should be looked for in the pattern.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.GraphObject"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a> having <a class="reference internal" href="#gnfd.Node.contains_var.params.symbol" title="gnfd.Node.contains_var"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> as its symbol.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.equals">
+<span class="sig-name descname"><span class="pre">equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.equals" title="Link to this definition">#</a></dt>
+<dd><p>Computes whether the structure of this and the <a class="reference internal" href="#gnfd.Node.equals.params.other" title="gnfd.Node.equals"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern and their labels and properties are equal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>whether the <a class="reference internal" href="#gnfd.Node.equals.params.other" title="gnfd.Node.equals"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> is equal to this pattern.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.get_graph_object_with_symbol">
+<span class="sig-name descname"><span class="pre">get_graph_object_with_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.get_graph_object_with_symbol" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a graph object with the given symbol</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.get_graph_objects">
+<span class="sig-name descname"><span class="pre">get_graph_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.get_graph_objects" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>all graph objects, i.e., any <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> or <a class="reference internal" href="#gnfd.Edge" title="gnfd.Edge"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)">set</a>[<a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.go_equals">
+<span class="sig-name descname"><span class="pre">go_equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.go_equals" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether 2 graph objects are equivalent</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.Node.leftmost_node">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">leftmost_node</span></span><a class="headerlink" href="#gnfd.Node.leftmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the left most node of the pattern, i.e., the leaf of always choosing pattern 1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.minimal_pattern_intersections">
+<span class="sig-name descname"><span class="pre">minimal_pattern_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.minimal_pattern_intersections" title="Link to this definition">#</a></dt>
+<dd><p>Computes the minimal pattern intersection between this and the <a class="reference internal" href="#gnfd.Node.minimal_pattern_intersections.params.other" title="gnfd.Node.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of tuples consisting of (1) the pattern that is the minimal intersection between this and the <a class="reference internal" href="#gnfd.Node.minimal_pattern_intersections.params.other" title="gnfd.Node.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern and of (2) tuples denote variable correspondences between the patterns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.Node.rightmost_node">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rightmost_node</span></span><a class="headerlink" href="#gnfd.Node.rightmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the right most node of the pattern, i.e., the leaf of always choosing pattern 2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.to_clingo_tableau">
+<span class="sig-name descname"><span class="pre">to_clingo_tableau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.to_clingo_tableau" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The pattern represented as clingo facts containing constants or variables.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Node.to_gql_match_where_tuple">
+<span class="sig-name descname"><span class="pre">to_gql_match_where_tuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Node.to_gql_match_where_tuple" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple where the first value denotes a GQL match and the second denotes a GQL where</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.Pattern">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">Pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.14/library/abc.html#abc.ABC" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Represents a pattern used for matching in an LPG.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Pattern.contains_property">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">contains_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern.contains_property" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether the pattern contains a graph object whose variable symbol is <a class="reference internal" href="#gnfd.Pattern.contains_property.params.symbol" title="gnfd.Pattern.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> and which has a property <a class="reference internal" href="#gnfd.Pattern.contains_property.params.key" title="gnfd.Pattern.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">key</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="gnfd.Pattern.contains_property.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.Pattern.contains_property.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol which should be looked for in the pattern.</p></li>
+<li><p><span class="target" id="gnfd.Pattern.contains_property.params.key"></span><strong>key</strong><a class="paramlink headerlink reference internal" href="#gnfd.Pattern.contains_property.params.key">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The key of the property whose existence should be checked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.GraphObject"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a> having <a class="reference internal" href="#gnfd.Pattern.contains_property.params.symbol" title="gnfd.Pattern.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> as its symbol.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Pattern.contains_var">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">contains_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern.contains_var" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether the pattern contains a graph object whose variable symbol is <a class="reference internal" href="#gnfd.Pattern.contains_var.params.symbol" title="gnfd.Pattern.contains_var"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="gnfd.Pattern.contains_var.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.Pattern.contains_var.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol which should be looked for in the pattern.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.GraphObject"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a> having <a class="reference internal" href="#gnfd.Pattern.contains_var.params.symbol" title="gnfd.Pattern.contains_var"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> as its symbol.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Pattern.equals">
+<span class="sig-name descname"><span class="pre">equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern.equals" title="Link to this definition">#</a></dt>
+<dd><p>Computes whether the structure of this and the <a class="reference internal" href="#gnfd.Pattern.equals.params.other" title="gnfd.Pattern.equals"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern and their labels and properties are equal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>whether the <a class="reference internal" href="#gnfd.Pattern.equals.params.other" title="gnfd.Pattern.equals"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> is equal to this pattern.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Pattern.get_graph_object_with_symbol">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_graph_object_with_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern.get_graph_object_with_symbol" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a graph object with the given symbol</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Pattern.get_graph_objects">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_graph_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern.get_graph_objects" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>all graph objects, i.e., any <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> or <a class="reference internal" href="#gnfd.Edge" title="gnfd.Edge"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)">set</a>[<a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.Pattern.leftmost_node">
+<span class="property"><span class="k"><span class="pre">abstract</span></span><span class="w"> </span><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">leftmost_node</span></span><a class="headerlink" href="#gnfd.Pattern.leftmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the left most node of the pattern, i.e., the leaf of always choosing pattern 1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Pattern.minimal_pattern_intersections">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">minimal_pattern_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern.minimal_pattern_intersections" title="Link to this definition">#</a></dt>
+<dd><p>Computes the minimal pattern intersection between this and the <a class="reference internal" href="#gnfd.Pattern.minimal_pattern_intersections.params.other" title="gnfd.Pattern.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of tuples consisting of (1) the pattern that is the minimal intersection between this and the <a class="reference internal" href="#gnfd.Pattern.minimal_pattern_intersections.params.other" title="gnfd.Pattern.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern and of (2) tuples denote variable correspondences between the patterns.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference internal" href="#gnfd.Pattern" title="gnfd.gnfd.Pattern"><em>Pattern</em></a>, <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)">set</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.Pattern.rightmost_node">
+<span class="property"><span class="k"><span class="pre">abstract</span></span><span class="w"> </span><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rightmost_node</span></span><a class="headerlink" href="#gnfd.Pattern.rightmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the right most node of the pattern, i.e., the leaf of always choosing pattern 2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Pattern.to_clingo_tableau">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">to_clingo_tableau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern.to_clingo_tableau" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The pattern represented as clingo facts containing constants or variables.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Pattern.to_gql_match_where_tuple">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">to_gql_match_where_tuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Pattern.to_gql_match_where_tuple" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple where the first value denotes a GQL match and the second denotes a GQL where</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.PatternConcat">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">PatternConcat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.PatternConcat" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gnfd.Pattern" title="gnfd.gnfd.Pattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pattern</span></code></a></p>
+<p>Represents a concatenation of two patterns.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.contains_property">
+<span class="sig-name descname"><span class="pre">contains_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.PatternConcat.contains_property" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether the pattern contains a graph object whose variable symbol is <a class="reference internal" href="#gnfd.PatternConcat.contains_property.params.symbol" title="gnfd.PatternConcat.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> and which has a property <a class="reference internal" href="#gnfd.PatternConcat.contains_property.params.key" title="gnfd.PatternConcat.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">key</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="gnfd.PatternConcat.contains_property.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.PatternConcat.contains_property.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol which should be looked for in the pattern.</p></li>
+<li><p><span class="target" id="gnfd.PatternConcat.contains_property.params.key"></span><strong>key</strong><a class="paramlink headerlink reference internal" href="#gnfd.PatternConcat.contains_property.params.key">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The key of the property whose existence should be checked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.GraphObject"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a> having <a class="reference internal" href="#gnfd.PatternConcat.contains_property.params.symbol" title="gnfd.PatternConcat.contains_property"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> as its symbol.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.contains_var">
+<span class="sig-name descname"><span class="pre">contains_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.PatternConcat.contains_var" title="Link to this definition">#</a></dt>
+<dd><p>Checks whether the pattern contains a graph object whose variable symbol is <a class="reference internal" href="#gnfd.PatternConcat.contains_var.params.symbol" title="gnfd.PatternConcat.contains_var"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="target" id="gnfd.PatternConcat.contains_var.params.symbol"></span><strong>symbol</strong><a class="paramlink headerlink reference internal" href="#gnfd.PatternConcat.contains_var.params.symbol">¶</a> (<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The symbol which should be looked for in the pattern.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a <a class="reference internal" href="#gnfd.GraphObject" title="gnfd.GraphObject"><code class="xref any py py-class docutils literal notranslate"><span class="pre">GraphObject</span></code></a> having <a class="reference internal" href="#gnfd.PatternConcat.contains_var.params.symbol" title="gnfd.PatternConcat.contains_var"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">symbol</span></code></a> as its symbol.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.get_graph_object_with_symbol">
+<span class="sig-name descname"><span class="pre">get_graph_object_with_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.PatternConcat.get_graph_object_with_symbol" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a graph object with the given symbol</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.get_graph_objects">
+<span class="sig-name descname"><span class="pre">get_graph_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.PatternConcat.get_graph_objects" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>all graph objects, i.e., any <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> or <a class="reference internal" href="#gnfd.Edge" title="gnfd.Edge"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#set" title="(in Python v3.14)">set</a>[<a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.leftmost_node">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">leftmost_node</span></span><a class="headerlink" href="#gnfd.PatternConcat.leftmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the left most node of the pattern, i.e., the leaf of always choosing pattern 1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.minimal_pattern_intersections">
+<span class="sig-name descname"><span class="pre">minimal_pattern_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.PatternConcat.minimal_pattern_intersections" title="Link to this definition">#</a></dt>
+<dd><p>Computes the minimal pattern intersection between this and the <a class="reference internal" href="#gnfd.PatternConcat.minimal_pattern_intersections.params.other" title="gnfd.PatternConcat.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of tuples consisting of (1) the pattern that is the minimal intersection between this and the <a class="reference internal" href="#gnfd.PatternConcat.minimal_pattern_intersections.params.other" title="gnfd.PatternConcat.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern and of (2) tuples denote variable correspondences between the patterns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.rightmost_node">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rightmost_node</span></span><a class="headerlink" href="#gnfd.PatternConcat.rightmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the right most node of the pattern, i.e., the leaf of always choosing pattern 2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.to_clingo_tableau">
+<span class="sig-name descname"><span class="pre">to_clingo_tableau</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.PatternConcat.to_clingo_tableau" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The pattern represented as clingo facts containing constants or variables.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.PatternConcat.to_gql_match_where_tuple">
+<span class="sig-name descname"><span class="pre">to_gql_match_where_tuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.PatternConcat.to_gql_match_where_tuple" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple where the first value denotes a GQL match and the second denotes a GQL where</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.Reference">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">Reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Reference" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.14/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents a reference to a property key contained in a graph object or to the graph object itself.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Reference.get_graph_object">
+<span class="sig-name descname"><span class="pre">get_graph_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Reference.get_graph_object" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The graph object of the reference.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#gnfd.GraphObject" title="gnfd.gnfd.GraphObject"><em>GraphObject</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.Reference.to_query_string">
+<span class="sig-name descname"><span class="pre">to_query_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.Reference.to_query_string" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The string representation of the reference that can be used to query the provided database.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gnfd.RightEdge">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gnfd.</span></span><span class="sig-name descname"><span class="pre">RightEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.RightEdge" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gnfd.Edge" title="gnfd.gnfd.Edge"><code class="xref py py-class docutils literal notranslate"><span class="pre">Edge</span></code></a></p>
+<p>Represents an LPG edge directed to the right.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.RightEdge.leftmost_node">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">leftmost_node</span></span><a class="headerlink" href="#gnfd.RightEdge.leftmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the left most node of the pattern, i.e., the leaf of always choosing pattern 1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gnfd.RightEdge.minimal_pattern_intersections">
+<span class="sig-name descname"><span class="pre">minimal_pattern_intersections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gnfd.RightEdge.minimal_pattern_intersections" title="Link to this definition">#</a></dt>
+<dd><p>Computes the minimal pattern intersection between this and the <a class="reference internal" href="#gnfd.RightEdge.minimal_pattern_intersections.params.other" title="gnfd.RightEdge.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a list of tuples consisting of (1) the pattern that is the minimal intersection between this and the <a class="reference internal" href="#gnfd.RightEdge.minimal_pattern_intersections.params.other" title="gnfd.RightEdge.minimal_pattern_intersections"><code class="xref py py-paramref docutils literal notranslate"><span class="pre">other</span></code></a> pattern and of (2) tuples denote variable correspondences between the patterns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.RightEdge.rightmost_node">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rightmost_node</span></span><a class="headerlink" href="#gnfd.RightEdge.rightmost_node" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the right most node of the pattern, i.e., the leaf of always choosing pattern 2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.RightEdge.src">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">src</span></span><a class="headerlink" href="#gnfd.RightEdge.src" title="Link to this definition">#</a></dt>
+<dd><p>:returns the source <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> of the edge</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gnfd.RightEdge.tgt">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tgt</span></span><a class="headerlink" href="#gnfd.RightEdge.tgt" title="Link to this definition">#</a></dt>
+<dd><p>:returns the target <a class="reference internal" href="#gnfd.Node" title="gnfd.Node"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Node</span></code></a> of the edge</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="grammar.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Grammar</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../normalization_src.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Normalization</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet"><code class="docutils literal notranslate"><span class="pre">DependencySet</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet.from_string_list"><code class="docutils literal notranslate"><span class="pre">DependencySet.from_string_list()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet.get_normal_form"><code class="docutils literal notranslate"><span class="pre">DependencySet.get_normal_form()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet.is_in_global_normal_form"><code class="docutils literal notranslate"><span class="pre">DependencySet.is_in_global_normal_form()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.DependencySet.lp_suitable"><code class="docutils literal notranslate"><span class="pre">DependencySet.lp_suitable</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge"><code class="docutils literal notranslate"><span class="pre">Edge</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.contains_property"><code class="docutils literal notranslate"><span class="pre">Edge.contains_property()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.contains_var"><code class="docutils literal notranslate"><span class="pre">Edge.contains_var()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.get_graph_object_with_symbol"><code class="docutils literal notranslate"><span class="pre">Edge.get_graph_object_with_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.get_graph_objects"><code class="docutils literal notranslate"><span class="pre">Edge.get_graph_objects()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.go_equals"><code class="docutils literal notranslate"><span class="pre">Edge.go_equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">Edge.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.src"><code class="docutils literal notranslate"><span class="pre">Edge.src</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.tgt"><code class="docutils literal notranslate"><span class="pre">Edge.tgt</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.to_clingo_tableau"><code class="docutils literal notranslate"><span class="pre">Edge.to_clingo_tableau()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Edge.to_gql_match_where_tuple"><code class="docutils literal notranslate"><span class="pre">Edge.to_gql_match_where_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GNFD"><code class="docutils literal notranslate"><span class="pre">GNFD</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GNFD.from_string"><code class="docutils literal notranslate"><span class="pre">GNFD.from_string()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GraphObject"><code class="docutils literal notranslate"><span class="pre">GraphObject</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GraphObject.clingo_symbol"><code class="docutils literal notranslate"><span class="pre">GraphObject.clingo_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GraphObject.go_equals"><code class="docutils literal notranslate"><span class="pre">GraphObject.go_equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.GraphObject.is_anonymous"><code class="docutils literal notranslate"><span class="pre">GraphObject.is_anonymous()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge"><code class="docutils literal notranslate"><span class="pre">LeftEdge</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.leftmost_node"><code class="docutils literal notranslate"><span class="pre">LeftEdge.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">LeftEdge.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.rightmost_node"><code class="docutils literal notranslate"><span class="pre">LeftEdge.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.src"><code class="docutils literal notranslate"><span class="pre">LeftEdge.src</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.LeftEdge.tgt"><code class="docutils literal notranslate"><span class="pre">LeftEdge.tgt</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node"><code class="docutils literal notranslate"><span class="pre">Node</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.contains_property"><code class="docutils literal notranslate"><span class="pre">Node.contains_property()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.contains_var"><code class="docutils literal notranslate"><span class="pre">Node.contains_var()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.equals"><code class="docutils literal notranslate"><span class="pre">Node.equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.get_graph_object_with_symbol"><code class="docutils literal notranslate"><span class="pre">Node.get_graph_object_with_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.get_graph_objects"><code class="docutils literal notranslate"><span class="pre">Node.get_graph_objects()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.go_equals"><code class="docutils literal notranslate"><span class="pre">Node.go_equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.leftmost_node"><code class="docutils literal notranslate"><span class="pre">Node.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">Node.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.rightmost_node"><code class="docutils literal notranslate"><span class="pre">Node.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.to_clingo_tableau"><code class="docutils literal notranslate"><span class="pre">Node.to_clingo_tableau()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Node.to_gql_match_where_tuple"><code class="docutils literal notranslate"><span class="pre">Node.to_gql_match_where_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern"><code class="docutils literal notranslate"><span class="pre">Pattern</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.contains_property"><code class="docutils literal notranslate"><span class="pre">Pattern.contains_property()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.contains_var"><code class="docutils literal notranslate"><span class="pre">Pattern.contains_var()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.equals"><code class="docutils literal notranslate"><span class="pre">Pattern.equals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.get_graph_object_with_symbol"><code class="docutils literal notranslate"><span class="pre">Pattern.get_graph_object_with_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.get_graph_objects"><code class="docutils literal notranslate"><span class="pre">Pattern.get_graph_objects()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.leftmost_node"><code class="docutils literal notranslate"><span class="pre">Pattern.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">Pattern.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.rightmost_node"><code class="docutils literal notranslate"><span class="pre">Pattern.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.to_clingo_tableau"><code class="docutils literal notranslate"><span class="pre">Pattern.to_clingo_tableau()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Pattern.to_gql_match_where_tuple"><code class="docutils literal notranslate"><span class="pre">Pattern.to_gql_match_where_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat"><code class="docutils literal notranslate"><span class="pre">PatternConcat</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.contains_property"><code class="docutils literal notranslate"><span class="pre">PatternConcat.contains_property()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.contains_var"><code class="docutils literal notranslate"><span class="pre">PatternConcat.contains_var()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.get_graph_object_with_symbol"><code class="docutils literal notranslate"><span class="pre">PatternConcat.get_graph_object_with_symbol()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.get_graph_objects"><code class="docutils literal notranslate"><span class="pre">PatternConcat.get_graph_objects()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.leftmost_node"><code class="docutils literal notranslate"><span class="pre">PatternConcat.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">PatternConcat.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.rightmost_node"><code class="docutils literal notranslate"><span class="pre">PatternConcat.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.to_clingo_tableau"><code class="docutils literal notranslate"><span class="pre">PatternConcat.to_clingo_tableau()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.PatternConcat.to_gql_match_where_tuple"><code class="docutils literal notranslate"><span class="pre">PatternConcat.to_gql_match_where_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Reference"><code class="docutils literal notranslate"><span class="pre">Reference</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Reference.get_graph_object"><code class="docutils literal notranslate"><span class="pre">Reference.get_graph_object()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.Reference.to_query_string"><code class="docutils literal notranslate"><span class="pre">Reference.to_query_string()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge"><code class="docutils literal notranslate"><span class="pre">RightEdge</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.leftmost_node"><code class="docutils literal notranslate"><span class="pre">RightEdge.leftmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.minimal_pattern_intersections"><code class="docutils literal notranslate"><span class="pre">RightEdge.minimal_pattern_intersections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.rightmost_node"><code class="docutils literal notranslate"><span class="pre">RightEdge.rightmost_node</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.src"><code class="docutils literal notranslate"><span class="pre">RightEdge.src</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gnfd.RightEdge.tgt"><code class="docutils literal notranslate"><span class="pre">RightEdge.tgt</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Johannes Schrott
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Johannes Schrott.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
