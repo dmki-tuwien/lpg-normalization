@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css?v=dd72e65a" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
@@ -150,8 +150,7 @@
  </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="nav bd-sidenav">
+        <ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="gnfd/index.html">Graph-Native Functional Dependencies</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/grammar.html">Grammar</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/src.html">Source Code Reference</a></li>
@@ -323,6 +322,7 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development">Development</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contents">Contents</a></li>
 </ul>
             </nav>
         </div>
@@ -336,11 +336,11 @@ document.write(`
                   
   <section id="a-graph-native-approach-to-normalization">
 <h1>A Graph-Native Approach to Normalization<a class="headerlink" href="#a-graph-native-approach-to-normalization" title="Link to this heading">#</a></h1>
-<p>Welcome to the documentation and <a class="reference external" href="https://github.com/dmki-tuwien/lpg-normalization">repository</a>
+<p>Welcome to the <a class="reference external" href="https://dmki-tuwien.github.io/lpg-normalization/">documentation</a> and <a class="reference external" href="https://github.com/dmki-tuwien/lpg-normalization">repository</a>
 accompanying the paper “A Graph-Native Approach to Normalization”.</p>
 <p>Repository structure:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">docs/</span></code>: The documentation of the source code of this repository</p></li>
+<li><p><cite>docs/</cite>: The documentation of the source code of this repository. Basis for the [documentation](<a class="reference external" href="https://dmki-tuwien.github.io/lpg-normalization/">https://dmki-tuwien.github.io/lpg-normalization/</a>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">gnfd/</span></code>: A Python package that implements the Graph Object Functional Dependencies</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">graphs/</span></code>: Contains graphs that are normalized as part of the evaluation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">out/</span></code>: Contains the output of the evaluation as CSV files</p></li>
@@ -350,7 +350,7 @@ accompanying the paper “A Graph-Native Approach to Normalization”.</p>
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
 <p>Since this repository contains a submodule for the
 <a class="reference external" href="https://github.com/neo4j-graph-examples/northwind">Northwind</a> graph dataset,
-the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/dmki-tuwien/lpg-normalization.git</span> <span class="pre">--recurse-submodules</span></code> needs to be used.</p>
+the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/dmki-tuwien/lpg-normalization.git</span> <span class="pre">--recurse-submodules</span></code> needs to be used to clone the repository.</p>
 <p>Please also download all datasets as described in the <code class="docutils literal notranslate"><span class="pre">graphs/</span></code> folder before running the evaluation.</p>
 <p>Following the cloning of the repository run the command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">build</span></code> to prepare the containers for the evaluation.</p>
 <p>The command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">up</span> <span class="pre">--abort-on-container-exit</span></code> automatically sets up the databases,
@@ -371,8 +371,10 @@ a Juypter Notebook <code class="docutils literal notranslate"><span class="pre">
 is used.
 On macOS, ANTLR can be installed using <a class="reference external" href="https://brew.sh/">Homebrew</a>:
 <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">antlr</span></code>.</p>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="gnfd/index.html">Graph-Native Functional Dependencies</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/grammar.html">Grammar</a></li>
@@ -426,6 +428,7 @@ On macOS, ANTLR can be installed using <a class="reference external" href="https
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development">Development</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contents">Contents</a></li>
 </ul>
   </nav></div>
 
