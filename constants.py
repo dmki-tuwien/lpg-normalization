@@ -33,7 +33,6 @@ PDF_METADATA = {
 PROPERTY_COUNT_COL = "no_properties"
 RED_COUNT_COL = "m8_red_count"
 RUN_ID_COL = "run_id"
-RUN_ID = str(uuid.uuid4())
 SUBSET_COL = "subset"
 TIMESTAMP_COL = "timestamp"
 TYPES_COUNT_COL = "no_types"
