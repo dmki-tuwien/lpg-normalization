@@ -29,7 +29,7 @@ neo4j_log.setLevel(logging.INFO)
 
 load_dotenv()  # Required to get content of .env when not using Docker
 
-GRAPHS_PATH = os.getenv("GRAPHS_PATH")
+GRAPHS_PATH = "/graphs" if os.getenv("GRAPHS_PATH") is None else os.getenv("GRAPHS_PATH")
 
 # Memgraph Connection
 MEMGRAPH_DATABASE = (
