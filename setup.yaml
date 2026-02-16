@@ -6,7 +6,7 @@ graphs:
   # * Either an entry "from_file" that contains a path, which points to a Cypher file that works with both, Neo4J and
   #   Memgraph, or an entry "neo4j" that contains "from_file" or "from_dump", with the latter being a path pointing to
   #   a Neo4J (Enterprise) database dump.
-  - name: "S09 - Rijden de Treinen"
+  - name: "$S_{TS-1}$"
     neo4j:
       from_dump: graphs/rijdendetreinen/rijdendetreinen_small.dump
     dependencies:
@@ -25,7 +25,7 @@ graphs:
     source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2025-11.csv.gz}"
     dependency_origin: "User provided"
 
-  - name: "S10 - Rijden de Treinen"
+  - name: "$S_{TS-2}$"
     neo4j:
       from_dump: graphs/rijdendetreinen/rijdendetreinen_small.dump
     dependencies:
@@ -46,7 +46,7 @@ graphs:
     source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2025-11.csv.gz}"
     dependency_origin: "User provided"
 
-  - name: "S06 - Offshore"
+  - name: "$S_{OF-1}$"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -57,7 +57,7 @@ graphs:
         - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.countries=>e.country_codes"
         - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.country_codes=>e.countries"
 
-  - name: "S07 - Offshore"
+  - name: "$S_{OF-2}$"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -73,7 +73,7 @@ graphs:
       - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.sourceID=>e.countries"
       - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.valid_until=>e.countries"
 
-  - name: "S08 - Offshore"
+  - name: "$S_{OF-3}$"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -94,7 +94,7 @@ graphs:
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.sourceID=>e.valid_until"
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.valid_until=>e.sourceID"
 
-  - name: "S11 - University"
+  - name: "$S_{UNI-1}$"
     from_file: graphs/lecture.cypher
     dependencies:
       - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
@@ -102,7 +102,7 @@ graphs:
       - "(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook"
     dependency_origin: "User provided"
 
-  - name: "S12 - University"
+  - name: "$S_{UNI-2}$"
     from_file: graphs/lecture.cypher
     dependencies:
       - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
@@ -110,7 +110,7 @@ graphs:
       - "(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook"
     dependency_origin: "User provided"
 
-  - name: "S03 - No Socks"
+  - name: "$S_{NO-1}$"
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time)::e.company,e.time=>e"
@@ -124,7 +124,8 @@ graphs:
       - "(e:Event:company&name&time&venue)::e.time,e.venue=>e.name"
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
-  - name: "S04 - No Socks" # works
+
+  - name: "$S_{NO-2}$"
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time&venue)::e.company,e.time=>e.venue"
@@ -139,7 +140,7 @@ graphs:
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
-  - name: "S05 - No Socks 2"
+  - name: "$S_{NO-3}$"
     from_file: graphs/nosocks.cypher
     dependencies:
       - "(e:Event:company&time&venue)::e.company,e.time=>e"
@@ -156,7 +157,7 @@ graphs:
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
-  - name: "S02 - Northwind Orders"
+  - name: "$S_{NW}$"
     neo4j:
       from_file: graphs/northwind/scripts/northwind.cypher
     dependencies:
@@ -168,18 +169,18 @@ graphs:
     dependency_origin: "\\citet{skavantzos_third_2025}"
     source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
 
-  - name: "S01 - London Public Transport" # works
+  - name: "$S_{LON}$"
     neo4j:
       from_file: graphs/london_neo4j.cypher
     dependencies:
       - "(s:Station:zone&zoneOriginal)::s.zoneOriginal=>s.zone"
-      - "(s:Station)-[c::line&color]->(t:Station)::c.line=>c.color"
+      - "(s:Station)-[c::line&color]->()::c.line=>c.color"
       - "(s:Station:latitude&longitude&zone)::s.latitude,s.longitude=>s.zone"
       - "(s:Station:latitude&longitude)::s.latitude,s.longitude=>s"
       - "()-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type"
     minimal_cover:
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::s.zoneOriginal=>s.zone"
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::s.latitude,s.longitude=>s"
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->(t:Station)::c.line=>c.color,c.type"
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->()::s.zoneOriginal=>s.zone"
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->()::s.latitude,s.longitude=>s"
+      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type"
     dependency_origin: "User provided"
     source: "Extended based on \\url{https://github.com/neo4j-partners/neo4j-transport-for-london}"
