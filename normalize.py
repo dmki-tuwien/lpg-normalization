@@ -189,7 +189,7 @@ RETURN avg(card) AS res
 
                             cleanup_queries.add(
                                 f"""
-MATCH (:{"&".join(edge.src.labels)})-[{edge.symbol}:{"&".join(edge.labels)}]->(:{"&".join(edge.tgt.labels)})
+MATCH ({"".join(map(lambda lab: f":{lab}", edge.src.labels))})-[{edge.symbol}{"".join(map(lambda lab: f":{lab}", edge.labels))}]->({"".join(map(lambda lab: f":{lab}", edge.tgt.labels))})
 DELETE {edge.symbol}"""
                             )
 
@@ -282,7 +282,7 @@ REMOVE {", ".join(map(str, left_references))}"""
 
                             cleanup_queries.add(
                                 f"""
-MATCH (:{"&".join(edge.src.labels)})-[{edge.symbol}:{"&".join(edge.labels)}]->(:{"&".join(edge.tgt.labels)})
+MATCH ({"".join(map(lambda lab: f":{lab}", edge.src.labels))})-[{edge.symbol}{"".join(map(lambda lab: f":{lab}", edge.labels))}]->({"".join(map(lambda lab: f":{lab}", edge.tgt.labels))})
 DELETE {edge.symbol}"""
                             )
 
@@ -550,7 +550,7 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
 
                 cleanup_queries.add(
                     f"""
-MATCH (:{"&".join(edge.src.labels)})-[{edge.symbol}:{"&".join(edge.labels)}]->(:{"&".join(edge.tgt.labels)})
+MATCH ({"".join(map(lambda lab: f":{lab}", edge.src.labels))})-[{edge.symbol}{"".join(map(lambda lab: f":{lab}", edge.labels))}]->({"".join(map(lambda lab: f":{lab}", edge.tgt.labels))})
 REMOVE {", ".join(map(str, all_references))}
 DELETE {edge.symbol}"""
                 )
