@@ -189,9 +189,8 @@ RETURN avg(card) AS res
 
                             cleanup_queries.add(
                                 f"""
-{inter_dep.pattern.to_gql_match_where_string()}
-DELETE {edge.symbol}
-                            """
+MATCH (:{"&".join(edge.src.labels)})-[{edge.symbol}:{"&".join(edge.labels)}]->(:{"&".join(edge.tgt.labels)})
+DELETE {edge.symbol}"""
                             )
 
                             right_ref_label_delim = (
@@ -283,7 +282,7 @@ REMOVE {", ".join(map(str, left_references))}"""
 
                             cleanup_queries.add(
                                 f"""
-{inter_dep.pattern.to_gql_match_where_string()}
+MATCH (:{"&".join(edge.src.labels)})-[{edge.symbol}:{"&".join(edge.labels)}]->(:{"&".join(edge.tgt.labels)})
 DELETE {edge.symbol}"""
                             )
 
@@ -551,7 +550,7 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
 
                 cleanup_queries.add(
                     f"""
-{dep.pattern.to_gql_match_where_string()}
+MATCH (:{"&".join(edge.src.labels)})-[{edge.symbol}:{"&".join(edge.labels)}]->(:{"&".join(edge.tgt.labels)})
 REMOVE {", ".join(map(str, all_references))}
 DELETE {edge.symbol}"""
                 )
