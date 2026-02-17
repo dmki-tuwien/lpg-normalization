@@ -107,7 +107,10 @@ class Pattern(abc.ABC):
 
     def to_gql_match_where_string(self) -> str:
         tup = self.to_gql_match_where_tuple()
-        return f"MATCH {tup[0]} WHERE {tup[1]}"
+        if len(tup[1]) > 0: # WHERE followed with no statements would be illegal!
+            return f"MATCH {tup[0]} WHERE {tup[1]}"
+        else:
+            return f"MATCH {tup[0]}"
 
     @abstractmethod
     def contains_var(self, symbol: str) -> bool:
@@ -805,6 +808,10 @@ class GNFD:
 
     def to_latex(self):
         return f"{str(self.pattern)}::{",".join(map(str, self.left))}\\determ {",".join(map(str, self.right))}"
+
+    @property
+    def is_trivial(self):
+        return len(set(map(str, self.right)).intersection(set(map(str, self.left)))) > 0
 
 
 class _GNFDListener(gnfdListener):
