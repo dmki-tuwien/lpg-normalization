@@ -602,12 +602,13 @@ def reify_and_extract_to_new_node(
     transformation_queries.add(
         f"""
     {inter_dep.pattern.to_gql_match_where_string()} 
-    MERGE (x{i}:$(type({edge.symbol})))
-    ON CREATE SET x{i} += properties({edge.symbol})
-    MERGE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i})
-    MERGE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
+    CREATE (x{i}:$(type({edge.symbol})))
+    CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i})
+    CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
     MERGE (newNode:{new_label} {{{new_properties}}})
-    MERGE (x{i})-[:{new_label.upper()}]->(newNode)"""
+    MERGE (x{i})-[:{new_label.upper()}]->(newNode)
+    ON CREATE SET x{i} += properties({edge.symbol})
+"""
     ) # Reification may have already happened for another dep. --> Merge!
 
     ## Uses less database hits but 10x more ram
