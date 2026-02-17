@@ -161,6 +161,14 @@ RETURN avg(card) AS res
                             index_queries.add(
                                 f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(left_go.properties)})"
                             )
+                            if len(left_go.src.properties) > 0:
+                                index_queries.add(
+                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(left_go.src.labels)}) ON (n.{", n.".join(left_go.src.properties)})"
+                                )
+                            if len(left_go.tgt.properties) > 0:
+                                index_queries.add(
+                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(left_go.tgt.labels)}) ON (n.{", n.".join(left_go.tgt.properties)})"
+                                )
 
                             new_properties: str = ", ".join(
                                 map(
@@ -247,6 +255,14 @@ REMOVE {", ".join(map(str, left_references))}"""
                             index_queries.add(
                                 f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(left_go.properties)})"
                             )
+                            if len(left_go.src.properties) > 0:
+                                index_queries.add(
+                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(left_go.src.labels)}) ON (n.{", n.".join(left_go.src.properties)})"
+                                )
+                            if len(left_go.tgt.properties) > 0:
+                                index_queries.add(
+                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(left_go.tgt.labels)}) ON (n.{", n.".join(left_go.tgt.properties)})"
+                                )
 
                             new_properties: str = ", ".join(
                                 map(
@@ -509,6 +525,14 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
                 index_queries.add(
                     f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(edge.properties)})"
                 )
+                if len(edge.src.properties) > 0:
+                    index_queries.add(
+                        f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.src.labels)}) ON (n.{", n.".join(edge.src.properties)})"
+                    )
+                if len(edge.tgt.properties) > 0:
+                    index_queries.add(
+                        f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.tgt.labels)}) ON (n.{", n.".join(edge.tgt.properties)})"
+                    )
 
                 new_properties: str = ", ".join(
                     map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
