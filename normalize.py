@@ -10,10 +10,6 @@ from tqdm_loggable.auto import tqdm
 from gnfd import DependencySet, GNFD, Node, Reference, Edge, GraphObject
 
 
-
-
-
-
 def perform_graph_native_normalization(
     driver: Driver,
     database,
@@ -36,7 +32,6 @@ def perform_graph_native_normalization(
 
     """A local copy of the provided dependencies that, e.g., may be filtered."""
     deps = provided_dependencies
-
 
     """A list of strings of queries that create indices"""
     index_queries: set[str] = set()
@@ -62,14 +57,17 @@ def perform_graph_native_normalization(
 
     def validate_dep(dep):
         """Validates whether a functional dependency holds"""
+        if dep.is_trivial:
+            return # The dependency is technically valid, although not minimal!
+
         with driver.session(database=database) as session:
             query = f"""
 {dep.pattern.to_gql_match_where_string()}
 WITH DISTINCT
-{",".join(map(lambda ref: str(ref)+" AS "+camelcase(str(ref)), dep.left.union(dep.right)))}
+{",".join(map(lambda ref: str(ref)+" AS "+pascalcase(str(ref)), dep.left.union(dep.right)))}
 WITH
-{",".join(map(lambda ref: camelcase(str(ref)), dep.left))},
-COUNT([{",".join(map(lambda ref: camelcase(str(ref)), dep.right))}]) AS card
+{",".join(map(lambda ref: pascalcase(str(ref)), dep.left))},
+COUNT([{",".join(map(lambda ref: pascalcase(str(ref)), dep.right))}]) AS card
 RETURN avg(card) AS res
 
 """
@@ -77,8 +75,7 @@ RETURN avg(card) AS res
             record = res.single()
             if record is not None:
                 if record["res"] != 1:
-                    raise ValueError(f"The dependency \"{str(dep)}\" is not functional!")
-
+                    raise ValueError(f'The dependency "{str(dep)}" is not functional!')
 
     # Phase 0: Filter deps according to parameter from evaluation.
     logging.info("Filter dependencies")
@@ -90,16 +87,28 @@ RETURN avg(card) AS res
         case "between-go":
             deps = DependencySet(filter(lambda dep: dep.is_inter_graph_object, deps))
         case "node-left":
-            deps = DependencySet(filter(lambda dep: dep.is_within_node or isinstance(next(iter(dep.left)).get_graph_object(), Node), deps))
+            deps = DependencySet(
+                filter(
+                    lambda dep: dep.is_within_node
+                    or isinstance(next(iter(dep.left)).get_graph_object(), Node),
+                    deps,
+                )
+            )
         case "edge-left":
-            deps = DependencySet(filter(lambda dep: isinstance(next(iter(dep.left)).get_graph_object(), Edge), deps))
+            deps = DependencySet(
+                filter(
+                    lambda dep: isinstance(
+                        next(iter(dep.left)).get_graph_object(), Edge
+                    ),
+                    deps,
+                )
+            )
 
     if len(deps) == 0:
         return (
             provided_dependencies,
             applied_transformations,
-        )  # Return original dependencies
-
+        )  # Nothing will happen --> Return original dependencies
 
     i = 0
 
@@ -112,9 +121,7 @@ RETURN avg(card) AS res
                 map(lambda ref: ref.get_graph_object(), inter_dep.left)
             )
 
-            if (
-                len(left_gos) == 1
-            ):  # Multiple GOs are not supported for the left side
+            if len(left_gos) == 1:  # Multiple GOs are not supported for the left side
                 left_go = left_gos.pop()
                 if isinstance(left_go, Edge):
                     edge = left_go
@@ -134,17 +141,13 @@ RETURN avg(card) AS res
                         ):
                             logging.info("Ep -> Np")
 
-                            merge_key_elements = list(map(str, left_references.union({right_ref})))
+                            merge_key_elements = list(
+                                map(str, left_references.union({right_ref}))
+                            )
                             merge_key_elements.sort()
                             within_merge_key: str = ",".join(merge_key_elements)
                             new_props = list(left_references.union({right_ref}))
                             new_props.sort(key=str)
-                            new_properties: str = ", ".join(
-                                map(
-                                    lambda ref: f"{pascalcase(ref)} : {ref}",
-                                    map(str, new_props),
-                                )
-                            )
                             new_label: str = pascalcase(within_merge_key)
 
                             index_queries.add(
@@ -152,11 +155,21 @@ RETURN avg(card) AS res
                             )
 
                             new_properties: str = ", ".join(
-                                map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
+                                map(
+                                    lambda ref: f"{pascalcase(ref)} : {ref}",
+                                    map(str, new_props),
+                                )
                             )
 
-                            reify_and_extract_to_new_node(edge, i, dep, new_label, new_properties, new_props,
-                                                          transformation_queries)
+                            reify_and_extract_to_new_node(
+                                edge,
+                                i,
+                                dep,
+                                new_label,
+                                new_properties,
+                                new_props,
+                                transformation_queries,
+                            )
 
                             cleanup_queries.add(
                                 f"""
@@ -165,9 +178,10 @@ DELETE {edge.symbol}
                             """
                             )
 
-
                             right_ref_label_delim = (
-                                ":" if len(right_ref.get_graph_object().labels) > 0 else ""
+                                ":"
+                                if len(right_ref.get_graph_object().labels) > 0
+                                else ""
                             )
                             cleanup_queries.add(
                                 f"""
@@ -193,8 +207,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 )
                             )
 
-                            applied_transformations.append(("inter1", 2))
-                        # if its no Node its more than one hop for sure
+                            applied_transformations.append(("Ep -> Np", 2))
 
                         elif (
                             right_ref.is_graph_object_variable
@@ -212,12 +225,6 @@ REMOVE {", ".join(map(str, left_references))}"""
                             within_merge_key: str = ",".join(merge_key_elements)
                             new_props = list(left_references)
                             new_props.sort(key=str)
-                            new_properties: str = ", ".join(
-                                map(
-                                    lambda ref: f"{pascalcase(ref)} : {ref}",
-                                    map(str, new_props),
-                                )
-                            )
                             new_label: str = pascalcase(within_merge_key)
 
                             index_queries.add(
@@ -225,22 +232,26 @@ REMOVE {", ".join(map(str, left_references))}"""
                             )
 
                             new_properties: str = ", ".join(
-                                map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
+                                map(
+                                    lambda ref: f"{pascalcase(ref)} : {ref}",
+                                    map(str, new_props),
+                                )
                             )
 
-                            reify_and_extract_to_new_node(edge, i, dep, new_label, new_properties, new_props,
-                                                          transformation_queries)
-
+                            reify_and_extract_to_new_node(
+                                edge,
+                                i,
+                                dep,
+                                new_label,
+                                new_properties,
+                                new_props,
+                                transformation_queries,
+                            )
 
                             cleanup_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()}
 DELETE {edge.symbol}"""
-                            )
-
-
-                            right_ref_label_delim = (
-                                ":" if len(right_ref.get_graph_object().labels) > 0 else ""
                             )
 
                             cleanup_queries.add(
@@ -266,7 +277,11 @@ REMOVE {", ".join(map(str, left_references))}"""
                     for right_ref in inter_dep.right:
                         left_is_go = (
                             len(
-                                set(filter(lambda ref: "." not in str(ref), inter_dep.left))
+                                set(
+                                    filter(
+                                        lambda ref: "." not in str(ref), inter_dep.left
+                                    )
+                                )
                             )
                             > 0
                         )
@@ -316,38 +331,38 @@ REMOVE {right_ref}"""
                         ):
                             logging.info("Np -> Ep")
 
-                            merge_key_elements = list(map(str, left_references.union({right_ref})))
+                            merge_key_elements = list(
+                                map(str, left_references.union({right_ref}))
+                            )
                             merge_key_elements.sort()
                             within_merge_key: str = ",".join(merge_key_elements)
                             new_props = list(left_references.union({right_ref}))
                             new_props.sort(key=str)
-                            new_properties: str = ", ".join(
-                                map(
-                                    lambda ref: f"{pascalcase(ref)}: {ref}",
-                                    map(str, new_props),
-                                )
-                            )
                             new_label: str = pascalcase(within_merge_key)
 
                             index_queries.add(
-f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
+                                f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                             )
 
                             new_properties: str = ", ".join(
-                                map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
+                                map(
+                                    lambda ref: f"{pascalcase(ref)} : {ref}",
+                                    map(str, new_props),
+                                )
                             )
 
                             # _apply_transformation_query(
-#                             transformation_queries.add(
-#                                 f"""
-# {dep.pattern.to_gql_match_where_string()}
-# WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
-# MERGE (newNode:{new_label} {{{new_properties}}})
-# WITH newNode, collect{node.symbol}
-# UNWIND collect{node.symbol} AS orig{node.symbol}
-# CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
-#                             )
-                            transformation_queries.add(f"""
+                            #                             transformation_queries.add(
+                            #                                 f"""
+                            # {dep.pattern.to_gql_match_where_string()}
+                            # WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
+                            # MERGE (newNode:{new_label} {{{new_properties}}})
+                            # WITH newNode, collect{node.symbol}
+                            # UNWIND collect{node.symbol} AS orig{node.symbol}
+                            # CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
+                            #                             )
+                            transformation_queries.add(
+                                f"""
                             {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
 MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
@@ -385,8 +400,12 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
 
         elif dep.is_within_graph_object:
             # First filter References that are Graph Object IDs. We don't need them here as their occurrence is a sign for structurally implied or to limiting dep.s.
-            left_references: set[Reference] = set(filter(lambda ref: ref.is_property_variable, dep.left))
-            right_references: set[Reference] = set(filter(lambda ref: ref.is_property_variable, dep.right))
+            left_references: set[Reference] = set(
+                filter(lambda ref: ref.is_property_variable, dep.left)
+            )
+            right_references: set[Reference] = set(
+                filter(lambda ref: ref.is_property_variable, dep.right)
+            )
             all_references: set[Reference] = left_references.union(right_references)
 
             merge_key_elements = list(map(str, all_references))
@@ -394,9 +413,6 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
             within_merge_key: str = ",".join(merge_key_elements)
             new_props = list(right_references.union(left_references))
             new_props.sort(key=str)
-            new_properties: str = ", ".join(
-                map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
-            )
             new_label: str = pascalcase(within_merge_key)
 
             i += 1
@@ -404,7 +420,11 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
             # # # # # # # # # #
             #  ψ_L1 (psi_L1)  #
             # # # # # # # # # #
-            if dep.is_within_node and len(left_references) > 0 and len(right_references) > 0:
+            if (
+                dep.is_within_node
+                and len(left_references) > 0
+                and len(right_references) > 0
+            ):
                 logging.info("Within n")
                 node: Node = dep.right.pop().get_graph_object()
 
@@ -416,14 +436,17 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
                     map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                 )
 
-                transformation_queries.add(f"""
+                transformation_queries.add(
+                    f"""
 {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
 MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                 )
 
                 # Remove old redundant properties in the end
-                cleanup_pattern = dep.pattern.to_gql_match_where_string().split("WHERE")[0]
+                cleanup_pattern = dep.pattern.to_gql_match_where_string().split(
+                    "WHERE"
+                )[0]
                 cleanup_queries.add(
                     f"""
 {cleanup_pattern} 
@@ -450,14 +473,16 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
             #  ψ_L2 (psi_L2)  #
             # # # # # # # # # #
             elif (
-                dep.is_within_edge and len(left_references) > 0 and len(right_references) > 0
+                dep.is_within_edge
+                and len(left_references) > 0
+                and len(right_references) > 0
             ):  # ψ_L2 (psi_L2)  --> Reification
                 logging.info("Within e")
 
                 edge: Edge = dep.right.pop().get_graph_object()
 
                 index_queries.add(
-f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
+                    f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                 )
 
                 new_properties: str = ", ".join(
@@ -465,8 +490,15 @@ f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{",
                 )
 
                 # Reification + create new node
-                reify_and_extract_to_new_node(edge, i, dep, new_label, new_properties, new_props,
-                                              transformation_queries)
+                reify_and_extract_to_new_node(
+                    edge,
+                    i,
+                    dep,
+                    new_label,
+                    new_properties,
+                    new_props,
+                    transformation_queries,
+                )
 
                 cleanup_queries.add(
                     f"""
@@ -475,7 +507,8 @@ REMOVE {", ".join(map(str, all_references))}
 DELETE {edge.symbol}"""
                 )
 
-                cleanup_queries.add(f"""
+                cleanup_queries.add(
+                    f"""
 MATCH ({edge.symbol})-[:{new_label.upper()}]->(x{i})
 REMOVE {", ".join(map(str, all_references))}"""
                 )  # Connect normalized nodes with reified nodes and remove redundant properties
@@ -508,18 +541,28 @@ REMOVE {", ".join(map(str, all_references))}"""
     return transformed_deps, applied_transformations
 
 
-def reify_and_extract_to_new_node(edge: Edge, i: int | Any, inter_dep: GNFD, new_label: str, new_properties: str,
-                                  new_props: list[Reference], transformation_queries: set[str]):
+def reify_and_extract_to_new_node(
+    edge: Edge,
+    i: int | Any,
+    inter_dep: GNFD,
+    new_label: str,
+    new_properties: str,
+    new_props: list[Reference],
+    transformation_queries: set[str],
+):
     # the "naive" way of encoding it
     transformation_queries.add(
-            f"""
+        f"""
     {inter_dep.pattern.to_gql_match_where_string()} 
     CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
     CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
     SET x{i} += properties({edge.symbol})
     MERGE (newNode:{new_label} {{{new_properties}}})
-    MERGE (x{i})-[:{new_label.upper()}]->(newNode)""")
+    MERGE (x{i})-[:{new_label.upper()}]->(newNode)"""
+    )
     ## Uses less database hits but 10x more ram
+
+
 #     transformation_queries.add(
 #         f"""
 # {inter_dep.pattern.to_gql_match_where_string()}
