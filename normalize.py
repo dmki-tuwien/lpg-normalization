@@ -554,23 +554,22 @@ def reify_and_extract_to_new_node(
     transformation_queries.add(
         f"""
     {inter_dep.pattern.to_gql_match_where_string()} 
-    CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
-    CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
+    MERGE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
+    MERGE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
     SET x{i} += properties({edge.symbol})
     MERGE (newNode:{new_label} {{{new_properties}}})
     MERGE (x{i})-[:{new_label.upper()}]->(newNode)"""
-    )
+    ) # Reification may have already happened for another dep. --> Merge!
+
     ## Uses less database hits but 10x more ram
-
-
-#     transformation_queries.add(
-#         f"""
-# {inter_dep.pattern.to_gql_match_where_string()}
-# CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
-# CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
-# SET x{i} += properties({edge.symbol})
-# WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
-# MERGE (newNode:{new_label} {{{new_properties}}})
-# WITH newNode, collectx{i}
-# UNWIND collectx{i} AS origx{i}
-# CREATE (origx{i})-[:{new_label.upper()}]->(newNode)""")
+    #     transformation_queries.add(
+    #         f"""
+    # {inter_dep.pattern.to_gql_match_where_string()}
+    # CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
+    # CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
+    # SET x{i} += properties({edge.symbol})
+    # WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
+    # MERGE (newNode:{new_label} {{{new_properties}}})
+    # WITH newNode, collectx{i}
+    # UNWIND collectx{i} AS origx{i}
+    # CREATE (origx{i})-[:{new_label.upper()}]->(newNode)""")
