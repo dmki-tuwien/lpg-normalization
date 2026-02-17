@@ -158,6 +158,9 @@ RETURN avg(card) AS res
                             index_queries.add(
                                 f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(left_go.properties)})"
                             )
+                            index_queries.add(
+                                f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(left_go.properties)})"
+                            )
 
                             new_properties: str = ", ".join(
                                 map(
@@ -240,6 +243,9 @@ REMOVE {", ".join(map(str, left_references))}"""
                             orig_edge_label = next(iter(left_go.labels))
                             index_queries.add(
                                 f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(left_go.properties)})"
+                            )
+                            index_queries.add(
+                                f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(left_go.properties)})"
                             )
 
                             new_properties: str = ", ".join(
@@ -499,6 +505,9 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
                 orig_edge_label = next(iter(edge.labels))
                 index_queries.add(
                     f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(edge.properties)})"
+                )
+                index_queries.add(
+                    f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(edge.properties)})"
                 )
 
                 new_properties: str = ", ".join(
