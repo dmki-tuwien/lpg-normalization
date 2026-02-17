@@ -154,6 +154,11 @@ RETURN avg(card) AS res
                                 f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                             )
 
+                            orig_edge_label = next(iter(left_go.labels))
+                            index_queries.add(
+                                f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(left_go.properties)})"
+                            )
+
                             new_properties: str = ", ".join(
                                 map(
                                     lambda ref: f"{pascalcase(ref)} : {ref}",
@@ -227,8 +232,14 @@ REMOVE {", ".join(map(str, left_references))}"""
                             new_props.sort(key=str)
                             new_label: str = pascalcase(within_merge_key)
 
+
                             index_queries.add(
                                 f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
+                            )
+
+                            orig_edge_label = next(iter(left_go.labels))
+                            index_queries.add(
+                                f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(left_go.properties)})"
                             )
 
                             new_properties: str = ", ".join(
@@ -483,6 +494,11 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
 
                 index_queries.add(
                     f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
+                )
+
+                orig_edge_label = next(iter(edge.labels))
+                index_queries.add(
+                    f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(edge.properties)})"
                 )
 
                 new_properties: str = ", ".join(
