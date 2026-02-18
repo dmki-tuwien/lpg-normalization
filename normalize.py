@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import Any
 
 from caseconverter import pascalcase, camelcase
@@ -468,11 +469,15 @@ REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
                     map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                 )
 
+                rand = str(uuid.uuid4())[:8]
+
                 transformation_queries.add(
                     f"""
 {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
-MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
+MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)
+SET {node.symbol}.`{rand}`="{rand}"
+"""
                 )
 
                 # Remove old redundant properties in the end
@@ -482,7 +487,9 @@ MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                 cleanup_queries.add(
                     f"""
 {cleanup_pattern} 
-REMOVE {", ".join(map(str, right_references.union(left_references)))}"""
+WHERE {node.symbol}.`{rand}`="{rand}"
+REMOVE {", ".join(map(str, right_references.union(left_references)))}
+REMOVE {node.symbol}.`{rand}`"""
                 )
 
                 dep.pattern.properties -= all_references
