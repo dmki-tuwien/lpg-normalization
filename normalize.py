@@ -187,6 +187,28 @@ RETURN avg(card) AS res
                                 new_props,
                                 transformation_queries,
                             )
+                            rand = str(uuid.uuid4())[:8]
+                            transformation_queries.add(
+f"""
+                        {dep.pattern.to_gql_match_where_string()} 
+SET {node.symbol}.`{rand}`="{rand}"
+"""
+                            )
+
+                            # Remove old redundant properties in the end
+                            cleanup_pattern = (
+                                inter_dep.pattern.to_gql_match_where_string().split(
+                                    "WHERE"
+                                )[0]
+                            )
+                            cleanup_queries.add(
+    f"""
+{cleanup_pattern} 
+WHERE {node.symbol}.`{rand}`="{rand}"
+REMOVE {right_ref}
+REMOVE {node.symbol}.`{rand}`
+"""
+                            )
 
                             cleanup_queries.add(
                                 f"""
@@ -199,11 +221,7 @@ DELETE {edge.symbol}"""
                                 if len(right_ref.get_graph_object().labels) > 0
                                 else ""
                             )
-                            cleanup_queries.add(
-                                f"""
-MATCH ({right_ref.get_graph_object().symbol}{right_ref_label_delim}{"&".join(right_ref.get_graph_object().labels)})
-REMOVE {right_ref}"""
-                            )  # Connect normalized nodes with reified nodes and remove redundant properties
+
 
                             cleanup_queries.add(
                                 f"""
