@@ -188,13 +188,13 @@ RETURN avg(card) AS res
                                 transformation_queries,
                             )
                             rand = str(uuid.uuid4())[:8]
+                            node = right_ref.get_graph_object()
                             transformation_queries.add(
 f"""
                         {dep.pattern.to_gql_match_where_string()} 
 SET {node.symbol}.`{rand}`="{rand}"
 """
                             )
-
                             # Remove old redundant properties in the end
                             cleanup_pattern = (
                                 inter_dep.pattern.to_gql_match_where_string().split(
