@@ -384,23 +384,16 @@ REMOVE {right_ref}"""
                                 )
                             )
 
-                            # _apply_transformation_query(
-                            #                             transformation_queries.add(
-                            #                                 f"""
-                            # {dep.pattern.to_gql_match_where_string()}
-                            # WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect({node.symbol}) AS collect{node.symbol}
-                            # MERGE (newNode:{new_label} {{{new_properties}}})
-                            # WITH newNode, collect{node.symbol}
-                            # UNWIND collect{node.symbol} AS orig{node.symbol}
-                            # CREATE (orig{node.symbol})-[:{new_label.upper()}]->(newNode)"""
-                            #                             )
+                            rand = str(uuid.uuid4())[:8]
+
                             transformation_queries.add(
                                 f"""
                             {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
-MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
+MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)
+SET {node.symbol}.`{rand}`="{rand}"
+"""
                             )
-                            #    pattern += f", ({node.symbol})-[:{new_label.upper()}]->(x{i}:{new_label})"
 
                             # Remove old redundant properties in the end
                             cleanup_pattern = (
@@ -411,7 +404,10 @@ MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)"""
                             cleanup_queries.add(
                                 f"""
 {cleanup_pattern} 
-REMOVE {", ".join(map(str, left_references.union({right_ref})))}"""
+WHERE {node.symbol}.`{rand}`="{rand}"
+REMOVE {", ".join(map(str, left_references.union({right_ref})))}
+REMOVE {node.symbol}.`{rand}`
+"""
                             )
 
                             right_ref.get_graph_object().properties -= {right_ref}
@@ -618,15 +614,3 @@ def reify_and_extract_to_new_node(
 """
     ) # Reification may have already happened for another dep. --> Merge!
 
-    ## Uses less database hits but 10x more ram
-    #     transformation_queries.add(
-    #         f"""
-    # {inter_dep.pattern.to_gql_match_where_string()}
-    # CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i}:$(type({edge.symbol})))
-    # CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
-    # SET x{i} += properties({edge.symbol})
-    # WITH {",".join(map(lambda ref: f"{ref} AS {camelcase(ref)}", map(str, new_props)))}, collect(x{i}) AS collectx{i}
-    # MERGE (newNode:{new_label} {{{new_properties}}})
-    # WITH newNode, collectx{i}
-    # UNWIND collectx{i} AS origx{i}
-    # CREATE (origx{i})-[:{new_label.upper()}]->(newNode)""")
