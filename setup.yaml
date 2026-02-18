@@ -46,7 +46,7 @@ graphs:
     source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2025-11.csv.gz}"
     dependency_origin: "User provided"
 
-  - name: "$S_\\text{Of-1}$"
+  - name: "$S_\\text{Off-1}$"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -57,7 +57,7 @@ graphs:
         - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.countries=>e.country_codes"
         - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.country_codes=>e.countries"
 
-  - name: "$S_\\text{Of-2}$"
+  - name: "$S_\\text{Off-2}$"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -73,7 +73,7 @@ graphs:
       - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.sourceID=>e.countries"
       - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.valid_until=>e.countries"
 
-  - name: "$S_\\text{Of-3}$"
+  - name: "$S_\\text{Off-3}$"
     neo4j:
       from_dump: graphs/offshore.dump
     dependencies:
@@ -90,7 +90,7 @@ graphs:
     minimal_cover:
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.countries=>e.country_codes"
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.country_codes=>e.countries"
-      - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.service_provider=>e.sourceID,e.valid_until"
+      - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.service_provider=>e.sourceID"
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.sourceID=>e.valid_until"
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.valid_until=>e.sourceID"
 
