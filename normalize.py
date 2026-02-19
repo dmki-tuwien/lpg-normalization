@@ -38,8 +38,10 @@ def perform_graph_native_normalization(
     index_queries: set[str] = set()
     """A list of strings of the queries that perform the transformations"""
     transformation_queries: set[str] = set()
-    """A list of strings of the queries that """
-    cleanup_queries: set[str] = set()
+    """A list of strings of the queries that remove properties"""
+    remove_queries: set[str] = set()
+    """A list of strings of the queries that delete graph objects"""
+    delete_queries: set[str] = set()
 
     """The set of dependencies after all transformations have been applied."""
     transformed_deps: DependencySet
@@ -119,16 +121,16 @@ RETURN avg(card) AS res
         if dep.is_inter_graph_object:
             inter_dep = dep
             left_gos: set[GraphObject] = set(
-                map(lambda ref: ref.get_graph_object(), inter_dep.left)
+                map(lambda ref: ref.get_graph_object(), dep.left)
             )
 
             if len(left_gos) == 1:  # Multiple GOs are not supported for the left side
                 left_go = left_gos.pop()
                 if isinstance(left_go, Edge):
                     edge = left_go
-                    for right_ref in inter_dep.right:
+                    for right_ref in dep.right:
                         left_references: set[Reference] = set(
-                            filter(lambda ref: ref.is_property_variable, inter_dep.left)
+                            filter(lambda ref: ref.is_property_variable, dep.left)
                         )
 
                         if (
@@ -141,6 +143,7 @@ RETURN avg(card) AS res
                             )
                         ):
                             logging.info("Ep -> Np")
+                            assert isinstance(right_ref.get_graph_object(), Node)
 
                             merge_key_elements = list(
                                 map(str, left_references.union({right_ref}))
@@ -191,7 +194,8 @@ RETURN avg(card) AS res
                             node = right_ref.get_graph_object()
                             transformation_queries.add(
 f"""
-                        {dep.pattern.to_gql_match_where_string()} 
+{dep.pattern.to_gql_match_where_string()} 
+WITH DISTINCT {node.symbol}
 SET {node.symbol}.`{rand}`="{rand}"
 """
                             )
@@ -201,29 +205,26 @@ SET {node.symbol}.`{rand}`="{rand}"
                                     "WHERE"
                                 )[0]
                             )
-                            cleanup_queries.add(
+                            remove_queries.add(
     f"""
 {cleanup_pattern} 
 WHERE {node.symbol}.`{rand}`="{rand}"
+WITH DISTINCT {node.symbol}
 REMOVE {right_ref}
 REMOVE {node.symbol}.`{rand}`
 """
                             )
 
-                            cleanup_queries.add(
+
+                            delete_queries.add(
                                 f"""
 MATCH ({"".join(map(lambda lab: f":{lab}", edge.src.labels))})-[{edge.symbol}{"".join(map(lambda lab: f":{lab}", edge.labels))}]->({"".join(map(lambda lab: f":{lab}", edge.tgt.labels))})
+WITH DISTINCT {edge.symbol}
 DELETE {edge.symbol}"""
                             )
 
-                            right_ref_label_delim = (
-                                ":"
-                                if len(right_ref.get_graph_object().labels) > 0
-                                else ""
-                            )
 
-
-                            cleanup_queries.add(
+                            remove_queries.add(
                                 f"""
 MATCH ({edge.symbol}) - [:{new_label.upper()}]->(x{i})
 REMOVE {", ".join(map(str, left_references))}"""
@@ -299,15 +300,17 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 transformation_queries,
                             )
 
-                            cleanup_queries.add(
+                            delete_queries.add(
                                 f"""
 MATCH ({"".join(map(lambda lab: f":{lab}", edge.src.labels))})-[{edge.symbol}{"".join(map(lambda lab: f":{lab}", edge.labels))}]->({"".join(map(lambda lab: f":{lab}", edge.tgt.labels))})
+WITH DISTINCT {edge.symbol}
 DELETE {edge.symbol}"""
                             )
 
-                            cleanup_queries.add(
+                            remove_queries.add(
                                 f"""
 MATCH ({edge.symbol})-[:{new_label.upper()}]->(x{i})
+WITH DISTINCT {edge.symbol}
 REMOVE {", ".join(map(str, left_references))}"""
                             )  # Connect normalized nodes with reified nodes and remove redundant properties
 
@@ -351,15 +354,19 @@ REMOVE {", ".join(map(str, left_references))}"""
                         ):
                             logging.info("N -> Ep")
 
+                            edge = right_ref.get_graph_object()
+                            assert isinstance(edge, Edge)
+
                             transformation_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()}
-WITH {left_go.symbol}, {right_ref} AS {camelcase(str(right_ref))}
+WITH DISTINCT {left_go.symbol}, {right_ref} AS {camelcase(str(right_ref))}
 SET {left_go.symbol}.{pascalcase(str(right_ref))} = {camelcase(str(right_ref))}"""
                             )
-                            cleanup_queries.add(
+                            remove_queries.add(
                                 f"""
 {inter_dep.pattern.to_gql_match_where_string()}
+WITH DISTINCT {edge.symbol}
 REMOVE {right_ref}"""
                             )
                             node.properties.add(pascalcase(str(right_ref)))
@@ -409,6 +416,7 @@ REMOVE {right_ref}"""
                             {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
 MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)
+WITH DISTINCT {node.symbol}
 SET {node.symbol}.`{rand}`="{rand}"
 """
                             )
@@ -419,11 +427,12 @@ SET {node.symbol}.`{rand}`="{rand}"
                                     "WHERE"
                                 )[0]
                             )
-                            cleanup_queries.add(
+                            remove_queries.add(
                                 f"""
 {cleanup_pattern} 
 WHERE {node.symbol}.`{rand}`="{rand}"
 REMOVE {", ".join(map(str, left_references.union({right_ref})))}
+WITH DISTINCT {node.symbol}
 REMOVE {node.symbol}.`{rand}`
 """
                             )
@@ -490,6 +499,7 @@ REMOVE {node.symbol}.`{rand}`
 {dep.pattern.to_gql_match_where_string()} 
 MERGE (newNode:{new_label} {{{new_properties}}})
 MERGE ({node.symbol})-[:{new_label.upper()}]->(newNode)
+WITH DISTINCT {node.symbol}
 SET {node.symbol}.`{rand}`="{rand}"
 """
                 )
@@ -498,12 +508,14 @@ SET {node.symbol}.`{rand}`="{rand}"
                 cleanup_pattern = dep.pattern.to_gql_match_where_string().split(
                     "WHERE"
                 )[0]
-                cleanup_queries.add(
+                remove_queries.add(
                     f"""
 {cleanup_pattern} 
+WITH DISTINCT {node.symbol}
 WHERE {node.symbol}.`{rand}`="{rand}"
+REMOVE {node.symbol}.`{rand}`
 REMOVE {", ".join(map(str, right_references.union(left_references)))}
-REMOVE {node.symbol}.`{rand}`"""
+"""
                 )
 
                 dep.pattern.properties -= all_references
@@ -569,16 +581,18 @@ REMOVE {node.symbol}.`{rand}`"""
                     transformation_queries,
                 )
 
-                cleanup_queries.add(
+                delete_queries.add(
                     f"""
 MATCH ({"".join(map(lambda lab: f":{lab}", edge.src.labels))})-[{edge.symbol}{"".join(map(lambda lab: f":{lab}", edge.labels))}]->({"".join(map(lambda lab: f":{lab}", edge.tgt.labels))})
 REMOVE {", ".join(map(str, all_references))}
+WITH DISTINCT {edge.symbol}
 DELETE {edge.symbol}"""
                 )
 
-                cleanup_queries.add(
+                remove_queries.add(
                     f"""
 MATCH ({edge.symbol})-[:{new_label.upper()}]->(x{i})
+WITH DISTINCT {edge.symbol}
 REMOVE {", ".join(map(str, all_references))}"""
                 )  # Connect normalized nodes with reified nodes and remove redundant properties
 
@@ -602,7 +616,9 @@ REMOVE {", ".join(map(str, all_references))}"""
             _apply_transformation_query(query)
     for query in tqdm(transformation_queries, desc="  Query"):
         _apply_transformation_query(query)
-    for query in tqdm(cleanup_queries, desc="  Cleanup"):
+    for query in tqdm(remove_queries, desc="  Cleanup (REMOVE)"):
+        _apply_transformation_query(query)
+    for query in tqdm(delete_queries, desc="  Cleanup (DELETE)"):
         _apply_transformation_query(query)
 
     transformed_deps = DependencySet.from_string_list(transformed_deps_list)
