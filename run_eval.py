@@ -78,7 +78,6 @@ per_dep_metrics_df = pd.DataFrame(
         MINIMALITY_COL,
         MINIMALITY_CLUSTER_COL,
         MINIMALITY_MATCHES_COL,
-        RED_COUNT_COL,
     ]
 )
 graph_overview_df = pd.DataFrame(
@@ -518,7 +517,6 @@ def get_graph_statistics(
 
             m5 = 0
             m6 = 0
-            m8 = 0
 
             # µ5
             logger.info("        µ5")
@@ -580,19 +578,19 @@ RETURN count({{
             minimality = 1 if e == 1 else (c - 1) / (e - 1)
 
             # µ8
-            logger.info("        µ8")
-            query8 = f"""
-            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
-            {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left.union(dep.right)))}, 
-            count(*) AS red WHERE red > 1
-            RETURN sum(red-1) AS res
-                            """
-            result = session.run(query8)
-            record = result.single()
-            if record is not None:
-                m8 = record["res"]
-            else:
-                0
+            # logger.info("        µ8")
+            # query8 = f"""
+            # {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH
+            # {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left.union(dep.right)))},
+            # count(*) AS red WHERE red > 1
+            # RETURN sum(red-1) AS res
+            #                 """
+            # result = session.run(query8)
+            # record = result.single()
+            # if record is not None:
+            #     m8 = record["res"]
+            # else:
+            #     0
 
         dep_res.append(
             {
@@ -605,7 +603,6 @@ RETURN count({{
                 MINIMALITY_COL: minimality,
                 MINIMALITY_CLUSTER_COL: c,
                 MINIMALITY_MATCHES_COL: e,
-                RED_COUNT_COL: m8,
             }
         )
 
