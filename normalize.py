@@ -197,7 +197,7 @@ RETURN avg(card) AS res
                                 f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(node.labels)}) ON (n.`{rand}`)"
                             )
 
-                            transformation_queries.add(
+                            index_queries.add(
 f"""
 {dep.pattern.to_gql_match_where_string()} 
 WITH DISTINCT {node.symbol}
