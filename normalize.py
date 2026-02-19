@@ -503,8 +503,8 @@ REMOVE {node.symbol}.`{rand}`
 
                 rand = str(uuid.uuid4())[:8]
                 index_queries.add(
-                    f"CREATE INDEX IF NOT EXISTS FOR (n:{"&".join(node.labels)}) ON (n.`{rand}`)"
-                )
+                    f"CREATE INDEX IF NOT EXISTS FOR (n:{next(iter(node.labels))}) ON (n.`{rand}`)"
+                ) # Neo4J only supports _single labels_ in indices!
 
                 transformation_queries.add(
                     f"""
