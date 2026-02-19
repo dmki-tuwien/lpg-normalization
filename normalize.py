@@ -192,6 +192,11 @@ RETURN avg(card) AS res
                             )
                             rand = str(uuid.uuid4())[:8]
                             node = right_ref.get_graph_object()
+
+                            index_queries.add(
+                                f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(node.labels)}) ON (n.`{rand}`)"
+                            )
+
                             transformation_queries.add(
 f"""
 {dep.pattern.to_gql_match_where_string()} 
@@ -269,7 +274,7 @@ REMOVE {", ".join(map(str, left_references))}"""
 
                             orig_edge_label = next(iter(left_go.labels))
                             index_queries.add(
-                                f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(left_go.properties)})"
+                                f"CREATE INDEX IF NOT EXISTS FOR (n:{orig_edge_label}) ON (n.{", n.".join(left_go.properties)})"
                             )
                             index_queries.add(
                                 f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(left_go.properties)})"
@@ -410,6 +415,10 @@ REMOVE {right_ref}"""
                             )
 
                             rand = str(uuid.uuid4())[:8]
+                            index_queries.add(
+                                f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(node.labels)}) ON (n.`{rand}`)"
+                            )
+
 
                             transformation_queries.add(
                                 f"""
@@ -493,6 +502,9 @@ REMOVE {node.symbol}.`{rand}`
                 )
 
                 rand = str(uuid.uuid4())[:8]
+                index_queries.add(
+                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(node.labels)}) ON (n.`{rand}`)"
+                )
 
                 transformation_queries.add(
                     f"""
@@ -552,7 +564,7 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}
 
                 orig_edge_label = next(iter(edge.labels))
                 index_queries.add(
-                    f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(edge.properties)})"
+                    f"CREATE INDEX IF NOT EXISTS FOR (n:{orig_edge_label}) ON (n.{", n.".join(edge.properties)})"
                 )
                 index_queries.add(
                     f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(edge.properties)})"
