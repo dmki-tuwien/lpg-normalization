@@ -337,7 +337,9 @@ document.write(`
   <section id="a-graph-native-approach-to-normalization">
 <h1>A Graph-Native Approach to Normalization<a class="headerlink" href="#a-graph-native-approach-to-normalization" title="Link to this heading">#</a></h1>
 <p>Welcome to the <a class="reference external" href="https://dmki-tuwien.github.io/lpg-normalization/">documentation</a> and <a class="reference external" href="https://github.com/dmki-tuwien/lpg-normalization">repository</a>
-accompanying the paper “A Graph-Native Approach to Normalization”.</p>
+accompanying the paper “A Graph-Native Approach to Normalization”.
+This repository provides the source code and Docker containers with the implementation of graph-native normalization for
+labeled property graphs.</p>
 <p>Repository structure:</p>
 <ul class="simple">
 <li><p><cite>docs/</cite>: The documentation of the source code of this repository. Basis for the [documentation](<a class="reference external" href="https://dmki-tuwien.github.io/lpg-normalization/">https://dmki-tuwien.github.io/lpg-normalization/</a>).</p></li>
@@ -350,25 +352,27 @@ accompanying the paper “A Graph-Native Approach to Normalization”.</p>
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
 <p>Since this repository contains a submodule for the
 <a class="reference external" href="https://github.com/neo4j-graph-examples/northwind">Northwind</a> graph dataset,
-the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/dmki-tuwien/lpg-normalization.git</span> <span class="pre">--recurse-submodules</span></code> needs to be used to clone the repository.</p>
-<p>Please also download all datasets as described in the <code class="docutils literal notranslate"><span class="pre">graphs/</span></code> folder before running the evaluation.</p>
-<p>Following the cloning of the repository run the command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">build</span></code> to prepare the containers for the evaluation.</p>
+the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/dmki-tuwien/lpg-normalization.git</span> <span class="pre">--recurse-submodules</span></code> needs to be used to <strong>clone</strong> the repository.</p>
+<p>Please also <strong>download all datasets</strong> as described in the <code class="docutils literal notranslate"><span class="pre">graphs/</span></code> folder before running the evaluation.</p>
+<p>Following the cloning of the repository run the command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">build</span></code> to <strong>prepare the containers</strong> for the evaluation.</p>
 <p>The evaluation scenarios are defined the file <code class="docutils literal notranslate"><span class="pre">setup.yaml</span></code>. For available configuration options, please refer to the comments in <code class="docutils literal notranslate"><span class="pre">setup.yaml</span></code>.</p>
 <p>Also adjust the <code class="docutils literal notranslate"><span class="pre">GRAPHS_PATH</span></code> environment variable in the file <code class="docutils literal notranslate"><span class="pre">.env</span></code> to be the <em>absolute</em> path to your <code class="docutils literal notranslate"><span class="pre">graphs</span></code> folder.
 Relative paths cannot be used due to a limitation of Docker. In case Docker Desktop is used, please uncomment the
 <code class="docutils literal notranslate"><span class="pre">TC_HOST</span></code> environment variable.</p>
 <p>The command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">up</span> <span class="pre">--abort-on-container-exit</span></code> automatically sets up the databases,
-runs the evaluation, and
+<strong>runs the evaluation</strong>, and
 shuts down the database containers after the evaluation finished.</p>
 <p>If you want to run the evaluation and view the HTML documentation, run
 <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">--profile</span> <span class="pre">docs</span> <span class="pre">up</span></code></p>
 <p>After running the Docker containers,
 the output of the evaluation,
 which is the basis for the figures and tables used in the paper,
-can be found in the directory <code class="docutils literal notranslate"><span class="pre">out/</span></code>.
-Additionally,
-a Jupyter Notebook <code class="docutils literal notranslate"><span class="pre">evaluation_tables_and_figures.ipynb</span></code> is provided for the further analysis of the evaluation results.</p>
-<p>The Jupyter Notebook <code class="docutils literal notranslate"><span class="pre">normalization-skavantzos-link.ipynb</span></code> computes same metrics as our evaluation scenarios normalized using the method described in <a class="reference external" href="https://doi.org/10.1007/s00778-025-00902-2">https://doi.org/10.1007/s00778-025-00902-2</a>.</p>
+can be found in the directory <code class="docutils literal notranslate"><span class="pre">out/</span></code>.</p>
+<p>Additionally, two Jupyter Notebooks are provided:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">evaluation_tables_and_figures.ipynb</span></code> is provided for the further analysis of the evaluation results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">normalization-skavantzos-link.ipynb</span></code> computes same metrics as our evaluation scenarios normalized using the method described in <a class="reference external" href="https://doi.org/10.1007/s00778-025-00902-2">https://doi.org/10.1007/s00778-025-00902-2</a>.</p></li>
+</ul>
 </section>
 <section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Link to this heading">#</a></h2>
