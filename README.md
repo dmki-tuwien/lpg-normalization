@@ -2,7 +2,8 @@
 
 Welcome to the [documentation](https://dmki-tuwien.github.io/lpg-normalization/) and [repository](https://github.com/dmki-tuwien/lpg-normalization)
 accompanying the paper "A Graph-Native Approach to Normalization".
-This repository provides the source code and Docker containers with the implementation of graph-native normalization for 
+This repository provides the source code and Docker containers with the implementation of graph-native normalization for
+labeled property graphs.
 
 Repository structure:
 * `docs/`: The documentation of the source code of this repository. Basis for the [documentation](https://dmki-tuwien.github.io/lpg-normalization/).
