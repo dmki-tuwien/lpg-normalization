@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css?v=dd72e65a" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
@@ -44,7 +44,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Graph-Native Functional Dependencies" href="gnfd/index.html" />
+    <link rel="next" title="Graph-Object Functional Dependencies (GO-FDs)" href="gnfd/index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -151,7 +151,7 @@
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="gnfd/index.html">Graph-Native Functional Dependencies</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gnfd/index.html">Graph-Object Functional Dependencies (GO-FDs)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/grammar.html">Grammar</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/src.html">Source Code Reference</a></li>
 </ul>
@@ -353,6 +353,10 @@ accompanying the paper “A Graph-Native Approach to Normalization”.</p>
 the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/dmki-tuwien/lpg-normalization.git</span> <span class="pre">--recurse-submodules</span></code> needs to be used to clone the repository.</p>
 <p>Please also download all datasets as described in the <code class="docutils literal notranslate"><span class="pre">graphs/</span></code> folder before running the evaluation.</p>
 <p>Following the cloning of the repository run the command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">build</span></code> to prepare the containers for the evaluation.</p>
+<p>The evaluation scenarios are defined the file <code class="docutils literal notranslate"><span class="pre">setup.yaml</span></code>. For available configuration options, please refer to the comments in <code class="docutils literal notranslate"><span class="pre">setup.yaml</span></code>.</p>
+<p>Also adjust the <code class="docutils literal notranslate"><span class="pre">GRAPHS_PATH</span></code> environment variable in the file <code class="docutils literal notranslate"><span class="pre">.env</span></code> to be the <em>absolute</em> path to your <code class="docutils literal notranslate"><span class="pre">graphs</span></code> folder.
+Relative paths cannot be used due to a limitation of Docker. In case Docker Desktop is used, please uncomment the
+<code class="docutils literal notranslate"><span class="pre">TC_HOST</span></code> environment variable.</p>
 <p>The command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">up</span> <span class="pre">--abort-on-container-exit</span></code> automatically sets up the databases,
 runs the evaluation, and
 shuts down the database containers after the evaluation finished.</p>
@@ -363,7 +367,8 @@ the output of the evaluation,
 which is the basis for the figures and tables used in the paper,
 can be found in the directory <code class="docutils literal notranslate"><span class="pre">out/</span></code>.
 Additionally,
-a Juypter Notebook <code class="docutils literal notranslate"><span class="pre">evaluation_tables_and_figures.ipynb</span></code> is provided for the further analysis of the evaluation results.</p>
+a Jupyter Notebook <code class="docutils literal notranslate"><span class="pre">evaluation_tables_and_figures.ipynb</span></code> is provided for the further analysis of the evaluation results.</p>
+<p>The Jupyter Notebook <code class="docutils literal notranslate"><span class="pre">normalization-skavantzos-link.ipynb</span></code> computes same metrics as our evaluation scenarios normalized using the method described in <a class="reference external" href="https://doi.org/10.1007/s00778-025-00902-2">https://doi.org/10.1007/s00778-025-00902-2</a>.</p>
 </section>
 <section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Link to this heading">#</a></h2>
@@ -376,13 +381,13 @@ On macOS, ANTLR can be installed using <a class="reference external" href="https
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="gnfd/index.html">Graph-Native Functional Dependencies</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="gnfd/index.html">Graph-Object Functional Dependencies (GO-FDs)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/grammar.html">Grammar</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/src.html">Source Code Reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="normalization_src.html">Normalization</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="normalization_src.html#normalize.perform_graph_native_normalization"><code class="docutils literal notranslate"><span class="pre">perform_graph_native_normalization()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="normalization_src.html#module-normalize">Source Code Reference</a></li>
 </ul>
 </li>
 </ul>
@@ -406,7 +411,7 @@ On macOS, ANTLR can be installed using <a class="reference external" href="https
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Graph-Native Functional Dependencies</p>
+        <p class="prev-next-title">Graph-Object Functional Dependencies (GO-FDs)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

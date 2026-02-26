@@ -1,4 +1,4 @@
-Graph-Native Functional Dependencies
+Graph-Object Functional Dependencies (GO-FDs)
 ========================================
 
 .. toctree::

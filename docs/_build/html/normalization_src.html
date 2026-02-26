@@ -148,9 +148,8 @@
  </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="gnfd/index.html">Graph-Native Functional Dependencies</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="gnfd/index.html">Graph-Object Functional Dependencies (GO-FDs)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/grammar.html">Grammar</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gnfd/src.html">Source Code Reference</a></li>
 </ul>
@@ -319,7 +318,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#normalize.perform_graph_native_normalization"><code class="docutils literal notranslate"><span class="pre">perform_graph_native_normalization()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-normalize">Source Code Reference</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#normalize.perform_graph_native_normalization"><code class="docutils literal notranslate"><span class="pre">perform_graph_native_normalization()</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -331,8 +333,10 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-normalize">
-<span id="normalization"></span><h1>Normalization<a class="headerlink" href="#module-normalize" title="Link to this heading">#</a></h1>
+  <section id="normalization">
+<h1>Normalization<a class="headerlink" href="#normalization" title="Link to this heading">#</a></h1>
+<section id="module-normalize">
+<span id="source-code-reference"></span><h2>Source Code Reference<a class="headerlink" href="#module-normalize" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="normalize.perform_graph_native_normalization">
 <span class="sig-prename descclassname"><span class="pre">normalize.</span></span><span class="sig-name descname"><span class="pre">perform_graph_native_normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">provided_dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#normalize.perform_graph_native_normalization" title="Link to this definition">#</a></dt>
@@ -343,7 +347,7 @@ document.write(`
 <li><p><span class="target" id="normalize.perform_graph_native_normalization.params.driver"></span><strong>driver</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.driver">¶</a> (<a class="reference external" href="https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Driver" title="(in Neo4j Python Driver v6.1)"><em>neo4j.Driver</em></a>) – The connection to the graph database</p></li>
 <li><p><span class="target" id="normalize.perform_graph_native_normalization.params.database"></span><strong>database</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.database">¶</a> – The name of the database in which the to be normalized graph is contained. Supported databases are: <code class="docutils literal notranslate"><span class="pre">&quot;neo4j&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;memgraph&quot;</span></code></p></li>
 <li><p><span class="target" id="normalize.perform_graph_native_normalization.params.provided_dependencies"></span><strong>provided_dependencies</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.provided_dependencies">¶</a> – The dependencies to be considered for the normalization</p></li>
-<li><p><span class="target" id="normalize.perform_graph_native_normalization.params.dep_filter"></span><strong>dep_filter</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.dep_filter">¶</a> – Whether only a subset of dependencies should be used. Possible values: <code class="docutils literal notranslate"><span class="pre">&quot;within-node&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;within-go&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;between-go&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>.</p></li>
+<li><p><span class="target" id="normalize.perform_graph_native_normalization.params.dep_filter"></span><strong>dep_filter</strong><a class="paramlink headerlink reference internal" href="#normalize.perform_graph_native_normalization.params.dep_filter">¶</a> – Whether only a subset of dependencies should be used. Possible values: <code class="docutils literal notranslate"><span class="pre">&quot;node-left&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;edge-left&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;within-node&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;within-go&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;between-go&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Type<span class="colon">:</span></dt>
@@ -364,6 +368,7 @@ document.write(`
 </dl>
 </dd></dl>
 
+</section>
 </section>
 
 
@@ -402,7 +407,10 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#normalize.perform_graph_native_normalization"><code class="docutils literal notranslate"><span class="pre">perform_graph_native_normalization()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-normalize">Source Code Reference</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#normalize.perform_graph_native_normalization"><code class="docutils literal notranslate"><span class="pre">perform_graph_native_normalization()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
