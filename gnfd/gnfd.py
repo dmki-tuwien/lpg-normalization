@@ -458,13 +458,13 @@ class Edge(GraphObject, Pattern, abc.ABC):
 
     @property
     @abstractmethod
-    def src(self):
+    def src(self) -> Node:
         """:returns the source :any:`Node` of the edge"""
         pass
 
     @property
     @abstractmethod
-    def tgt(self):
+    def tgt(self) -> Node:
         """:returns the target :any:`Node` of the edge"""
         pass
 

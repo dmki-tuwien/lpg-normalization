@@ -90,19 +90,16 @@ services:
       dockerfile: eval.Dockerfile
     container_name: global-lpg-norm
     depends_on:
-#      neo4j:
-#        condition: service_healthy
       memgraph:
         condition: service_healthy
-##      dtgraph:
-#        condition: service_healthy
+
     env_file:
       - .env
     volumes:
       - ./graphs:/graphs
       - ./setup.yaml:/setup.yaml
       - ./out:/out
-      - /var/run/docker.sock:/var/run/docker.sock # to spin up further containers!
+      - /var/run/docker.sock:/var/run/docker.sock # needed to spin up further containers using Python!
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - TC_HOST=host.docker.internal

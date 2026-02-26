@@ -96,7 +96,7 @@ graph_overview_df = pd.DataFrame(
     ]
 )
 
-# Keeps track if graph overview has been assessed
+# Keeps track if graph overview has been computed for a graph
 _created_graph_overview: list = []
 
 setup: dict
@@ -135,33 +135,13 @@ def main():
 
 
 def export_tables_and_plots():
-    """Exports the computed statistics as CSV and LaTeX tables, as well as PDF plots (only per graph statistics)."""
-    logger.info("📊 Create plot and export CSV results.")
-    plot_height = 2 * len(setup["graphs"])
-    plot_metrics = (
-        ggplot(per_graph_metrics_df, aes(x=METHOD_COL, y=VALUE_COL, fill=DATABASE_COL))
-        + geom_col(position="dodge")
-        + geom_text(
-            aes(label=f"{VALUE_COL}.round(3).astype(str)"),
-            nudge_y=0.1,
-            size=10,
-            va="bottom",
-        )
-        + facet_grid(f"{GRAPH_COL} ~ {METRIC_COL}", scales="free_y")
-        #         + scale_y_continuous(limits=(0, max(metrics_df[VALUE_COL])*1.1))  # Set the new upper limit
-        + scale_y_continuous(expand=(0, 0, 0.1, 0))
-        + theme_bw()
-        + theme(
-            axis_text_x=element_text(angle=45, ha="right"), figure_size=(8, plot_height)
-        )
-    )
+    """Exports the computed statistics as CSV and LaTeX tables."""
+    logger.info("📊 Export CSV results.")
 
     try:
         os.mkdir("out")
     except FileExistsError:
         pass  # It's fine if the output folder is already there :)
-
-    plot_metrics.save("out/plot.pdf", metadata=PDF_METADATA, verbose=False)
 
     graph_overview_df.to_csv("out/graph_overview.csv", index=False)
     graph_overview_df.to_latex("out/graph_overview.tex", index=False)
@@ -169,14 +149,11 @@ def export_tables_and_plots():
     per_graph_metrics_df.to_csv("out/metrics.csv", index=False)
 
     global per_dep_metrics_df
-    # per_dep_metrics_df = per_dep_metrics_df.loc[per_dep_metrics_df[DATABASE_COL] == "Neo4J"]
     per_dep_metrics_df = per_dep_metrics_df.set_index(
         [GRAPH_COL, DATABASE_COL, METHOD_COL, DEPENDENCY_COL]
     )
     per_dep_metrics_df.to_csv("out/per_dep_metrics.csv")
-    per_dep_metrics_df.style.format(precision=3).to_latex(
-        "out/per_dep_metrics.latex", hrules=True, clines="all;index", siunitx=True
-    )
+
 
 
 def perform_evaluation(

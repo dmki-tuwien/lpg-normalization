@@ -26,7 +26,7 @@ def perform_graph_native_normalization(
     :type: str
     :param provided_dependencies: The dependencies to be considered for the normalization
     :type: gnfd.DependencySet
-    :param dep_filter: Whether only a subset of dependencies should be used. Possible values: ``"within-node"``, ``"within-go"``, ``"between-go"``, ``"all"``. Defaults to ``"all"``.
+    :param dep_filter: Whether only a subset of dependencies should be used. Possible values: ``"node-left"``, ``"edge-left"``, ``"within-node"``, ``"within-go"``, ``"between-go"``, ``"all"``. Defaults to ``"all"``.
     :type: str
     :return:
     """
