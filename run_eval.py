@@ -1,5 +1,4 @@
 import logging
-import os
 import time
 
 import yaml
@@ -10,8 +9,7 @@ from testcontainers.core.container import DockerContainer
 from testcontainers.core.wait_strategies import LogMessageWaitStrategy
 from testcontainers.neo4j import Neo4jContainer
 
-from neo4j import GraphDatabase, Query, Driver, Neo4jDriver
-from plotnine import *
+from neo4j import GraphDatabase, Query, Driver
 from dotenv import load_dotenv
 from tqdm_loggable.auto import tqdm
 

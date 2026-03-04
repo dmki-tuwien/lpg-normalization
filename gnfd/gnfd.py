@@ -5,7 +5,6 @@ import copy
 import operator
 from functools import reduce
 
-import clingo
 import uuid
 from abc import abstractmethod
 
