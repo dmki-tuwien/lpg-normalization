@@ -321,6 +321,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rest-api">REST API</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development">Development</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contents">Contents</a></li>
 </ul>
@@ -359,7 +360,7 @@ the command <code class="docutils literal notranslate"><span class="pre">git</sp
 <p>Also adjust the <code class="docutils literal notranslate"><span class="pre">GRAPHS_PATH</span></code> environment variable in the file <code class="docutils literal notranslate"><span class="pre">.env</span></code> to be the <em>absolute</em> path to your <code class="docutils literal notranslate"><span class="pre">graphs</span></code> folder.
 Relative paths cannot be used due to a limitation of Docker. In case Docker Desktop is used, please uncomment the
 <code class="docutils literal notranslate"><span class="pre">TC_HOST</span></code> environment variable.</p>
-<p>The command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">up</span> <span class="pre">--abort-on-container-exit</span></code> automatically sets up the databases,
+<p>The command <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">--profile</span> <span class="pre">eval</span> <span class="pre">up</span> <span class="pre">--abort-on-container-exit</span></code> automatically sets up the databases,
 <strong>runs the evaluation</strong>, and
 shuts down the database containers after the evaluation finished.</p>
 <p>If you want to run the evaluation and view the HTML documentation, run
@@ -373,6 +374,11 @@ can be found in the directory <code class="docutils literal notranslate"><span c
 <li><p><code class="docutils literal notranslate"><span class="pre">evaluation_tables_and_figures.ipynb</span></code> is provided for the further analysis of the evaluation results.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">normalization-skavantzos-link.ipynb</span></code> computes same metrics as our evaluation scenarios normalized using the method described in <a class="reference external" href="https://doi.org/10.1007/s00778-025-00902-2">https://doi.org/10.1007/s00778-025-00902-2</a>.</p></li>
 </ul>
+</section>
+<section id="rest-api">
+<h2>REST API<a class="headerlink" href="#rest-api" title="Link to this heading">#</a></h2>
+<p>A REST API service for graph-native normalization can be started using
+<code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">--profile</span> <span class="pre">rest</span> <span class="pre">up</span> <span class="pre">--build</span></code></p>
 </section>
 <section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Link to this heading">#</a></h2>
@@ -436,6 +442,7 @@ On macOS, ANTLR can be installed using <a class="reference external" href="https
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started">Getting Started</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rest-api">REST API</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development">Development</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contents">Contents</a></li>
 </ul>
