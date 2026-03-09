@@ -28,7 +28,7 @@ Also adjust the `GRAPHS_PATH` environment variable in the file `.env` to be the 
 Relative paths cannot be used due to a limitation of Docker. In case Docker Desktop is used, please uncomment the 
 `TC_HOST` environment variable.
 
-The command `docker compose up --abort-on-container-exit` automatically sets up the databases,
+The command `docker compose --profile eval up --abort-on-container-exit` automatically sets up the databases,
 **runs the evaluation**, and 
 shuts down the database containers after the evaluation finished.
 
@@ -43,6 +43,10 @@ can be found in the directory `out/`.
 Additionally, two Jupyter Notebooks are provided:
 * `evaluation_tables_and_figures.ipynb` is provided for the further analysis of the evaluation results.
 * `normalization-skavantzos-link.ipynb` computes same metrics as our evaluation scenarios normalized using the method described in <https://doi.org/10.1007/s00778-025-00902-2>.
+
+## REST API
+A REST API service for graph-native normalization can be started using
+`docker compose --profile rest up --build`
 
 ## Development
 For the generation of the parser of the dependencies, [ANTLR](https://www.antlr.org/) 

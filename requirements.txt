@@ -1,5 +1,4 @@
 antlr4-python3-runtime~=4.13.2
-dtgraph @ git+https://github.com/yannramusat/DTGraph.git@main
 neo4j~=5.28.1
 pytest~=9.0.0
 testcontainers~=4.13.3
@@ -16,5 +15,7 @@ sphinx-book-theme
 sphinx-paramlinks
 pyyaml
 pandas
-clingo~=5.8.0
 tqdm-loggable
+watchdog
+fastapi[standard]
+python-dotenv

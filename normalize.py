@@ -16,7 +16,7 @@ def perform_graph_native_normalization(
     database,
     provided_dependencies: DependencySet,
     dep_filter: str = "all",
-) -> (DependencySet, list[tuple[str, int]]):
+) -> (DependencySet, list[str]):
     """
     Performs graph-native normalization under consideration of the provided parameters.
 
@@ -48,7 +48,7 @@ def perform_graph_native_normalization(
     """A list of the string representations of the transformed dependencies."""
     transformed_deps_list: list[str] = []
 
-    applied_transformations: list[tuple[str, int]] = []
+    applied_transformations: list[str] = []
 
     def _apply_transformation_query(query: str):
         """Runs a query string on the graph connected through :any:`driver`.
@@ -247,7 +247,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 )
                             )
 
-                            applied_transformations.append(("Ep -> Np", 2))
+                            applied_transformations.append("Ep -> Np")
 
                         elif (
                             right_ref.is_graph_object_variable
@@ -330,6 +330,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                                     "\n", ""
                                 )
                             )
+                            applied_transformations.append("Ep -> N")
 
                 elif isinstance(left_go, Node):
                     node = left_go
@@ -381,7 +382,7 @@ REMOVE {right_ref}"""
                             transformed_deps_list.append(
                                 f"({node.symbol}:{"&".join(node.labels)}:{pascalcase(str(right_ref))})::{node.symbol}=>{node.symbol}.{pascalcase(str(right_ref))}"
                             )
-                            applied_transformations.append(("inter2", 2))
+                            applied_transformations.append("N -> Ep")
 
                         elif (
                             right_ref.is_property_variable
@@ -461,7 +462,7 @@ REMOVE {node.symbol}.`{rand}`
                                 )
                             )
 
-                            applied_transformations.append(("inter3", 0))
+                            applied_transformations.append("Np -> Ep")
 
         elif dep.is_within_graph_object:
             # First filter References that are Graph Object IDs. We don't need them here as their occurrence is a sign for structurally implied or to limiting dep.s.
@@ -544,7 +545,7 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}
                     )
                 )
 
-                applied_transformations.append(("within1", 0))
+                applied_transformations.append("within-node")
 
             # # # # # # # # # #
             #  ψ_L2 (psi_L2)  #
@@ -620,7 +621,7 @@ REMOVE {", ".join(map(str, all_references))}"""
                     )
                 )
 
-                applied_transformations.append(("within-edge", 2))
+                applied_transformations.append("within-edge")
 
         i += 1
     if database == "neo4j":

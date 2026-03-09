@@ -197,9 +197,9 @@ def perform_evaluation(
         container.with_kwargs(nano_cpus=int(4 * 1e9))  # 1 CPU = 1e9 nanocpus
 
         start_sh: str = (
-            "ls -la /var/lib/neo4j/import && cp -R /tmp/graphs /var/lib/neo4j/import &&"
+            "cp -R /tmp/graphs /var/lib/neo4j/import &&"
         )
-        start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && ls -la /var/lib/neo4j/import && "
+        start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && "
         if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
             start_sh += f"{{ cat /var/lib/neo4j/import/{graph["neo4j"]['from_dump']} | neo4j-admin database load --from-stdin neo4j --overwrite-destination=true ; }} && "
         start_sh += "exec /startup/docker-entrypoint.sh neo4j"
@@ -301,7 +301,7 @@ RETURN value"""
                 measured_denormalized,
                 subset,
                 ignore_min_cov,
-            )  # None = no normalization performed yet --> TODO: Enum?
+            )  # None = no normalization performed yet
             measured_denormalized = True  # Measurements for denormalized graphs have been taken and are not performed again
 
             logger.info("Start normalization")
@@ -327,9 +327,6 @@ RETURN value"""
                 subset,
                 ignore_min_cov,
             )
-            # TODO replace with transformed dependencies
-
-            # input("Press any key to continue...")
 
     logger.info(f"\tFinished experiment with graph \"{graph['name']}\"")
 
@@ -549,24 +546,7 @@ RETURN count({{
             if record is not None:
                 e = record["res"]
 
-            # print("µ7c: ", µ7c)
-
             minimality = 1 if e == 1 else (c - 1) / (e - 1)
-
-            # µ8
-            # logger.info("        µ8")
-            # query8 = f"""
-            # {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH
-            # {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left.union(dep.right)))},
-            # count(*) AS red WHERE red > 1
-            # RETURN sum(red-1) AS res
-            #                 """
-            # result = session.run(query8)
-            # record = result.single()
-            # if record is not None:
-            #     m8 = record["res"]
-            # else:
-            #     0
 
         dep_res.append(
             {

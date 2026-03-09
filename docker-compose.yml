@@ -1,51 +1,23 @@
 services:
-#  neo4j:
-#    image: neo4j:2025.11
-#    container_name: neo4j
-#    ports:
-#      - "7474:7474"  # HTTP
-#      - "7687:7687"  # Bolt
-#    environment:
-#      NEO4J_AUTH: ${USERNAME}/${PASSWORD}
-#      NEO4J_PLUGINS: '["apoc","apoc-extended"]'
-#      NEO4J_dbms_security_procedures_unrestricted: apoc.*
-#      NEO4J_apoc_export_file_enabled: "true"
-#      NEO4J_apoc_import_file_enabled: "true"
-## There is no volume for persistence because we need the original graphs
-#    networks:
-#      - app-network
-#    volumes:
-#      - ./graphs:/var/lib/neo4j/import/graphs
-#      - ./out:/out
-#    pre_stop:
-#      - command: "chown -R --reference=/out /var/lib/neo4j/import/graphs"
-#        user: root
-#        privileged: true
-#      - command: "chmod -R --reference=/out /var/lib/neo4j/import/graphs"
-#        user: root
-#        privileged: true
-#    healthcheck:
-#      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
-#      start_period: 30s
-#  dtgraph:
-#    image: ghcr.io/dmki-tuwien/dtgraph-rest
-#    container_name: dtgraph-rest
-#    ports:
-#      - "8765:8000"
-#    depends_on:
-#      neo4j:
-#        condition: service_healthy
-#    healthcheck:
-#      test: [ "CMD-SHELL", "curl -f http://localhost:8000/health || exit 1" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
-#      start_period: 30s
-#    env_file:
-##      - .env
+  neo4j:
+    image: neo4j:2026.01-enterprise
+    command: 'bash -c "cp -R /tmp/graphs /var/lib/neo4j/import && chown -R 7474:7474 /var/lib/neo4j/import && exec /startup/docker-entrypoint.sh neo4j"'
+    environment:
+       NEO4J_ACCEPT_LICENSE_AGREEMENT: "eval"
+       NEO4J_AUTH: ${USERNAME}/${PASSWORD}
+       NEO4J_PLUGINS: '["apoc","apoc-extended"]'
+       NEO4J_apoc_import_file_enabled: true
+       NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+
+    ports:
+      - "7687:7687"  # Bolt
+    networks:
+      - app-network
+    volumes:
+      - ./graphs:/tmp/graphs
+    profiles:
+      - rest
+
   memgraph:
     image: memgraph/memgraph-mage:latest
     container_name: memgraph-mage
@@ -64,9 +36,9 @@ services:
       start_period: 0s
     networks:
       - app-network
-#    environment:
-#      MEMGRAPH_USER: ${USERNAME}
-#      MEMGRAPH_PASSWORD: ${PASSWORD}
+    profiles:
+      - rest
+      - eval
 
   memgraph-lab:
     image: memgraph/lab:latest
@@ -84,6 +56,7 @@ services:
       - QUICK_CONNECT_MG_PORT=7687
     profiles:
       - docs
+
   global-lpg-norm:
     build:
       context: .
@@ -105,6 +78,9 @@ services:
       - TC_HOST=host.docker.internal
     networks:
       - app-network
+    profiles:
+      - eval
+
   docs-webserver:
     image: nginx:latest
     volumes:
@@ -113,6 +89,23 @@ services:
       - "8000:80"
     profiles:
       - docs
+  restapi:
+    build:
+      context: .
+      dockerfile: ./restapi/restapi.Dockerfile
+    env_file:
+      - .env
+    environment:
+      - TC_HOST=host.docker.internal
+    ports:
+      - "8001:8000"
+    profiles:
+      - rest
+    networks:
+      - app-network
+    volumes:
+      - ./setup.yaml:/app/setup.yaml
+
 
 
 volumes:
