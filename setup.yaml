@@ -6,7 +6,29 @@ graphs:
   # * Either an entry "from_file" that contains a path, which points to a Cypher file that works with both, Neo4J and
   #   Memgraph, or an entry "neo4j" that contains "from_file" or "from_dump", with the latter being a path pointing to
   #   a Neo4J (Enterprise) database dump.
+  - id: "grana-l"
+    category: "Illustrative scenario"
+    name: "Grana large"
+    name_html: "Grana large"
+    from_file: "graphs/grana_aging_big.cypher"
+    dependencies:
+      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
+    minimal_cover:
+      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
+
+  - id: "grana-s"
+    category: "Illustrative scenario"
+    name: "Grana small"
+    name_html: "Grana small"
+    from_file: "graphs/grana_aging_small.cypher"
+    dependencies:
+      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
+    minimal_cover:
+      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
+
+
   - id: "ts1"
+    category: "Graph dataset"
     name: "$S_\\text{Ts-1}$"
     name_html: "Train Services 1"
     neo4j:
@@ -28,6 +50,7 @@ graphs:
     dependency_origin: "User provided"
 
   - id: "ts2"
+    category: "Graph dataset"
     name: "$S_\\text{Ts-2}$"
     name_html: "Train Services 2"
     neo4j:
@@ -51,6 +74,7 @@ graphs:
     dependency_origin: "User provided"
 
   - id: "off1"
+    category: "Graph dataset"
     name: "$S_\\text{Off-1}$"
     name_html: "Offshore 1"
     neo4j:
@@ -64,6 +88,7 @@ graphs:
         - "(e:Entity:jurisdiction_description&countries&service_provider&country_codes)::e.country_codes=>e.countries"
 
   - id: "off2"
+    category: "Graph dataset"
     name: "$S_\\text{Off-2}$"
     name_html: "Offshore 2"
     neo4j:
@@ -82,6 +107,7 @@ graphs:
       - "(e:Entity:jurisdiction_description&countries&country_codes&sourceID&valid_until)::e.country_codes,e.valid_until=>e.countries"
 
   - id: "off3"
+    category: "Graph dataset"
     name: "$S_\\text{Off-3}$"
     name_html: "Offshore 3"
     neo4j:
@@ -105,6 +131,7 @@ graphs:
       - "(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until)::e.valid_until=>e.sourceID"
 
   - id: "uni1"
+    category: "Illustrative scenario"
     name: "$S_\\text{Uni-1}$"
     name_html: "University 1"
     from_file: graphs/lecture.cypher
@@ -115,6 +142,7 @@ graphs:
     dependency_origin: "User provided"
 
   - id: "uni2"
+    category: "Illustrative scenario"
     name: "$S_\\text{Uni-2}$"
     name_html: "University 2"
     from_file: graphs/lecture.cypher
@@ -125,6 +153,7 @@ graphs:
     dependency_origin: "User provided"
 
   - id: "no1"
+    category: "Illustrative scenario"
     name: "$S_\\text{No-1}$"
     name_html: "No Socks 1"
     from_file: graphs/nosocks.cypher
@@ -142,6 +171,7 @@ graphs:
     source: "\\cite{skavantzos_third_2025}"
 
   - id: "no2"
+    category: "Illustrative scenario"
     name: "$S_\\text{No-2}$"
     name_html: "No Socks 2"
     from_file: graphs/nosocks.cypher
@@ -159,6 +189,7 @@ graphs:
     source: "\\cite{skavantzos_third_2025}"
 
   - id: "no3"
+    category: "Illustrative scenario"
     name: "$S_\\text{No-3}$"
     name_html: "No Socks 3"
     from_file: graphs/nosocks.cypher
@@ -180,6 +211,7 @@ graphs:
   - id: "nw"
     name: "$S_\\text{Nw}$"
     name_html: "Northwind"
+    category: "Graph dataset"
     neo4j:
       from_file: graphs/northwind/scripts/northwind.cypher
     dependencies:
@@ -193,6 +225,7 @@ graphs:
 
   - id: "lon"
     name: "$S_\\text{Lon}$"
+    category: "Graph dataset"
     name_html: "London Public Transport"
     neo4j:
       from_file: graphs/london_neo4j.cypher
@@ -208,3 +241,44 @@ graphs:
       - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type"
     dependency_origin: "User provided"
     source: "Extended based on \\url{https://github.com/neo4j-partners/neo4j-transport-for-london}"
+
+  - id: "within-n"
+    category: "Redundancy pattern"
+    name: "$\\psi_\\text{within-n}"
+    name_html: "within-n"
+    from_file: "graphs/redundancy_patterns/within-n.cypher"
+    dependencies:
+      - "(x:L:k1&k2)::x.k1=>x.k2"
+    minimal_cover:
+      - "(x:L:k1&k2)::x.k1=>x.k2"
+
+  - id: "within-e"
+    category: "Redundancy pattern"
+    name: "$\\psi_\\text{within-e}"
+    name_html: "within-e"
+    from_file: "graphs/redundancy_patterns/within-e.cypher"
+    dependencies:
+      - "()-[yL:k1&k2]->()::y.k1=>y.k2"
+    minimal_cover:
+      - "()-[y:L:k1&k2]->()::y.k1=>y.k2"
+
+  - id: "between-n-ep"
+    category: "Redundancy pattern"
+    name: "$\\psi_\\text{between-n-ep}"
+    name_html: "between-n-ep"
+    from_file: "graphs/redundancy_patterns/between-n-ep.cypher"
+    dependencies:
+      - "(x)-[y:L:k1]->()::x=>y.k1"
+    minimal_cover:
+      - "(x)-[y:L:k1]->()::x=>y.k1"
+
+  - id: "between-np-ep"
+    category: "Redundancy pattern"
+    name: "$\\psi_\\text{between-np-ep}"
+    name_html: "between-np-ep"
+    from_file: "graphs/redundancy_patterns/between-np-ep.cypher"
+    dependencies:
+      - "(x:L:k1)-[y::k2]->()::x.k1=>y.k2"
+    minimal_cover:
+      - "(x:L:k1)-[y::k2]->()::x.k1=>y.k2"
+

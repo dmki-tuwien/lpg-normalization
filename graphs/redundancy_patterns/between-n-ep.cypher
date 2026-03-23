@@ -1,4 +1,4 @@
-CREATE (xA:L {k1: "1", k2: "2", k3: "3a"})
-CREATE (xB:L {k1: "1", k2: "2", k3: "3b"})
-CREATE (xC:L {k1: "1", k2: "2", k3: "3c"})
-CREATE (xD:L {k1: "1", k2: "2", k3: "3d"});
+CREATE (x)-[yA:L {k1: "1", k2: "2a"}]->()
+MERGE (x)-[yB:L {k1: "1", k2: "2b"}]->()
+MERGE (x)-[yC:L {k1: "1", k2: "2c"}]->()
+MERGE (x)-[yD:L {k1: "1", k2: "2d"}]->();

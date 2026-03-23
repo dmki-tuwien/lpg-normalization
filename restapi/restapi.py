@@ -1,4 +1,5 @@
 import sys
+import time
 
 from caseconverter import pascalcase
 from dotenv import load_dotenv
@@ -15,8 +16,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import gnfd
 from normalize import perform_graph_native_normalization
 
+ROOT_PATH = (
+    ""
+    if os.getenv("URL_PREFIX") is None
+    else os.getenv("URL_PREFIX")
+)
+app: FastAPI
+if ROOT_PATH == "":
+    app = FastAPI()
+else:
+    app = FastAPI(root_path=ROOT_PATH)
 
-app = FastAPI()
 
 origins = [
     "http://localhost:3000"
@@ -54,7 +64,7 @@ MEMGRAPH_URI = (
 
 # Neo4J Connection
 NEO4J_URI = (
-    "neo4j://neo4j:7687" if os.getenv("NEO4J_URI") is None else os.getenv("NEO4J_URI")
+    "bolt://neo4j:7687" if os.getenv("NEO4J_URI") is None else os.getenv("NEO4J_URI")
 )
 NEO4J_DATABASE = (
     "neo4j" if os.getenv("NEO4J_DATABASE") is None else os.getenv("NEO4J_DATABASE")
@@ -76,6 +86,7 @@ def get_driver(database: Literal["neo4j", "memgraph"]) -> Driver:
 class ScenarioDef(BaseModel):
     id: str
     name: str
+    category: str
 
 @app.get("/health")
 def get_health() -> bool:
@@ -110,9 +121,13 @@ def get_scenarios(database: Literal["neo4j", "memgraph"]) -> list[ScenarioDef]:
     """Retrieves the names and IDs of available scenarios as a `list`"""
 
     res: list[ScenarioDef] = list(
-        map(lambda map_entry: {"id": map_entry["id"], "name": map_entry["name_html"]}, filter(
-        lambda filter_entry: (database in filter_entry.keys() and "from_file" in filter_entry[database].keys()) or ("from_file" in filter_entry.keys()),
-        setup["graphs"])))
+        map(lambda map_entry: {"id": map_entry["id"], "name": map_entry["name_html"], "category": map_entry["category"]},
+           filter(
+               lambda filter_entry: ("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or ("from_file" in filter_entry.keys()),
+                setup["graphs"]
+           )
+           )
+    )
 
     return res
 
@@ -125,7 +140,7 @@ def load_scenario(database: Literal["neo4j", "memgraph"], id: str) -> bool:
     driver = get_driver(database)
     graph =next(filter(lambda filter_entry:
                        (
-                           (database in filter_entry.keys() and "from_file" in filter_entry[database].keys()) or
+                           ("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or
                            ("from_file" in filter_entry.keys())
                        ) and id == filter_entry["id"],
         setup["graphs"]))
@@ -136,7 +151,62 @@ def load_scenario(database: Literal["neo4j", "memgraph"], id: str) -> bool:
             elif "memgraph" in graph.keys():
                 file = graph["memgraph"]["from_file"]
             else:
-                return False
+                neo_driver = get_driver("neo4j")
+
+                with neo_driver.session(database="neo4j") as session:
+                    if "from_file" in graph.keys():
+                        session.run(
+                            f"CALL apoc.cypher.runFile(\"{graph['from_file']}\");"
+                        )
+                    elif (
+                            "neo4j" in graph.keys()
+                            and "from_file" in graph["neo4j"].keys()
+                    ):
+                        session.run(
+                            f"CALL apoc.cypher.runFile(\"{graph['neo4j']['from_file']}\");"
+                        )
+                with driver.session(database="memgraph") as session:
+                    session.run("CREATE INDEX ON :__MigrationNode__;")
+
+                    session.run("CREATE INDEX ON :__MigrationNode__(__elementId__);")
+
+                    neo4j_uri = NEO4J_URI[7:-5]
+                    if "localhost" in neo4j_uri or "127.0.0.1" in neo4j_uri:
+                        neo4j_uri = "host.docker.internal"
+
+                    print(session.run(f"""
+CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props",  {{host: "{neo4j_uri}", port: 7687, username: "neo4j", password: "password"}})
+YIELD row
+MERGE (n:__MigrationNode__ {{__elementId__: row.src_id}})
+SET n:row.src_labels
+SET n += row.src_props; """))
+                    session.run(f"""
+CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{neo4j_uri}", port: 7687, username: "neo4j", password: "password"}})
+YIELD row
+MERGE (n:__MigrationNode__ {{__elementId__: row.src_id}})
+SET n:row.src_labels
+SET n += row.src_props; """)
+
+                    session.run(f"""
+CALL migrate.neo4j(
+  "MATCH (n)-[r]->(m) RETURN type(r) as rel_type, elementId(n) AS src_id, elementId(m) AS dest_id, properties(r) AS edge_props",
+  {{host: "{neo4j_uri}", port: 7687, username: "neo4j", password: "password"}})
+YIELD row
+MATCH (n:__MigrationNode__ {{__elementId__: row.src_id}})
+MATCH (m:__MigrationNode__ {{__elementId__: row.dest_id}})
+CREATE (n)-[r:row.rel_type]->(m)
+SET r += row.edge_props;""")
+
+                    session.run("""
+MATCH (n:__MigrationNode__)
+REMOVE n:__MigrationNode__
+REMOVE n.__elementId__;""")
+                    session.run("DROP INDEX ON :__MigrationNode__;")
+                    session.run("DROP INDEX ON :__MigrationNode__(__elementId__);")
+
+                    return True
+
+
             with open(file, "r") as filename:
                 create_graph_queries_str = filename.read()
                 create_graph_queries = [
@@ -168,7 +238,7 @@ def load_scenario(database: Literal["neo4j", "memgraph"], id: str) -> bool:
 @app.get("/{database}/scenarios/{id}/dependencies")
 def get_dependencies(database: Literal["neo4j", "memgraph"], id: str) -> list[str]:
     res: list[str] = next(map(lambda map_entry: map_entry["dependencies"], filter(
-            lambda filter_entry: filter_entry["id"] == id and ((database in filter_entry.keys() and "from_file" in filter_entry[database].keys()) or (
+            lambda filter_entry: filter_entry["id"] == id and (("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or (
                         "from_file" in filter_entry.keys())),
             setup["graphs"])))
 
@@ -178,7 +248,7 @@ def get_dependencies(database: Literal["neo4j", "memgraph"], id: str) -> list[st
 @app.get("/{database}/scenarios/{id}/minimal_cover")
 def get_minimal_cover(database: Literal["neo4j", "memgraph"], id: str) -> list[str]:
     res: list[str] = next(map(lambda map_entry: map_entry["minimal_cover"], filter(
-            lambda filter_entry: filter_entry["id"] == id and ((database in filter_entry.keys() and "from_file" in filter_entry[database].keys()) or (
+            lambda filter_entry: filter_entry["id"] == id and (("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or (
                         "from_file" in filter_entry.keys())),
             setup["graphs"])))
     return res
@@ -259,39 +329,100 @@ def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies:
             if record is not None:
                 elements = record["res"]
 
-        res[dep_str]["minimality"] = 1 if elements == 1 else (clusters - 1) / (elements - 1)
+        res[dep_str]["Minimality"] = 1 if elements == 1 else (clusters - 1) / (elements - 1)
 
     return res
 
 @app.post("/{database}/normalize")
-def normalize(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> tuple[list[str], list[str]]:
+def normalize(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> tuple[list[str], list[str], float]:
     dependencies_str_list = dependencies
     dependencies_obj_list = gnfd.DependencySet.from_string_list(dependencies_str_list)
 
     with get_driver(database) as driver:
+        before = time.time_ns()
         norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list)
+        after = time.time_ns()
 
-    res = (list(map(str, norm_res[0])), norm_res[1])
+    duration = after - before
+    duration = duration/(10**9)
+    res = (list(map(str, norm_res[0])), norm_res[1], duration)
 
 
     return res
 
 @app.get("/{database}/visualize/nodes")
-def visualize(database: Literal["neo4j", "memgraph"]) -> list[dict]:
+def visualize_nodes(database: Literal["neo4j", "memgraph"]) -> list[dict]:
     with get_driver(database).session() as session:
         if database == "neo4j":
-            result = session.run(f"""MATCH (n) return elementId(n) as id, labels(n) as labels""")
+            result = session.run(f"""MATCH (n) return elementId(n) as id, labels(n) as labels, properties(n) as properties""")
             return [record for record in result]
         if database == "memgraph":
-            result = session.run(f"""MATCH (n) return id(n) as id, labels(n) as labels""")
+            result = session.run(f"""MATCH (n) return id(n) as id, labels(n) as labels, properties(n) as properties""")
             return [record for record in result]
 
 @app.get("/{database}/visualize/edges")
-def visualize(database: Literal["neo4j", "memgraph"]) -> list[dict]:
+def visualize_edges(database: Literal["neo4j", "memgraph"]) -> list[dict]:
     with get_driver(database).session() as session:
         if database == "neo4j":
-            result = session.run(f"""MATCH (n)-[m]->(o) return elementId(n) as src, elementId(m) as id, elementId(o) as tgt, [type(m)] as labels""")
+            result = session.run(f"""MATCH (n)-[m]->(o) return elementId(n) as src, elementId(m) as id, elementId(o) as tgt, [type(m)] as labels,  properties(m) as properties""")
             return [record for record in result]
         if database == "memgraph":
-            result = session.run(f"""MATCH (n)-[m]->(o) return id(n) as src, id(m) as id, id(o) as tgt, [type(m)] as labels""")
+            result = session.run(f"""MATCH (n)-[m]->(o) return id(n) as src, id(m) as id, id(o) as tgt, [type(m)] as labels, properties(m) as properties""")
             return [record for record in result]
+
+@app.post("/{database}/visualize/dependencies")
+def visualize_deps(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> list:
+    res_list = []
+    for dep_str in dependencies:
+        dep = gnfd.GNFD.from_string(dep_str)
+        for left in dep.left:
+            left_prefix = "n" if isinstance(left.get_graph_object(), gnfd.Node) else "re"
+            for right in dep.right:
+                right_prefix = "n" if isinstance(right.get_graph_object(), gnfd.Node) else "re"
+                with get_driver(database).session() as session:
+                    if left.is_graph_object_variable and right.is_graph_object_variable:
+                        result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
+                                    "{left_prefix}"+{str(left.to_query_string(database))} AS left,
+                                    "{right_prefix}"+{str(right.to_query_string(database))} AS right
+                                    RETURN left, right""")
+                    elif left.is_graph_object_variable and right.is_property_variable:
+                        if database == "neo4j":
+                            result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
+                                                                "{left_prefix}"+{str(left.to_query_string(database))} AS left,
+                                                                "{right_prefix}"+elementId({str(right.get_graph_object().symbol)})+"_{str(right.reference.key)}" AS right
+                                                                RETURN left, right""")
+                        else:
+                            assert database == "memgraph"
+                            result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
+                                                                "{left_prefix}"+{str(left.to_query_string(database))} AS left,
+                                                                "{right_prefix}"+id({str(right.get_graph_object().symbol)})+"_{str(right.reference.key)}" AS right
+                                                                RETURN left, right""")
+                    elif left.is_property_variable and right.is_graph_object_variable:
+                        if database == "neo4j":
+                            result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
+                                                                "{left_prefix}"+elementId({str(left.get_graph_object().symbol)})+"_{str(left.reference.key)}" AS left,
+                                                                "{right_prefix}"+{str(right.to_query_string(database))} AS right
+                                                                RETURN left, right""")
+                        else:
+                            assert database == "memgraph"
+                            result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
+                                                                "{left_prefix}"+id({str(left.get_graph_object().symbol)})+"_{str(left.reference.key)}" AS left,
+                                                                "{right_prefix}"+{str(right.to_query_string(database))} AS right
+                                                                RETURN left, right""")
+                    else:
+                        assert left.is_property_variable
+                        assert right.is_property_variable
+                        if database == "neo4j":
+                            result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
+                                                                "{left_prefix}"+elementId({str(left.get_graph_object().symbol)})+"_{str(left.reference.key)}" AS left,
+                                                                "{right_prefix}"+elementId({str(right.get_graph_object().symbol)})+"_{str(right.reference.key)}" AS right
+                                                                RETURN left, right""")
+                        else:
+                            result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
+                                                                "{left_prefix}"+id({str(left.get_graph_object().symbol)})+"_{str(left.reference.key)}" AS left,
+                                                                "{right_prefix}"+id({str(right.get_graph_object().symbol)})+"_{str(right.reference.key)}" AS right
+                                                                RETURN left, right""")
+
+                    res_list = res_list + [record for record in result]
+
+    return res_list

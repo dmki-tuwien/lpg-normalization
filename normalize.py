@@ -142,7 +142,7 @@ RETURN avg(card) AS res
                                 or right_ref.get_graph_object() is left_go.tgt
                             )
                         ):
-                            logging.info("Ep -> Np")
+                            logging.info("between-ep-np")
                             assert isinstance(right_ref.get_graph_object(), Node)
 
                             merge_key_elements = list(
@@ -247,7 +247,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 )
                             )
 
-                            applied_transformations.append("Ep -> Np")
+                            applied_transformations.append("between-ep-np")
 
                         elif (
                             right_ref.is_graph_object_variable
@@ -258,7 +258,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 or right_ref.get_graph_object() is left_go.tgt
                             )
                         ):
-                            logging.info("Ep -> N")
+                            logging.info("between-ep-n")
 
                             merge_key_elements = list(map(str, left_references))
                             merge_key_elements.sort()
@@ -330,7 +330,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                                     "\n", ""
                                 )
                             )
-                            applied_transformations.append("Ep -> N")
+                            applied_transformations.append("between-ep-n")
 
                 elif isinstance(left_go, Node):
                     node = left_go
@@ -358,7 +358,7 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 or right_ref.get_graph_object().tgt is node
                             )
                         ):
-                            logging.info("N -> Ep")
+                            logging.info("between-n-ep")
 
                             edge = right_ref.get_graph_object()
                             assert isinstance(edge, Edge)
@@ -382,7 +382,7 @@ REMOVE {right_ref}"""
                             transformed_deps_list.append(
                                 f"({node.symbol}:{"&".join(node.labels)}:{pascalcase(str(right_ref))})::{node.symbol}=>{node.symbol}.{pascalcase(str(right_ref))}"
                             )
-                            applied_transformations.append("N -> Ep")
+                            applied_transformations.append("between-n-ep")
 
                         elif (
                             right_ref.is_property_variable
@@ -393,7 +393,7 @@ REMOVE {right_ref}"""
                                 or right_ref.get_graph_object().tgt is node
                             )
                         ):
-                            logging.info("Np -> Ep")
+                            logging.info("between-np-ep")
 
                             merge_key_elements = list(
                                 map(str, left_references.union({right_ref}))
@@ -462,7 +462,7 @@ REMOVE {node.symbol}.`{rand}`
                                 )
                             )
 
-                            applied_transformations.append("Np -> Ep")
+                            applied_transformations.append("between-np-ep")
 
         elif dep.is_within_graph_object:
             # First filter References that are Graph Object IDs. We don't need them here as their occurrence is a sign for structurally implied or to limiting dep.s.
@@ -491,7 +491,7 @@ REMOVE {node.symbol}.`{rand}`
                 and len(left_references) > 0
                 and len(right_references) > 0
             ):
-                logging.info("Within n")
+                logging.info("within-n")
                 node: Node = dep.right.pop().get_graph_object()
 
                 index_queries.add(
@@ -545,7 +545,7 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}
                     )
                 )
 
-                applied_transformations.append("within-node")
+                applied_transformations.append("within-n")
 
             # # # # # # # # # #
             #  ψ_L2 (psi_L2)  #
@@ -621,7 +621,7 @@ REMOVE {", ".join(map(str, all_references))}"""
                     )
                 )
 
-                applied_transformations.append("within-edge")
+                applied_transformations.append("within-e")
 
         i += 1
     if database == "neo4j":
@@ -648,9 +648,22 @@ def reify_and_extract_to_new_node(
     new_props: list[Reference],
     transformation_queries: set[str],
 ):
+    edge_label = next(iter(edge.labels))
+
     # the "naive" way of encoding it
     transformation_queries.add(
         f"""
+    {inter_dep.pattern.to_gql_match_where_string()} 
+    CREATE (x{i}:{edge_label})
+    CREATE ({edge.src.symbol})-[:SRC_{edge_label}]->(x{i})
+    CREATE (x{i})-[:TGT_{edge_label}]->({edge.tgt.symbol})
+    MERGE (newNode:{new_label} {{{new_properties}}})
+    MERGE (x{i})-[:{new_label.upper()}]->(newNode)
+    ON CREATE SET x{i} += properties({edge.symbol})
+"""
+    ) # Reification may have already happened for another dep. --> Merge!
+
+    print(        f"""
     {inter_dep.pattern.to_gql_match_where_string()} 
     CREATE (x{i}:$(type({edge.symbol})))
     CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i})
@@ -658,6 +671,4 @@ def reify_and_extract_to_new_node(
     MERGE (newNode:{new_label} {{{new_properties}}})
     MERGE (x{i})-[:{new_label.upper()}]->(newNode)
     ON CREATE SET x{i} += properties({edge.symbol})
-"""
-    ) # Reification may have already happened for another dep. --> Merge!
-
+""")
