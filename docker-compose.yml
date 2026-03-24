@@ -93,14 +93,13 @@ services:
       - .env
     environment:
       - TC_HOST=host.docker.internal
-    ports:
-      - "8001:8000"
     profiles:
       - rest
     networks:
       - app-network
     volumes:
       - ./setup.yaml:/app/setup.yaml
+      - ./graphs:/app/graphs
 
 
 
