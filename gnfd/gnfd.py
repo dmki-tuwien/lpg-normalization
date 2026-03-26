@@ -7,6 +7,7 @@ from functools import reduce
 
 import uuid
 from abc import abstractmethod
+import random
 
 from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
 
@@ -38,7 +39,13 @@ class GraphObject(abc.ABC):
         properties: set[str] | None = None,
     ):
         self.unique = uuid.uuid4().hex[:7]
-        self.symbol: str = symbol
+
+        if symbol == "":
+            self.symbol = "".join(random.choice(["a","b","c","d","e","f","g"]) for i in range(5))
+        else:
+            self.symbol: str = symbol
+
+
 
         if labels is None:
             self.labels: set[str] = set()

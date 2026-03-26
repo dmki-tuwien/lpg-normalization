@@ -91,7 +91,10 @@ class ScenarioDef(BaseModel):
 @app.get("/health")
 def get_health() -> bool:
     """Returns `true` when the API is healthy."""
-    return get_database_health("neo4j") and get_database_health("memgraph")
+    try:
+        return get_database_health("neo4j") and get_database_health("memgraph")
+    except Exception:
+        return False
 
 @app.get("/{database}/health")
 def get_database_health(database: Literal["neo4j", "memgraph"]):
@@ -255,12 +258,29 @@ def get_minimal_cover(database: Literal["neo4j", "memgraph"], id: str) -> list[s
 
 @app.get("/{database}/statistics/graph")
 def get_per_graph_statistics(database: Literal["neo4j", "memgraph"]) -> dict[str, float]:
-    statistics_def: dict[str, float] = {
+    statistics_def: dict[str, str]
+    if database=="neo4j":
+        statistics_def = {
         "NodeCount": "MATCH (n) RETURN COUNT(n) as res",
         "EdgeCount": "MATCH ()-[e]->() RETURN COUNT(e) as res",
         "AvgNodePropCount": "MATCH (n) RETURN avg(size(keys(properties(n)))) AS res",
-        "AvgEdgePropCount": "MATCH ()-[e]->() RETURN avg(size(keys(properties(e)))) AS res"
-    }
+        "AvgEdgePropCount": "MATCH ()-[e]->() RETURN avg(size(keys(properties(e)))) AS res",
+        "DisconnectedSubgraphCount": """MATCH (n)
+OPTIONAL MATCH (n)-[*0..]-(m)
+WITH n, collect(DISTINCT elementId(m)) AS component
+WITH DISTINCT apoc.coll.sort(component) AS uniqueComponents
+RETURN count(uniqueComponents) AS res"""
+        }
+    else:
+        assert database=="memgraph"
+        statistics_def = {
+            "NodeCount": "MATCH (n) RETURN COUNT(n) as res",
+            "EdgeCount": "MATCH ()-[e]->() RETURN COUNT(e) as res",
+            "AvgNodePropCount": "MATCH (n) RETURN avg(size(keys(properties(n)))) AS res",
+            "AvgEdgePropCount": "MATCH ()-[e]->() RETURN avg(size(keys(properties(e)))) AS res",
+            "DisconnectedSubgraphCount": """CALL weakly_connected_components.get() YIELD node, component_id
+RETURN count(DISTINCT component_id) AS res"""
+        }
 
     res = dict()
 
