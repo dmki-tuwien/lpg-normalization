@@ -154,25 +154,39 @@ RETURN avg(card) AS res
                             new_props.sort(key=str)
                             new_label: str = pascalcase(within_merge_key)
 
-                            index_queries.add(
-                                f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
-                            )
+                            if database == "neo4j":
+                                index_queries.add(
+                                    f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
+                                )
+                            else:
+                                assert database == "memgraph"
+                                index_queries.add(f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
 
-                            orig_edge_label = next(iter(left_go.labels))
-                            index_queries.add(
-                                f"CREATE INDEX IF NOT EXISTS FOR (xi:{orig_edge_label}) ON (xi.{", xi.".join(left_go.properties)})"
-                            )
-                            index_queries.add(
-                                f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(left_go.properties)})"
-                            )
-                            if len(left_go.src.properties) > 0:
+                            orig_edge_label = next(iter(edge.labels))
+                            if database == "neo4j":
                                 index_queries.add(
-                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(left_go.src.labels)}) ON (n.{", n.".join(left_go.src.properties)})"
+                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{orig_edge_label}) ON (n.{", n.".join(edge.properties)})"
                                 )
-                            if len(left_go.tgt.properties) > 0:
                                 index_queries.add(
-                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(left_go.tgt.labels)}) ON (n.{", n.".join(left_go.tgt.properties)})"
+                                    f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(edge.properties)})"
                                 )
+                                if len(edge.src.properties) > 0:
+                                    index_queries.add(
+                                        f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.src.labels)}) ON (n.{", n.".join(edge.src.properties)})"
+                                    )
+                                if len(edge.tgt.properties) > 0:
+                                    index_queries.add(
+                                        f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.tgt.labels)}) ON (n.{", n.".join(edge.tgt.properties)})"
+                                    )
+                            else:
+                                assert database == "memgraph"
+                                index_queries.add(
+                                    f"CREATE INDEX on :{orig_edge_label}({",".join(edge.properties)})"
+                                )
+                                index_queries.add(
+                                    f"CREATE EDGE INDEX ON :{orig_edge_label} ({next(iter(edge.properties))})"
+                                )
+
 
                             new_properties: str = ", ".join(
                                 map(
@@ -193,9 +207,14 @@ RETURN avg(card) AS res
                             rand = str(uuid.uuid4())[:8]
                             node = right_ref.get_graph_object()
 
-                            index_queries.add(
-                                f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(node.labels)}) ON (n.`{rand}`)"
-                            )
+                            if database == "neo4j":
+                                index_queries.add(
+                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(node.labels)}) ON (n.`{rand}`)"
+                                )
+                            else:
+                                index_queries.add(
+                                    f"CREATE INDEX ON :{next(iter(node.labels))}(`{rand}`)"
+                                )
 
                             index_queries.add(
 f"""
@@ -267,26 +286,39 @@ REMOVE {", ".join(map(str, left_references))}"""
                             new_props.sort(key=str)
                             new_label: str = pascalcase(within_merge_key)
 
-
-                            index_queries.add(
-                                f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
-                            )
-
-                            orig_edge_label = next(iter(left_go.labels))
-                            index_queries.add(
-                                f"CREATE INDEX IF NOT EXISTS FOR (n:{orig_edge_label}) ON (n.{", n.".join(left_go.properties)})"
-                            )
-                            index_queries.add(
-                                f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(left_go.properties)})"
-                            )
-                            if len(left_go.src.properties) > 0:
+                            if database == "neo4j":
                                 index_queries.add(
-                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(left_go.src.labels)}) ON (n.{", n.".join(left_go.src.properties)})"
+                                    f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
                                 )
-                            if len(left_go.tgt.properties) > 0:
+                            else:
+                                assert database == "memgraph"
+                                index_queries.add(f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
+
+                            orig_edge_label = next(iter(edge.labels))
+                            if database == "neo4j":
                                 index_queries.add(
-                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(left_go.tgt.labels)}) ON (n.{", n.".join(left_go.tgt.properties)})"
+                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{orig_edge_label}) ON (n.{", n.".join(edge.properties)})"
                                 )
+                                index_queries.add(
+                                    f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(edge.properties)})"
+                                )
+                                if len(edge.src.properties) > 0:
+                                    index_queries.add(
+                                        f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.src.labels)}) ON (n.{", n.".join(edge.src.properties)})"
+                                    )
+                                if len(edge.tgt.properties) > 0:
+                                    index_queries.add(
+                                        f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.tgt.labels)}) ON (n.{", n.".join(edge.tgt.properties)})"
+                                    )
+                            else:
+                                assert database == "memgraph"
+                                index_queries.add(
+                                    f"CREATE INDEX on :{orig_edge_label}({",".join(edge.properties)})"
+                                )
+                                index_queries.add(
+                                    f"CREATE EDGE INDEX ON :{orig_edge_label} ({next(iter(edge.properties))})"
+                                )
+
 
                             new_properties: str = ", ".join(
                                 map(
@@ -404,9 +436,15 @@ REMOVE {right_ref}"""
                             new_props.sort(key=str)
                             new_label: str = pascalcase(within_merge_key)
 
-                            index_queries.add(
-                                f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
-                            )
+                            if database == "neo4j":
+                                index_queries.add(
+                                    f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
+                                )
+                            else:
+                                assert database == "memgraph"
+                                index_queries.add(
+                                    f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
+
 
                             new_properties: str = ", ".join(
                                 map(
@@ -416,9 +454,14 @@ REMOVE {right_ref}"""
                             )
 
                             rand = str(uuid.uuid4())[:8]
-                            index_queries.add(
-                                f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(node.labels)}) ON (n.`{rand}`)"
-                            )
+                            if database == "neo4j":
+                                index_queries.add(
+                                    f"CREATE INDEX IF NOT EXISTS FOR (n:{next(iter(node.labels))}) ON (n.`{rand}`)"
+                                )
+                            else:
+                                index_queries.add(
+                                    f"CREATE INDEX ON :{next(iter(node.labels))}(`{rand}`)"
+                                )
 
 
                             transformation_queries.add(
@@ -494,18 +537,28 @@ REMOVE {node.symbol}.`{rand}`
                 logging.info("within-n")
                 node: Node = dep.right.pop().get_graph_object()
 
-                index_queries.add(
-                    f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
-                )
+                if database == "neo4j":
+                    index_queries.add(
+                        f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
+                    )
+                else:
+                    assert database == "memgraph"
+                    index_queries.add(
+                        f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
 
                 new_properties: str = ", ".join(
                     map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
                 )
 
                 rand = str(uuid.uuid4())[:8]
-                index_queries.add(
-                    f"CREATE INDEX IF NOT EXISTS FOR (n:{next(iter(node.labels))}) ON (n.`{rand}`)"
-                ) # Neo4J only supports _single labels_ in indices!
+                if database == "neo4j":
+                    index_queries.add(
+                        f"CREATE INDEX IF NOT EXISTS FOR (n:{next(iter(node.labels))}) ON (n.`{rand}`)"
+                    )
+                else:
+                    index_queries.add(
+                        f"CREATE INDEX ON :{next(iter(node.labels))}(`{rand}`)"
+                    )
 
                 transformation_queries.add(
                     f"""
@@ -559,25 +612,40 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}
 
                 edge: Edge = dep.right.pop().get_graph_object()
 
-                index_queries.add(
-                    f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
-                )
+                if database == "neo4j":
+                    index_queries.add(
+                        f"CREATE CONSTRAINT IF NOT EXISTS FOR (newNode:{new_label}) REQUIRE (newNode.{", newNode.".join(map(pascalcase, map(str, left_references)))}) IS UNIQUE"
+                    )
+                else:
+                    assert database == "memgraph"
+                    index_queries.add(
+                        f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
 
                 orig_edge_label = next(iter(edge.labels))
-                index_queries.add(
-                    f"CREATE INDEX IF NOT EXISTS FOR (n:{orig_edge_label}) ON (n.{", n.".join(edge.properties)})"
-                )
-                index_queries.add(
-                    f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(edge.properties)})"
-                )
-                if len(edge.src.properties) > 0:
+                if database == "neo4j":
                     index_queries.add(
-                        f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.src.labels)}) ON (n.{", n.".join(edge.src.properties)})"
+                        f"CREATE INDEX IF NOT EXISTS FOR (n:{orig_edge_label}) ON (n.{", n.".join(edge.properties)})"
                     )
-                if len(edge.tgt.properties) > 0:
                     index_queries.add(
-                        f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.tgt.labels)}) ON (n.{", n.".join(edge.tgt.properties)})"
+                        f"CREATE INDEX IF NOT EXISTS FOR ()-[e:{orig_edge_label}]-() ON (e.{", e.".join(edge.properties)})"
                     )
+                    if len(edge.src.properties) > 0:
+                        index_queries.add(
+                            f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.src.labels)}) ON (n.{", n.".join(edge.src.properties)})"
+                        )
+                    if len(edge.tgt.properties) > 0:
+                        index_queries.add(
+                            f"CREATE INDEX IF NOT EXISTS FOR (n:{":".join(edge.tgt.labels)}) ON (n.{", n.".join(edge.tgt.properties)})"
+                        )
+                else:
+                    assert database == "memgraph"
+                    index_queries.add(
+                        f"CREATE INDEX on :{orig_edge_label}({",".join(edge.properties)})"
+                    )
+                    index_queries.add(
+                        f"CREATE EDGE INDEX ON :{orig_edge_label}({next(iter(edge.properties))})"
+                    )
+
 
                 new_properties: str = ", ".join(
                     map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
@@ -624,9 +692,10 @@ REMOVE {", ".join(map(str, all_references))}"""
                 applied_transformations.append("within-e")
 
         i += 1
-    if database == "neo4j":
-        for query in tqdm(index_queries, desc="  Indices"):
-            _apply_transformation_query(query)
+
+    for query in tqdm(index_queries, desc="  Indices"):
+        logging.info(query)
+        _apply_transformation_query(query)
     for query in tqdm(transformation_queries, desc="  Query"):
         _apply_transformation_query(query)
     for query in tqdm(remove_queries, desc="  Cleanup (REMOVE)"):

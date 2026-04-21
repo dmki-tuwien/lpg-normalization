@@ -23,7 +23,7 @@ services:
     ports:
       - "7688:7687"
       - "7444:7444"
-    command: [ "--log-level=TRACE", "--telemetry-enabled=false"]
+    command: ["--storage-properties-on-edges=true", "--log-level=TRACE", "--telemetry-enabled=false"]
     volumes:
       - ./graphs:/graphs
     healthcheck:

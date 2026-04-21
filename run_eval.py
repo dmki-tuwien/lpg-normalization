@@ -280,7 +280,7 @@ def perform_evaluation(
                             session.run("CREATE INDEX ON :__MigrationNode__;")
 
                             session.run("CREATE INDEX ON :__MigrationNode__(__elementId__);")
-                            
+
                             logger.info(f"""
                             CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{container.get_container_host_ip()}", port: {container.get_exposed_port(7687)}, username: "neo4j", password: "password"}})
                             YIELD row
