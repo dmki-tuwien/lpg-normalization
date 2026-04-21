@@ -241,7 +241,7 @@ def perform_evaluation(
 
                 try:
                     with container.get_driver() as d:
-                        with driver.session(database=DATABASE) as session:
+                        with d.session(database="neo4j") as session:
                             session.run("MATCH (n) RETURN n LIMIT 1")
                 except neo4j.exceptions.DatabaseUnavailable:
                     responsive = False
