@@ -49,6 +49,8 @@ NEO4J_URI = (
 NEO4J_DATABASE = (
     "neo4j" if os.getenv("NEO4J_DATABASE") is None else os.getenv("NEO4J_DATABASE")
 )
+NEO4J_HEAP_SIZE = 1 if os.getenv("NEO4J_HEAP_SIZE") is None else os.getenv("NEO4J_HEAP_SIZE")
+NEO4J_PAGECACHE_SIZE = 5 if os.getenv("NEO4J_PAGECACHE_SIZE") is None else os.getenv("NEO4J_PAGECACHE_SIZE")
 
 RUN_ID = ""
 
@@ -191,9 +193,9 @@ def perform_evaluation(
         container.with_env("NEO4J_apoc_export_file_enabled", "true")
         container.with_env("NEO4J_apoc_import_file_enabled", "true")
         container.with_env("NEO4J_AUTH", "neo4j/password")
-        container.with_env("NEO4J_server_memory_heap_initial__size", "1G")
-        container.with_env("NEO4J_server_memory_heap_max__size", "1G")
-        container.with_env("NEO4J_server_memory_pagecache_size", "5G")
+        container.with_env("NEO4J_server_memory_heap_initial__size", f"{NEO4J_HEAP_SIZE}G")
+        container.with_env("NEO4J_server_memory_heap_max__size", f"{NEO4J_HEAP_SIZE}G")
+        container.with_env("NEO4J_server_memory_pagecache_size", f"{NEO4J_PAGECACHE_SIZE}G")
         container.with_kwargs(nano_cpus=int(4 * 1e9))  # 1 CPU = 1e9 nanocpus
 
         start_sh: str = (

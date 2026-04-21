@@ -141,7 +141,7 @@ def load_scenario(database: Literal["neo4j", "memgraph"], id: str) -> bool:
     reset(database)
 
     driver = get_driver(database)
-    graph =next(filter(lambda filter_entry:
+    graph = next(filter(lambda filter_entry:
                        (
                            ("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or
                            ("from_file" in filter_entry.keys())
