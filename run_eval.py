@@ -52,9 +52,16 @@ NEO4J_DATABASE = (
 )
 NEO4J_HEAP_SIZE: str = "1" if os.getenv("NEO4J_HEAP_SIZE") is None else os.getenv("NEO4J_HEAP_SIZE")
 NEO4J_PAGECACHE_SIZE: str = "5" if os.getenv("NEO4J_PAGECACHE_SIZE") is None else os.getenv("NEO4J_PAGECACHE_SIZE")
-NEO4J_PLUGINS_PATH: str = "./plugins" if os.getenv("NEO4J_PLUGINS_PATH") is None else os.getenv("NEO4J_PLUGINS_PATH")
+NEO4J_PLUGINS_PATH: str = "plugins" if os.getenv("NEO4J_PLUGINS_PATH") is None else os.getenv("NEO4J_PLUGINS_PATH")
 
 NUMBER_OF_RUNS = 3
+
+USERNAME = (
+        "neo4j" if os.getenv("USERNAME") is None else os.getenv("USERNAME")
+)
+PASSWORD = (
+        "password" if os.getenv("PASSWORD") is None else os.getenv("PASSWORD")
+)
 
 RUN_ID = ""
 
@@ -123,7 +130,7 @@ def main():
         global RUN_ID
         RUN_ID = str(uuid.uuid4())
 
-        for database in tqdm(["neo4j"]):  # , "memgraph"], desc="System"):
+        for database in tqdm(["memgraph"]):  # , "memgraph"], desc="System"):
             for graph in tqdm(setup["graphs"], desc="Graphs"):
                 for subset in tqdm(
                     ["all", "node-left", "edge-left"], desc="Dep. subset"
@@ -182,16 +189,18 @@ def perform_evaluation(
     driver: Driver
     """A Neo4J driver connected to the database running in :any:`container`."""
 
+    is_based_on_neo4j_dump: bool = "memgraph" not in graph.keys() and "from_file" not in graph.keys()
+
     # 1. Get a fresh database container
-    if database == "memgraph":
+    if database == "memgraph" and not is_based_on_neo4j_dump:
         container = DockerContainer("alpine")
     else:
-        assert database == "neo4j"
+        assert database == "neo4j" or (database == "memgraph" and is_based_on_neo4j_dump)
         container = Neo4jContainer("neo4j:2025.12-enterprise")
         container.with_volume_mapping(
             GRAPHS_PATH, "/tmp/graphs"
         )  # "/var/lib/neo4j/import/graphs")
-        container.with_volume_mapping(NEO4J_PLUGINS_PATH,"/tmp/plugins")
+        container.with_volume_mapping(NEO4J_PLUGINS_PATH,"/plugins","rw")
         container.with_env("NEO4J_ACCEPT_LICENSE_AGREEMENT", "eval")
         container.with_env("NEO4J_PLUGINS", '["apoc","apoc-extended"]')
         container.with_env("NEO4J_dbms_security_procedures_unrestricted", "apoc.*")
@@ -204,7 +213,7 @@ def perform_evaluation(
         container.with_kwargs(nano_cpus=int(4 * 1e9))  # 1 CPU = 1e9 nanocpus
 
         start_sh: str = (
-            "cp -R /tmp/graphs /var/lib/neo4j/import && cp -R /tmp/plugins /plugins &&"
+            "cp -R /tmp/graphs /var/lib/neo4j/import &&"
         )
         start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && "
         if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
@@ -216,16 +225,28 @@ def perform_evaluation(
     with container:
         if database == "memgraph":
             uri = MEMGRAPH_URI
-        if database == "neo4j":
+            if is_based_on_neo4j_dump:
+                logger.info("Start Neo4J for data import to Memgraph.")
+        if database == "neo4j" or is_based_on_neo4j_dump:
             logger.info("Wait for Neo4J to clean query caches.")
             # Neo4J Enterprise is not immediately coming online (although logs say different things)
             container.waiting_for(LogMessageWaitStrategy("db.clearQueryCaches():"))
             # and even after this additional intermediate log message it takes further ~15 seconds
-            if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
-                logger.info("Wait 1 minute for Neo4J to become responsive")
-                time.sleep(60)
-            else:
+       #     if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
+            logger.info("Wait for Neo4J to become responsive")
+            responsive = False
+            while not responsive:
+                try:
+                    with container.get_driver() as d:
+                        pass
+                except Exception:
+                    pass
+                responsive = True
                 time.sleep(1)
+            logger.info("Neo4J is now responsive")
+
+         #   else:
+         #       time.sleep(1)
 
         with (
             container.get_driver()
@@ -245,20 +266,66 @@ def perform_evaluation(
                     elif "memgraph" in graph.keys():
                         file = graph["memgraph"]["from_file"]
                     else:
-                        return
-                    with open(file, "r") as filename:
-                        create_graph_queries_str = filename.read()
-                        create_graph_queries = [
-                            s.strip()
-                            for s in (create_graph_queries_str.split(";"))
-                            if s.strip()
-                        ]
-
+                        logger.info("Stream data from Neo4J into Memgraph")
+                        if (
+                            "neo4j" in graph.keys()
+                            and "from_file" in graph["neo4j"].keys()
+                        ):
+                            with container.get_driver() as neo4j_driver:
+                                with neo4j_driver.session() as session:
+                                    session.run(
+                                        f"CALL apoc.cypher.runFile(\"{graph['neo4j']['from_file']}\");"
+                                    )
                         with driver.session(database=DATABASE) as session:
-                            for query in create_graph_queries:
-                                #   print(query)
-                                session.run(query)
+                            logger.info(f"""
+                            CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{container.get_container_host_ip()}", port: {container.get_exposed_port(7687)}, username: "neo4j", password: "password"}})
+                            YIELD row
+                            MERGE (n:__MigrationNode__ {{__elementId__: row.src_id}})
+                            SET n:row.src_labels
+                            SET n += row.src_props; """)
+
+                            session.run(f"""
+                            CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{container.get_container_host_ip()}", port: {container.get_exposed_port(7687)}, username: "neo4j", password: "password"}})
+                            YIELD row
+                            MERGE (n:__MigrationNode__ {{__elementId__: row.src_id}})
+                            SET n:row.src_labels
+                            SET n += row.src_props; """)
+
+
+                            session.run(f"""
+                            CALL migrate.neo4j(
+                              "MATCH (n)-[r]->(m) RETURN type(r) as rel_type, elementId(n) AS src_id, elementId(m) AS dest_id, properties(r) AS edge_props",
+                              {{host: "{container.get_container_host_ip()}", port: {container.get_exposed_port(7687)}, username: "neo4j", password: "password"}})
+                            YIELD row
+                            MATCH (n:__MigrationNode__ {{__elementId__: row.src_id}})
+                            MATCH (m:__MigrationNode__ {{__elementId__: row.dest_id}})
+                            CREATE (n)-[r:row.rel_type]->(m)
+                            SET r += row.edge_props;""")
+
+                            session.run("""
+                            MATCH (n:__MigrationNode__)
+                            REMOVE n:__MigrationNode__
+                            REMOVE n.__elementId__;""")
+                            session.run("DROP INDEX ON :__MigrationNode__;")
+                            session.run("DROP INDEX ON :__MigrationNode__(__elementId__);")
+
+                            logger.info("Importing data from Neo4J to Memgraph finished.")
+
+                    if not is_based_on_neo4j_dump:
+                        with open(file, "r") as filename:
+                            create_graph_queries_str = filename.read()
+                            create_graph_queries = [
+                                s.strip()
+                                for s in (create_graph_queries_str.split(";"))
+                                if s.strip()
+                            ]
+
+                            with driver.session(database=DATABASE) as session:
+                                for query in create_graph_queries:
+                                    #   print(query)
+                                    session.run(query)
                 case _:
+                    assert database == "neo4j"
                     with driver.session(database=DATABASE) as session:
                         res = session.run(
                             """CALL dbms.listConfig() YIELD name, value 
