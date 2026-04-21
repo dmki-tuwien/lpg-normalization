@@ -2,6 +2,7 @@ import logging
 import os
 import time
 
+import neo4j.exceptions
 import yaml
 import pandas as pd
 
@@ -236,12 +237,14 @@ def perform_evaluation(
             logger.info("Wait for Neo4J to become responsive")
             responsive = False
             while not responsive:
+                responsive = True
+
                 try:
                     with container.get_driver() as d:
-                        pass
-                except Exception:
-                    pass
-                responsive = True
+                        with driver.session(database=DATABASE) as session:
+                            session.run("MATCH (n) RETURN n LIMIT 1")
+                except neo4j.exceptions.DatabaseUnavailable:
+                    responsive = False
                 time.sleep(1)
             logger.info("Neo4J is now responsive")
 
