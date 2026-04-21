@@ -30,6 +30,7 @@ load_dotenv()  # Required to get content of .env when not using Docker
 
 GRAPHS_PATH = "./graphs" if os.getenv("GRAPHS_PATH") is None else os.getenv("GRAPHS_PATH")
 
+
 # Memgraph Connection
 MEMGRAPH_DATABASE = (
     "memgraph"
@@ -49,8 +50,11 @@ NEO4J_URI = (
 NEO4J_DATABASE = (
     "neo4j" if os.getenv("NEO4J_DATABASE") is None else os.getenv("NEO4J_DATABASE")
 )
-NEO4J_HEAP_SIZE = 1 if os.getenv("NEO4J_HEAP_SIZE") is None else os.getenv("NEO4J_HEAP_SIZE")
-NEO4J_PAGECACHE_SIZE = 5 if os.getenv("NEO4J_PAGECACHE_SIZE") is None else os.getenv("NEO4J_PAGECACHE_SIZE")
+NEO4J_HEAP_SIZE: str = "1" if os.getenv("NEO4J_HEAP_SIZE") is None else os.getenv("NEO4J_HEAP_SIZE")
+NEO4J_PAGECACHE_SIZE: str = "5" if os.getenv("NEO4J_PAGECACHE_SIZE") is None else os.getenv("NEO4J_PAGECACHE_SIZE")
+NEO4J_PLUGINS_PATH: str = "./plugins" if os.getenv("NEO4J_PLUGINS_PATH") is None else os.getenv("NEO4J_PLUGINS_PATH")
+
+NUMBER_OF_RUNS = 3
 
 RUN_ID = ""
 
@@ -115,7 +119,7 @@ def main():
         logger.error('🔥 "setup.yaml" does not contain any graph.')
         exit(1)
 
-    for _ in tqdm(range(3), desc="run"):
+    for _ in tqdm(range(NUMBER_OF_RUNS), desc="run"):
         global RUN_ID
         RUN_ID = str(uuid.uuid4())
 
@@ -187,6 +191,7 @@ def perform_evaluation(
         container.with_volume_mapping(
             GRAPHS_PATH, "/tmp/graphs"
         )  # "/var/lib/neo4j/import/graphs")
+        container.with_volume_mapping(NEO4J_PLUGINS_PATH,"/plugins")
         container.with_env("NEO4J_ACCEPT_LICENSE_AGREEMENT", "eval")
         container.with_env("NEO4J_PLUGINS", '["apoc","apoc-extended"]')
         container.with_env("NEO4J_dbms_security_procedures_unrestricted", "apoc.*")
