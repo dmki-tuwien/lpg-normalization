@@ -191,7 +191,7 @@ def perform_evaluation(
         container.with_volume_mapping(
             GRAPHS_PATH, "/tmp/graphs"
         )  # "/var/lib/neo4j/import/graphs")
-        container.with_volume_mapping(NEO4J_PLUGINS_PATH,"/plugins")
+        container.with_volume_mapping(NEO4J_PLUGINS_PATH,"/tmp/plugins")
         container.with_env("NEO4J_ACCEPT_LICENSE_AGREEMENT", "eval")
         container.with_env("NEO4J_PLUGINS", '["apoc","apoc-extended"]')
         container.with_env("NEO4J_dbms_security_procedures_unrestricted", "apoc.*")
@@ -204,7 +204,7 @@ def perform_evaluation(
         container.with_kwargs(nano_cpus=int(4 * 1e9))  # 1 CPU = 1e9 nanocpus
 
         start_sh: str = (
-            "cp -R /tmp/graphs /var/lib/neo4j/import &&"
+            "cp -R /tmp/graphs /var/lib/neo4j/import && cp -R /tmp/plugins /plugins &&"
         )
         start_sh += f"chown -R 7474:7474 /var/lib/neo4j/import && "
         if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
