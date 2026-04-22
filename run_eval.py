@@ -638,11 +638,12 @@ def get_graph_statistics(
 
                 mu7c = f"""
     {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
-    RETURN count(DISTINCT [{{
-    {", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
-    {", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
-    }}]) AS res"""
-                # print(f"µ7 clusters\n=========={µ7c}")
+    WITH
+    DISTINCT 
+    {", ".join(map(lambda left: f"{left} as x{pascalcase(str(left))}", dep.left))}, 
+    {", ".join(map(lambda right: f"{right} as x{pascalcase(str(right))}", dep.right))}
+    RETURN count(*) AS res"""
+                print(f"µ7 clusters\n=========={mu7c}")
                 result = session.run(mu7c)
                 record = result.single()
                 if record is not None:
@@ -653,10 +654,10 @@ def get_graph_statistics(
                 result = session.run(
                     f"""
     {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
-    RETURN count([{{
-    {", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
-    {", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
-    }}]) AS res"""
+    WITH
+    {", ".join(map(lambda left: f"{left} as x{pascalcase(str(left))}", dep.left))}, 
+    {", ".join(map(lambda right: f"{right} as x{pascalcase(str(right))}", dep.right))}
+    RETURN count(*) AS res"""
                 )
                 record = result.single()
                 if record is not None:
