@@ -269,21 +269,24 @@ def perform_evaluation(
                 case "memgraph":
                     # We do'n't have a fresh database for memgraph --> delete everything first!
                     with driver.session(database=DATABASE) as session:
-                        session.run("MATCH (n) DETACH DELETE n")
 
                         responsive = False
                         i = 0
                         with tqdm(desc="Memgraph cleanup", initial=i) as t:
-                            while not responsive:
-                                responsive = True
+                         #   for s in (["MATCH (n) DETACH DELETE n", "DROP ALL INDEXES", "DROP ALL CONSTRAINTS"]):
+                            for s in (["STORAGE MODE IN_MEMORY_ANALYTICAL", "DROP GRAPH", "STORAGE MODE IN_MEMORY_TRANSACTIONAL"]):
+                                session.run(s)
 
-                                try:
-                                    session.run("MATCH (n) RETURN n LIMIT 1")
-                                except neo4j.exceptions.TransientError:
-                                    responsive = False
-                                    time.sleep(1)
-                                    i += 1
-                                    t.update(i)
+                                while not responsive:
+                                    responsive = True
+
+                                    try:
+                                        session.run("MATCH (n) RETURN n LIMIT 1")
+                                    except neo4j.exceptions.TransientError:
+                                        responsive = False
+                                        time.sleep(1)
+                                        i += 1
+                                        t.update(i)
                     if "from_file" in graph.keys():
                         file = graph["from_file"]
                     elif "memgraph" in graph.keys():
@@ -311,13 +314,6 @@ def perform_evaluation(
                             session.run("CREATE INDEX ON :__MigrationNode__;")
 
                             session.run("CREATE INDEX ON :__MigrationNode__(__elementId__);")
-
-                            logger.info(f"""
-                            CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{container.get_container_host_ip()}", port: {container.get_exposed_port(7687)}, username: "neo4j", password: "password"}})
-                            YIELD row
-                            MERGE (n:__MigrationNode__ {{__elementId__: row.src_id}})
-                            SET n:row.src_labels
-                            SET n += row.src_props; """)
 
                             session.run(f"""
                             CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{container.get_container_host_ip()}", port: {container.get_exposed_port(7687)}, username: "neo4j", password: "password"}})
@@ -594,85 +590,97 @@ def get_graph_statistics(
     # Retrieve per dependency metrics(1 Table and 1 Plot)
     # # # # # # # # # # # # # # # # # # # # #
 
-    for dep in dependencies:
-        logger.info(f"    Get per dep. metrics for {str(dep)}")
-        with driver.session() as session:
-            c = 0
-            e = 0
+    i = 0
+    with tqdm(desc="Per dependency metric calculation:", initial=0, total=len(dependencies)*3) as t:
+        for dep in dependencies:
+            logger.info(f"    Get per dep. metrics for {str(dep)}")
+            with driver.session() as session:
+                c = 0
+                e = 0
 
-            m5 = 0
-            m6 = 0
+                m5 = 0
+                m6 = 0
 
-            # µ5
-            logger.info("        µ5")
-            mu5 = f"""
-            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
-            {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
-            count(*) AS red
-            RETURN max(red) AS res
-                                            """
-            result = session.run(mu5)
-            record = result.single()
-            if record is not None:
-                m5 = record["res"]
+                # µ5
+                t.postfix = "Maximum redundancy potential"
+                mu5 = f"""
+                {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
+                {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
+                count(*) AS red
+                RETURN max(red) AS res
+                                                """
+                result = session.run(mu5)
+                record = result.single()
+                if record is not None:
+                    m5 = record["res"]
+                i += 1
+                t.update(i)
 
-            # µ6
-            logger.info("        µ6")
-            result = session.run(
-                f"""
-            {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
-            {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
-            count(*) AS red
-            RETURN avg(red) AS res
-                                            """
+                # µ6
+                t.postfix = "Average redundancy potential"
+                result = session.run(
+                    f"""
+                {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
+                {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
+                count(*) AS red
+                RETURN avg(red) AS res
+                                                """
+                )
+                record = result.single()
+                if record is not None:
+                    m6 = record["res"]
+                i += 1
+                t.update(i)
+
+
+                # µ7 == minimality; as defined in "Lisa Ehrlinger and Wolfram Wöß. “A Novel Data Quality Metric for Minimality.” In Data Quality and Trust in Big Data, vol. 11235, Springer, 2019. https://doi.org/10.1007/978-3-030-19143-6_1."
+                t.postfix = "Minimality"
+
+                mu7c = f"""
+    {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
+    RETURN count(DISTINCT {{
+    {", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
+    {", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
+    }}) AS res"""
+                # print(f"µ7 clusters\n=========={µ7c}")
+                result = session.run(mu7c)
+                record = result.single()
+                if record is not None:
+                    c = record["res"]
+                i += 0.5
+                t.update(i)
+
+                result = session.run(
+                    f"""
+    {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
+    RETURN count({{
+    {", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
+    {", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
+    }}) AS res"""
+                )
+                record = result.single()
+                if record is not None:
+                    e = record["res"]
+
+                minimality = 1 if e == 1 else (c - 1) / (e - 1)
+                i += 0.5
+                t.update(i)
+
+            t.postfix = "Finished"
+            dep_res.append(
+                {
+                    GRAPH_COL: graph_name,
+                    DATABASE_COL: "Neo4J" if database == "neo4j" else "Memgraph",
+                    DEPENDENCY_COL: dep.to_latex(),
+                    METHOD_COL: method,
+                    MAX_INC_COUNT_COL: m5,
+                    AVG_INC_COUNT_COL: m6,
+                    MINIMALITY_COL: minimality,
+                    MINIMALITY_CLUSTER_COL: c,
+                    MINIMALITY_MATCHES_COL: e,
+                }
             )
-            record = result.single()
-            if record is not None:
-                m6 = record["res"]
 
-            # µ7 == minimality; as defined in "Lisa Ehrlinger and Wolfram Wöß. “A Novel Data Quality Metric for Minimality.” In Data Quality and Trust in Big Data, vol. 11235, Springer, 2019. https://doi.org/10.1007/978-3-030-19143-6_1."
-            logger.info("        µ7 Clusters")
-
-            mu7c = f"""
-{dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
-RETURN count(DISTINCT {{
-{", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
-{", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
-}}) AS res"""
-            # print(f"µ7 clusters\n=========={µ7c}")
-            result = session.run(mu7c)
-            record = result.single()
-            if record is not None:
-                c = record["res"]
-
-            logger.info("        µ7 Elements")
-            result = session.run(
-                f"""
-{dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
-RETURN count({{
-{", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
-{", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
-}}) AS res"""
-            )
-            record = result.single()
-            if record is not None:
-                e = record["res"]
-
-            minimality = 1 if e == 1 else (c - 1) / (e - 1)
-
-        dep_res.append(
-            {
-                GRAPH_COL: graph_name,
-                DATABASE_COL: "Neo4J" if database == "neo4j" else "Memgraph",
-                DEPENDENCY_COL: dep.to_latex(),
-                METHOD_COL: method,
-                MAX_INC_COUNT_COL: m5,
-                AVG_INC_COUNT_COL: m6,
-                MINIMALITY_COL: minimality,
-                MINIMALITY_CLUSTER_COL: c,
-                MINIMALITY_MATCHES_COL: e,
-            }
-        )
 
     dep_df = pd.DataFrame(dep_res)
     global per_dep_metrics_df
