@@ -58,6 +58,7 @@ def perform_graph_native_normalization(
         :param query: The to be run query.
         :type query: str"""
         with driver.session(database=database) as session:
+            responsive = False
             while not responsive:
                 responsive = True
                 try:
