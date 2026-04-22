@@ -66,6 +66,8 @@ PASSWORD = (
 
 RUN_ID = ""
 
+STOP = True
+
 # Statistics and Metrics Export configuration
 per_graph_metrics_df = pd.DataFrame(
     columns=[
@@ -298,6 +300,14 @@ def perform_evaluation(
                                         f"CALL apoc.cypher.runFile(\"{graph['neo4j']['from_file']}\");"
                                     )
                         with driver.session(database=DATABASE) as session:
+                            responsive = False
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
                             session.run("CREATE INDEX ON :__MigrationNode__;")
 
                             session.run("CREATE INDEX ON :__MigrationNode__(__elementId__);")
@@ -402,6 +412,9 @@ RETURN value"""
                 ignore_min_cov,
             )  # None = no normalization performed yet
             measured_denormalized = True  # Measurements for denormalized graphs have been taken and are not performed again
+
+            if STOP:
+                input("Loaded graph. Press enter to continue ... ")
 
             logger.info("Start normalization")
             normalized_deps, transformations = perform_graph_native_normalization(
