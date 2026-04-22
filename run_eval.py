@@ -234,19 +234,23 @@ def perform_evaluation(
             container.waiting_for(LogMessageWaitStrategy("db.clearQueryCaches():"))
             # and even after this additional intermediate log message it takes further ~15 seconds
        #     if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
-            logger.info("Wait for Neo4J to become responsive")
-            responsive = False
-            while not responsive:
-                responsive = True
 
-                try:
-                    with container.get_driver() as d:
-                        with d.session(database="neo4j") as session:
-                            session.run("MATCH (n) RETURN n LIMIT 1")
-                except neo4j.exceptions.DatabaseUnavailable:
-                    responsive = False
-                time.sleep(1)
-            logger.info("Neo4J is now responsive")
+            i = 0
+            with tqdm(desc="Wait for Neo4J to become responsive", initial=i) as t:
+                responsive = False
+                while not responsive:
+                    responsive = True
+
+                    try:
+                        with container.get_driver() as d:
+                            with d.session(database="neo4j") as session:
+                                session.run("MATCH (n) RETURN n LIMIT 1")
+                    except neo4j.exceptions.DatabaseUnavailable:
+                        responsive = False
+                        time.sleep(1)
+                        i += 1
+                        t.update(i)
+                t.postfix = "Neo4J is now responsive"
 
          #   else:
          #       time.sleep(1)
@@ -264,6 +268,20 @@ def perform_evaluation(
                     # We do'n't have a fresh database for memgraph --> delete everything first!
                     with driver.session(database=DATABASE) as session:
                         session.run("MATCH (n) DETACH DELETE n")
+
+                        responsive = False
+                        i = 0
+                        with tqdm(desc="Memgraph cleanup", initial=i) as t:
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
+                                    time.sleep(1)
+                                    i += 1
+                                    t.update(i)
                     if "from_file" in graph.keys():
                         file = graph["from_file"]
                     elif "memgraph" in graph.keys():
@@ -679,18 +697,19 @@ def test_connection_to_memgraph(uri):
 def test_docker_container_creation():
     """Tests whether the `testcontainers` package is able to create Docker containers.
     If the creation files the evaluation is exited as no experiments can be run."""
-    logging.info(
-        'Testing Docker container creation by creating a simple container that logs "Hello World!".'
-    )
-    with DockerContainer("alpine").with_command(
-        "echo 'Hello world!' && tail -f /dev/null"
-    ) as container:
-        try:
-            container.waiting_for(LogMessageWaitStrategy("Hello world!"))
-        except Exception:
-            logging.error(f'Running the "Hello World!" Docker container failed.')
-            exit()
-    logging.info(f'The "Hello World!" Docker container was run successfully.')
+    with tqdm(desc="Startup testing", initial=0, total=1) as t:
+        t.postfix =            'Testing Docker container creation'
+
+        with DockerContainer("alpine").with_command(
+            "echo 'Hello world!' && tail -f /dev/null"
+        ) as container:
+            try:
+                container.waiting_for(LogMessageWaitStrategy("Hello world!"))
+            except Exception:
+                logging.error('Running the "Hello World!" Docker container failed; cannot start the evaluation.')
+                exit()
+        t.update(1)
+        t.postfix = 'The "Hello World!" Docker container was run successfully.'
 
 
 if __name__ == "__main__":
