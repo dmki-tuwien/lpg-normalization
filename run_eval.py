@@ -66,7 +66,7 @@ PASSWORD = (
 
 RUN_ID = ""
 
-STOP = True
+STOP = False
 
 # Statistics and Metrics Export configuration
 per_graph_metrics_df = pd.DataFrame(
@@ -638,10 +638,10 @@ def get_graph_statistics(
 
                 mu7c = f"""
     {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
-    RETURN count(DISTINCT {{
+    RETURN count(DISTINCT [{{
     {", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
     {", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
-    }}) AS res"""
+    }}]) AS res"""
                 # print(f"µ7 clusters\n=========={µ7c}")
                 result = session.run(mu7c)
                 record = result.single()
@@ -653,10 +653,10 @@ def get_graph_statistics(
                 result = session.run(
                     f"""
     {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} 
-    RETURN count({{
+    RETURN count([{{
     {", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))}, 
     {", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
-    }}) AS res"""
+    }}]) AS res"""
                 )
                 record = result.single()
                 if record is not None:
