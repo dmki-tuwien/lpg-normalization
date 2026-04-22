@@ -61,6 +61,8 @@ services:
     depends_on:
       memgraph:
         condition: service_healthy
+    stdin_open: true
+    tty: true
 
     env_file:
       - .env
