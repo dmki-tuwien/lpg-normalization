@@ -55,7 +55,7 @@ NEO4J_HEAP_SIZE: str = "1" if os.getenv("NEO4J_HEAP_SIZE") is None else os.geten
 NEO4J_PAGECACHE_SIZE: str = "5" if os.getenv("NEO4J_PAGECACHE_SIZE") is None else os.getenv("NEO4J_PAGECACHE_SIZE")
 NEO4J_PLUGINS_PATH: str = "plugins" if os.getenv("NEO4J_PLUGINS_PATH") is None else os.getenv("NEO4J_PLUGINS_PATH")
 
-NUMBER_OF_RUNS = 3
+NUMBER_OF_RUNS = 1
 
 USERNAME = (
         "neo4j" if os.getenv("USERNAME") is None else os.getenv("USERNAME")

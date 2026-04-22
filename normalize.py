@@ -1,7 +1,9 @@
 import logging
+import time
 import uuid
 from typing import Any
 
+import neo4j
 from caseconverter import pascalcase, camelcase
 
 from neo4j import Driver
@@ -56,7 +58,14 @@ def perform_graph_native_normalization(
         :param query: The to be run query.
         :type query: str"""
         with driver.session(database=database) as session:
-            session.run(query)
+            while not responsive:
+                responsive = True
+                try:
+                    session.run(query)
+                except neo4j.exceptions.TransientError:
+                    responsive = False
+                    time.sleep(1)
+
 
     def validate_dep(dep):
         """Validates whether a functional dependency holds"""
