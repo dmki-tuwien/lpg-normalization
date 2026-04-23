@@ -55,7 +55,7 @@ NEO4J_HEAP_SIZE: str = "1" if os.getenv("NEO4J_HEAP_SIZE") is None else os.geten
 NEO4J_PAGECACHE_SIZE: str = "5" if os.getenv("NEO4J_PAGECACHE_SIZE") is None else os.getenv("NEO4J_PAGECACHE_SIZE")
 NEO4J_PLUGINS_PATH: str = "plugins" if os.getenv("NEO4J_PLUGINS_PATH") is None else os.getenv("NEO4J_PLUGINS_PATH")
 
-NUMBER_OF_RUNS = 1
+NUMBER_OF_RUNS = 3
 
 USERNAME = (
         "neo4j" if os.getenv("USERNAME") is None else os.getenv("USERNAME")
@@ -66,7 +66,15 @@ PASSWORD = (
 
 RUN_ID = ""
 
-STOP = False
+SETUP_FILE = (
+        "setup.yaml" if os.getenv("SETUP_FILE") is None else os.getenv("SETUP_FILE")
+)
+
+
+STOP = my_env = os.getenv("STOP", 'False').lower() in ('true', '1', 't')
+if STOP:
+    NUMBER_OF_RUNS = 1
+
 
 # Statistics and Metrics Export configuration
 per_graph_metrics_df = pd.DataFrame(
@@ -410,7 +418,7 @@ RETURN value"""
             measured_denormalized = True  # Measurements for denormalized graphs have been taken and are not performed again
 
             if STOP:
-                input("Loaded graph. Press enter to continue ... ")
+                input(f"Loaded graph {graph["name"]}. Press enter to continue ... ")
 
             logger.info("Start normalization")
             normalized_deps, transformations = perform_graph_native_normalization(
@@ -435,6 +443,9 @@ RETURN value"""
                 subset,
                 ignore_min_cov,
             )
+
+            if STOP:
+                input(f"Normalized graph {graph["name"]}. Press enter to continue ... ")
 
     logger.info(f"\tFinished experiment with graph \"{graph['name']}\"")
 
