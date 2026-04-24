@@ -124,7 +124,7 @@ _created_graph_overview: list = []
 
 setup: dict
 """The configuration of the evaluation. Defines the used datasets and dependencies."""
-with open("setup.yaml", "r") as file:
+with open(SETUP_FILE, "r") as file:
     setup = yaml.safe_load(file)
 
 
