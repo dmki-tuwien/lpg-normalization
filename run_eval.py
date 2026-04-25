@@ -141,10 +141,14 @@ def main():
         global RUN_ID
         RUN_ID = str(uuid.uuid4())
 
-        for database in tqdm(["memgraph"]):  # , "memgraph"], desc="System"):
+        for database in tqdm(["neo4j", "memgraph"], desc="System"):
             for graph in tqdm(setup["graphs"], desc="Graphs"):
+                if STOP:
+                    subsets = ["all"]
+                else:
+                    subsets = ["all", "node-left", "edge-left"]
                 for subset in tqdm(
-                    ["all", "node-left", "edge-left"], desc="Dep. subset"
+                    subsets, desc="Dep. subset"
                 ):
                     for algorithm in ["synthesis"]:  # ,"decomposition"]:
                         for ignore_min_cov in [False]: #tqdm([True, False], desc="Min. cov."):
