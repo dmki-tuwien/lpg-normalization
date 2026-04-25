@@ -216,6 +216,7 @@ def perform_evaluation(
             GRAPHS_PATH, "/tmp/graphs"
         )  # "/var/lib/neo4j/import/graphs")
         container.with_volume_mapping(NEO4J_PLUGINS_PATH,"/plugins","rw")
+        container.with_bind_ports(7687, 7687)
         container.with_env("NEO4J_ACCEPT_LICENSE_AGREEMENT", "eval")
         container.with_env("NEO4J_PLUGINS", '["apoc","apoc-extended"]')
         container.with_env("NEO4J_dbms_security_procedures_unrestricted", "apoc.*")
