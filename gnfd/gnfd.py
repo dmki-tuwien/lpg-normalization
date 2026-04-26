@@ -589,8 +589,8 @@ class LeftEdge(Edge):
     def minimal_pattern_intersections(self, other: Pattern):
         pass
 
-    def less_than(self, other):
-        pass
+        # def less_than(self, other):
+        #     super().less_than(other)
 
     def __str__(self):
         return f"{str(self.tgt_pattern)}<-[{self._gnfd_middle}]-{str(self.src_pattern)}"
@@ -618,8 +618,8 @@ class RightEdge(Edge):
     def minimal_pattern_intersections(self, other: Pattern):
         pass
 
-    def less_than(self, other):
-        pass
+    # def less_than(self, other):
+    #     super().less_than(other)
 
     def __str__(self):
         return f"{str(self.src_pattern)}-[{self._gnfd_middle}]->{str(self.tgt_pattern)}"
@@ -873,7 +873,7 @@ class GOFD:
     def __lt__(self, other):
         if not isinstance(other, GOFD):
             return NotImplemented
-        return self.pattern < other.pattern
+        return self.pattern.less_than(other.pattern)
 
     def __hash__(self):
         return hash(str(self))
