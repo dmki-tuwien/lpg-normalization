@@ -589,6 +589,9 @@ class LeftEdge(Edge):
     def minimal_pattern_intersections(self, other: Pattern):
         pass
 
+    def less_than(self, other):
+        pass
+
     def __str__(self):
         return f"{str(self.tgt_pattern)}<-[{self._gnfd_middle}]-{str(self.src_pattern)}"
 
@@ -613,6 +616,9 @@ class RightEdge(Edge):
         return self.tgt_pattern.leftmost_node
 
     def minimal_pattern_intersections(self, other: Pattern):
+        pass
+
+    def less_than(self, other):
         pass
 
     def __str__(self):
