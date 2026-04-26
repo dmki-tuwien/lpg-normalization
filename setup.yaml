@@ -42,10 +42,11 @@ graphs:
       - "()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st"
     minimal_cover:
       - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
-      - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type,ts.operator"
-      - "(ts::date&number&operator)-[:STOPS_AT]->()::ts.serviceid=>ts"
+      - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type"
+      - "(ts::date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator"
+      - "(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts"
       - "()-[t:STOPS_AT:stopid]->()::t.stopid=>t"
-      - "()-[t:STOPS_AT:departure&stopid]->(s)::t.departure,t.stopid=>s"
+      - "()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s"
     source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2025-11.csv.gz}"
     dependency_origin: "User provided"
 
@@ -66,10 +67,11 @@ graphs:
     minimal_cover:
       - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
       - "()-[t:STOPS_AT:code]->(s:Station:name)::t.code=>s.name"
-      - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type,ts.operator"
-      - "(ts::date&number&operator)-[:STOPS_AT]->()::ts.serviceid=>ts"
+      - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type"
+      - "(ts::date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator"
+      - "(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts"
       - "()-[t:STOPS_AT:stopid]->()::t.stopid=>t"
-      - "()-[t:STOPS_AT:departure&stopid]->(s)::t.departure,t.stopid=>s"
+      - "()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s"
     source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2025-11.csv.gz}"
     dependency_origin: "User provided"
 
