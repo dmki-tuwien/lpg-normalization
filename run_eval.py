@@ -114,7 +114,6 @@ graph_overview_df = pd.DataFrame(
         NO_INTER_GRAPH_DEPS_COL,
         NO_INTRA_GRAPH_DEPS_COL,
         ORIGIN_OF_DEPS_COL,
-        ORIGINAL_NF_COL,
         LP_POSSIBLE_COL,
     ]
 )
@@ -590,7 +589,6 @@ def get_graph_statistics(
                             if "dependency_origin" in graph_setup.keys() is not None
                             else "unknown"
                         ),
-                        ORIGINAL_NF_COL: dependencies.get_normal_form(session),
                         LP_POSSIBLE_COL: (
                             "$\\checkmark$" if dependencies.lp_suitable else "$\\times$"
                         ),

@@ -1,4 +1,6 @@
 from __future__ import annotations
+from functools import total_ordering
+
 
 import abc
 import copy
@@ -167,6 +169,11 @@ class Pattern(abc.ABC):
         return True
 
     @abstractmethod
+    def less_than(self, other) -> bool:
+        """Computes whether the structure of this pattern is more specific than the other pattern."""
+        pass
+
+    @abstractmethod
     def minimal_pattern_intersections(
         self, other: Pattern
     ) -> list[tuple[Pattern, set[tuple[str, str]]]]:
@@ -252,6 +259,13 @@ class Node(GraphObject, Pattern):
 
     def contains_property(self, symbol: str, key: str):
         return self.contains_var(symbol) and key in self.properties
+
+    def less_than(self, other):
+        if not isinstance(other, Node):
+            return False
+        return ((other.labels.issubset(self.labels) and other.properties.issubset(self.properties)) or
+                (other.labels == self.labels and other.properties.issubset(self.properties)) or
+        (other.labels.issubset(self.labels) and other.properties == self.properties))
 
     def minimal_pattern_intersections(self, other: Pattern):
         res: list[tuple[Pattern, set[tuple[str, str]]]] = []
@@ -462,6 +476,17 @@ class Edge(GraphObject, Pattern, abc.ABC):
         return res
 
 
+    def less_than(self, other):
+        if not isinstance(other, Edge):
+            return False
+        return (((other.labels.issubset(self.labels) and other.properties.issubset(self.properties)) or
+                (other.labels == self.labels and other.properties.issubset(self.properties)) or
+        (other.labels.issubset(self.labels) and other.properties == self.properties)) and
+            ((self.src.less_than(other.src) and self.tgt.less_than(other.tgt) or
+            (self.src.equals(other.src) and self.tgt.less_than(other.tgt) or
+            (self.src.less_than(other.src) and self.tgt.equals(other.tgt))
+            ))))
+
     @property
     @abstractmethod
     def src(self) -> Node:
@@ -652,6 +677,18 @@ class PatternConcat(Pattern):
     def rightmost_node(self):
         return self.right.rightmost_node
 
+    def less_than(self, other):
+        if not isinstance(other, PatternConcat):
+            return self.left.less_than(other) or self.right.less_than(other)
+        else:
+            return ((self.left.less_than(other.left) and self.right.less_than(other.right)) or
+        (self.left.less_than(other.right) and self.right.less_than(other.left)) or
+                    (self.left.equals(other.left) and self.right.less_than(other.right)) or
+                    (self.left.equals(other.right) and self.right.less_than(other.left)) or
+                    (self.left.less_than(other.left) and self.right.equals(other.right)) or
+                    (self.left.less_than(other.right) and self.right.equals(other.left))
+                    )
+
     def minimal_pattern_intersections(self, other: Pattern):
         if isinstance(other, Node) or isinstance(other, Edge):
             return other.minimal_pattern_intersections(self)
@@ -751,9 +788,10 @@ class Reference:
     def is_graph_object_variable(self):
         return isinstance(self.reference, GraphObject)
 
-
-class GNFD:
-    """Denotes a GN-FD that consists of a :any:`Pattern` and sets of :any:`Reference` that denote the right and left side of the descriptor of the GN-FD."""
+@total_ordering
+class GOFD:
+    """Denotes a GN-FD that consists of a :any:`Pattern` and sets of :any:`Reference` that denote the right and left side of the descriptor of the GN-FD.
+    GNFDs are ordered by their pattern."""
 
     def __init__(
         self,
@@ -819,10 +857,25 @@ class GNFD:
     def is_trivial(self):
         return len(set(map(str, self.right)).intersection(set(map(str, self.left)))) > 0
 
+    # Comparison is based in pattern!
+
+    def __eq__(self, other):
+        if not isinstance(other, GOFD):
+            return NotImplemented
+        return self.pattern.equals(other.pattern)
+
+    def __lt__(self, other):
+        if not isinstance(other, GOFD):
+            return NotImplemented
+        return self.pattern < other.pattern
+
+    def __hash__(self):
+        return hash(str(self))
+
 
 class _GNFDListener(gnfdListener):
     def __init__(self):
-        self.dependency: GNFD
+        self.dependency: GOFD
         self.stack: list = []
 
     def exitDependency(self, ctx: gnfdParser.DependencyContext):
@@ -830,7 +883,7 @@ class _GNFDListener(gnfdListener):
         left = self.stack.pop()
         pattern = self.stack.pop()
 
-        self.dependency = GNFD(pattern, left, right)
+        self.dependency = GOFD(pattern, left, right)
 
     def exitReference(self, ctx: gnfdParser.ReferenceContext):
         ref = ctx.getText().split(".")

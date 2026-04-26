@@ -10,7 +10,7 @@ from neo4j import Driver
 from tqdm_loggable.auto import tqdm
 
 
-from gnfd import DependencySet, GNFD, Node, Reference, Edge, GraphObject
+from gnfd import DependencySet, GOFD, Node, Reference, Edge, GraphObject
 
 
 def perform_graph_native_normalization(
@@ -125,7 +125,10 @@ RETURN avg(card) AS res
 
     i = 0
 
-    for dep in deps:
+    sorted_deps = list(deps)
+    sorted_deps.sort()
+
+    for dep in sorted_deps:
         validate_dep(dep)
 
         if dep.is_inter_graph_object:
@@ -721,7 +724,7 @@ REMOVE {", ".join(map(str, all_references))}"""
 def reify_and_extract_to_new_node(
     edge: Edge,
     i: int | Any,
-    inter_dep: GNFD,
+    inter_dep: GOFD,
     new_label: str,
     new_properties: str,
     new_props: list[Reference],

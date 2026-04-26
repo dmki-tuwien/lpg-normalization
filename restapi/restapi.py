@@ -110,6 +110,7 @@ def get_database_health(database: Literal["neo4j", "memgraph"]):
 
 @app.post("/{database}/reset")
 def reset(database:  Literal["neo4j", "memgraph"]):
+    """Resets the database system, i.e., removes all nodes and edges."""
     with get_driver(database).session(database=database) as session:
         session.run("MATCH (n) DETACH DELETE n")
 
@@ -177,12 +178,6 @@ def load_scenario(database: Literal["neo4j", "memgraph"], id: str) -> bool:
                     if "localhost" in neo4j_uri or "127.0.0.1" in neo4j_uri:
                         neo4j_uri = "host.docker.internal"
 
-                    print(session.run(f"""
-CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props",  {{host: "{neo4j_uri}", port: 7687, username: "neo4j", password: "password"}})
-YIELD row
-MERGE (n:__MigrationNode__ {{__elementId__: row.src_id}})
-SET n:row.src_labels
-SET n += row.src_props; """))
                     session.run(f"""
 CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{neo4j_uri}", port: 7687, username: "neo4j", password: "password"}})
 YIELD row
@@ -300,7 +295,7 @@ def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies:
 
     for dep_str in dependencies:
         res[dep_str] = dict()
-        dep = gnfd.GNFD.from_string(dep_str)
+        dep = gnfd.GOFD.from_string(dep_str)
 
         with get_driver(database).session() as session:
             result = session.run(f"""
@@ -394,7 +389,7 @@ def visualize_edges(database: Literal["neo4j", "memgraph"]) -> list[dict]:
 def visualize_deps(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> list:
     res_list = []
     for dep_str in dependencies:
-        dep = gnfd.GNFD.from_string(dep_str)
+        dep = gnfd.GOFD.from_string(dep_str)
         for left in dep.left:
             left_prefix = "n" if isinstance(left.get_graph_object(), gnfd.Node) else "re"
             for right in dep.right:
