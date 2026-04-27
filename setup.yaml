@@ -102,11 +102,11 @@ graphs:
       - "(e:Entity:sourceID&countries&country_codes)::e.country_codes,e.sourceID=>e.countries"
       - "(e:Entity:valid_until&countries&country_codes)::e.country_codes,e.valid_until=>e.countries"
     minimal_cover:
-      - "(e:Entity:jurisdiction_description&countries&country_codes)::e.countries,e.jurisdiction_description=>e.country_codes"
-      - "(e:Entity:sourceID&countries&country_codes)::e.countries,e.sourceID=>e.country_codes"
-      - "(e:Entity:valid_until&countries&country_codes)::e.countries,e.valid_until=>e.country_codes"
-      - "(e:Entity:sourceID&countries&country_codes)::e.country_codes,e.sourceID=>e.countries"
-      - "(e:Entity:valid_until&countries&country_codes)::e.country_codes,e.valid_until=>e.countries"
+      - "(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes)::e.countries,e.jurisdiction_description=>e.country_codes"
+      - "(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes)::e.countries,e.sourceID=>e.country_codes"
+      - "(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes)::e.countries,e.valid_until=>e.country_codes"
+      - "(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes)::e.country_codes,e.sourceID=>e.countries"
+      - "(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes)::e.country_codes,e.valid_until=>e.countries"
 
   - id: "off3"
     category: "Real-world data"
