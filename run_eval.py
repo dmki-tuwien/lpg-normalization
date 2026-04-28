@@ -316,6 +316,7 @@ def perform_evaluation(
                                     )
                         with driver.session(database=DATABASE) as session:
                             responsive = False
+
                             while not responsive:
                                 responsive = True
 
@@ -323,9 +324,29 @@ def perform_evaluation(
                                     session.run("MATCH (n) RETURN n LIMIT 1")
                                 except neo4j.exceptions.TransientError:
                                     responsive = False
+                                    time.sleep(1)
+
                             session.run("CREATE INDEX ON :__MigrationNode__;")
 
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
+                                time.sleep(1)
+
                             session.run("CREATE INDEX ON :__MigrationNode__(__elementId__);")
+
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
+                                    time.sleep(1)
 
                             session.run(f"""
                             CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{container.get_container_host_ip()}", port: {container.get_exposed_port(7687)}, username: "neo4j", password: "password"}})
@@ -334,6 +355,14 @@ def perform_evaluation(
                             SET n:row.src_labels
                             SET n += row.src_props; """)
 
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
+                                    time.sleep(1)
 
                             session.run(f"""
                             CALL migrate.neo4j(
@@ -345,12 +374,50 @@ def perform_evaluation(
                             CREATE (n)-[r:row.rel_type]->(m)
                             SET r += row.edge_props;""")
 
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
+                                time.sleep(1)
+
                             session.run("""
                             MATCH (n:__MigrationNode__)
                             REMOVE n:__MigrationNode__
                             REMOVE n.__elementId__;""")
+
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
+                                time.sleep(1)
+
                             session.run("DROP INDEX ON :__MigrationNode__;")
+
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
+                                time.sleep(1)
+
                             session.run("DROP INDEX ON :__MigrationNode__(__elementId__);")
+
+                            while not responsive:
+                                responsive = True
+
+                                try:
+                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                except neo4j.exceptions.TransientError:
+                                    responsive = False
+                                time.sleep(1)
 
                             logger.info("Importing data from Neo4J to Memgraph finished.")
 
