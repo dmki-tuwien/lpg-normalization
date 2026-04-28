@@ -7,7 +7,6 @@ graphs:
   #   Memgraph, or an entry "neo4j" that contains "from_file" or "from_dump", with the latter being a path pointing to
   #   a Neo4J (Enterprise) database dump.
 
-
   - id: "ts2"
     category: "Real-world data"
     name: "$S_\\text{Ts-2}$"
@@ -18,17 +17,18 @@ graphs:
       - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
       - "()-[t:STOPS_AT:code]->(s:Station:name)::t.code=>s.name"
       - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type"
-      - "(x::date&number&operator)-[:STOPS_AT]->()::x.number,x.date=>x.operator"
+      - "(x:TrainService:date&number&operator)-[:STOPS_AT]->()::x.number,x.date=>x.operator"
       - "(x:TrainService:serviceid)::x.serviceid=>x"
       - "()-[s:STOPS_AT:stopid]->()::s.stopid=>s"
       - "()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st"
     minimal_cover:
-      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::s.name=>t.code"
-      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.code=>s.name"
-      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.number,ts.date=>ts.type,ts.operator"
-      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::ts.serviceid=>ts"
-      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.stopid=>t"
-      - "(ts:TrainService:date&number&operator&serviceid&type)-[t:STOPS_AT:code&departure&stopid]->(s:Station:name)::t.departure,t.stopid=>s"
+      - "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code"
+      - "()-[t:STOPS_AT:code]->(s:Station:name)::t.code=>s.name"
+      - "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type"
+      - "(ts:TrainService:date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator"
+      - "(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts"
+      - "()-[t:STOPS_AT:stopid]->()::t.stopid=>t"
+      - "()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s"
     source: "Based on \\url{https://opendata.rijdendetreinen.nl/public/services/services-2025-11.csv.gz}"
     dependency_origin: "User provided"
 
@@ -57,7 +57,7 @@ graphs:
       - "(o:Order:orderID)::o.orderID=>o"
       - "(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
     minimal_cover:
-      - "(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.orderID=>o"
+      - "(o:Order:orderID)::o.orderID=>o"
       - "(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion"
     dependency_origin: "\\citet{skavantzos_third_2025}"
     source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
@@ -70,14 +70,13 @@ graphs:
       from_file: graphs/london_neo4j.cypher
     dependencies:
       - "(s:Station:zone&zoneOriginal)::s.zoneOriginal=>s.zone"
-      - "(s:Station)-[c::line&color]->()::c.line=>c.color"
+      - "(s:Station)-[c::line&color&type]->()::c.line=>c.color"
       - "(s:Station:latitude&longitude&zone)::s.latitude,s.longitude=>s.zone"
       - "(s:Station:latitude&longitude)::s.latitude,s.longitude=>s"
       - "()-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type"
     minimal_cover:
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->()::s.zoneOriginal=>s.zone"
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->()::s.latitude,s.longitude=>s"
-      - "(s:Station:zone&zoneOriginal&latitude&longitude)-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type"
+      - "(s:Station:zone&zoneOriginal)::s.zoneOriginal=>s.zone"
+      - "(s:Station:latitude&longitude)::s.latitude,s.longitude=>s"
+      - "(s:Station)-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type"
     dependency_origin: "User provided"
     source: "Extended based on \\url{https://github.com/neo4j-partners/neo4j-transport-for-london}"
-
