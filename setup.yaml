@@ -165,10 +165,10 @@ graphs:
       - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
       - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
     minimal_cover:
-      - "(e:Event:company&time)::e.company,e.time=>e"
-      - "(e:Event:name&company)::e.name=>e.company"
-      - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
-      - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
+      - "(e:Event:company&name&time&venue)::e.company,e.time=>e"
+      - "(e:Event:company&name&time&venue)::e.name=>e.company"
+      - "(e:Event:company&name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event:company&name&time&venue)::e.time,e.venue=>e.name"
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
@@ -183,10 +183,10 @@ graphs:
       - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
       - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
     minimal_cover:
-      - "(e:Event:company&time&venue)::e.company,e.time=>e.venue"
-      - "(e:Event:name&company)::e.name=>e.company"
-      - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
-      - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
+      - "(e:Event:company&name&time&venue)::e.company,e.time=>e.venue"
+      - "(e:Event:company&name&time&venue)::e.name=>e.company"
+      - "(e:Event:company&name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event:company&name&time&venue)::e.time,e.venue=>e.name"
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
@@ -202,11 +202,11 @@ graphs:
       - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
       - "(e:Event&Confirmed:name&company&time)::e.name,e.company=>e.time"
     minimal_cover:
-      - "(e:Event:company&time&venue)::e.company,e.time=>e"
-      - "(e:Event:name&company)::e.name=>e.company"
-      - "(e:Event:name&time&venue)::e.name,e.time=>e.venue"
-      - "(e:Event:time&venue&name)::e.time,e.venue=>e.name"
-      - "(e:Event&Confirmed:name&company&time)::e.name,e.company=>e.time"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.company,e.time=>e"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.name=>e.company"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.name,e.time=>e.venue"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.time,e.venue=>e.name"
+      - "(e:Event&Confirmed:company&name&time&venue)::e.name,e.company=>e.time"
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
