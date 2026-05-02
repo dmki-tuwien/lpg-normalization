@@ -173,6 +173,27 @@ def test_pattern_more_specific(): # Note that more specific patterns are "less t
     assert abc_dep_3.pattern.less_than(abc_dep_2.pattern)
     assert abc_dep_4.pattern.less_than(abc_dep_3.pattern)
 
+    ts_dep_1 = GOFD.from_string("()-[s:STOPS_AT:stopid]->()::s.stopid=>s")
+    ts_dep_2 = GOFD.from_string("()-[s:STOPS_AT:departure&stopid]->(st)::s.departure,s.stopid=>st")
+    ts_dep_3 = GOFD.from_string("(ts::date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator")
+    ts_dep_4 = GOFD.from_string("(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts")
+
+    assert ts_dep_2.pattern.less_than(ts_dep_1.pattern)
+    assert not ts_dep_4.pattern.less_than(ts_dep_3.pattern)
+
+
+def test_sorted_deps():
+    dep_set = DependencySet.from_string_list([
+        "()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code",
+        "(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type",
+        "(ts::date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator",
+        "(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts",
+        "()-[t:STOPS_AT:stopid]->()::t.stopid=>t",
+        "()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s"])
+
+    l = list(dep_set)
+    l.sort()
+    pass
 
 # def test_minimal_pattern_intersections():
 #     # Case 1

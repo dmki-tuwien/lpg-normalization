@@ -280,7 +280,26 @@ graphs:
     name_html: "between-np-ep"
     from_file: "graphs/redundancy_patterns/between-np-ep.cypher"
     dependencies:
-      - "(x:L:k1)-[y::k2]->()::x.k1=>y.k2"
+      - "(x:L:k1)-[y:E:k2]->()::x.k1=>y.k2"
     minimal_cover:
-      - "(x:L:k1)-[y::k2]->()::x.k1=>y.k2"
+      - "(x:L:k1)-[y:E:k2]->()::x.k1=>y.k2"
 
+  - id: "between-ep-np"
+    category: "Redundancy pattern"
+    name: "$\\psi_\\text{between-ep-np}"
+    name_html: "between-ep-np"
+    from_file: "graphs/redundancy_patterns/between-ep-np.cypher"
+    dependencies:
+      - "(x:L:k1)-[y:E:k2]->()::y.k2=>x.k1"
+    minimal_cover:
+      - "(x:L:k1)-[y:E:k2]->()::y.k2=>x.k1"
+
+  - id: "between-ep-n"
+    category: "Redundancy pattern"
+    name: "$\\psi_\\text{between-ep-n}"
+    name_html: "between-ep-n"
+    from_file: "graphs/redundancy_patterns/between-ep-n.cypher"
+    dependencies:
+      - "(x:L)-[y:E:k2]->()::y.k2=>x"
+    minimal_cover:
+      - "(x:L)-[y:E:k2]->()::y.k2=>x"
