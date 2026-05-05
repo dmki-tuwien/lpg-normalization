@@ -1,0 +1,31 @@
+scenario,queryNo,query,state,mode,database,time,dbhits,memory
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,16.848541,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,13.263462,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,2.129809,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,10.358192,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,4.367811,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,0.811585,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,8.241712,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,3.928473,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,1.772254,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,8.808461,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,3.554032,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,1.206466,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,7.248705,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,3.651809,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,1.28889,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,4.745908,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,3.558759,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,1.114659,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,5.403913,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,3.352801,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,1.210383,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,5.059186,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,3.340862,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,1.14851,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,3.442675,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,3.330407,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,1.082691,2529,328
+S_Nw,1,"PROFILE MATCH (o:Order) RETURN DISTINCT o.orderID, o.customerID",before,retrieval,neo4j,4.900999,3321,156080
+S_Nw,2,PROFILE MATCH (o:Order) WHERE o.customerID IS NOT NULL AND o.shipCity IS NOT NULL AND o.shipPostalCode IS NOT NULL AND o.shipCountry IS NOT NULL AND o.shipAddress IS NOT NULL AND o.shipRegion IS NOT NULL RETURN DISTINCT o.customerID,before,retrieval,neo4j,3.280602,10791,6360
+S_Nw,1,"PROFILE MATCH (o:Order) WHERE o.customerID = ""FOLKO"" SET o.shipCountry = ""Rainbow""",before,update,neo4j,1.063383,2529,328

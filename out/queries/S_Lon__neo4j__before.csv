@@ -1,0 +1,61 @@
+scenario,queryNo,query,state,mode,database,time,dbhits,memory
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,7.118731,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,2.195969,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,2.88525,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,3.176647,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,1.537492,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,5.015009,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,6.343509,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.72124,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,1.983921,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,2.546123,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.71441,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,1.95698,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,4.822031,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,1.111314,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,1.494118,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,1.744182,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.577555,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,1.574728,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,2.507846,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.536303,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,0.797915,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.959747,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.605356,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,1.471043,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,2.443319,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.538016,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,0.785656,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,1.240248,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.565146,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,1.443641,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,2.630379,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.592237,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,0.754039,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.921289,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.582242,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,1.500897,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,2.372543,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.498947,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,0.74829,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,2.614004,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.918996,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,2.742387,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,4.414631,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.84197,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,1.341079,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,1.537543,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.54795,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,1.351423,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,2.39059,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.859928,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,1.410652,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,1.538234,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.958976,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,1.357633,4001,328
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() RETURN DISTINCT c.line, c.color",before,retrieval,neo4j,4.384346,5857,5776
+S_Lon,2,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-() WHERE s.name = ""Piccadilly Circus"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.951595,1971,552
+S_Lon,3,"PROFILE MATCH (s:Station) WHERE s.zoneOriginal IS NOT NULL RETURN DISTINCT s.zone, s.zoneOriginal",before,retrieval,neo4j,0.747609,3241,3160
+S_Lon,4,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]-(:Station) WHERE s.zone = ""6"" RETURN DISTINCT c.line",before,retrieval,neo4j,0.864734,3459,1776
+S_Lon,5,"PROFILE MATCH (s:Station)-[c:CONNECTED_THROUGH]->(t:Station) WHERE s.name = ""Piccadilly Circus"" AND c.line = ""Bakerloo"" RETURN DISTINCT s.name, t.name",before,retrieval,neo4j,0.573759,1971,816
+S_Lon,1,"PROFILE MATCH ()-[c:CONNECTED_THROUGH]->() WHERE c.line = ""Bakerloo"" SET c.color = ""Rainbow""",before,update,neo4j,1.36224,4001,328

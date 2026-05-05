@@ -1,0 +1,51 @@
+scenario,queryNo,query,state,mode,database,time,dbhits,memory
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,382.060141,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,76.477558,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,55.782505,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,187.193998,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,2.276117,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,374.993221,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,59.621833,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,55.635564,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,117.501495,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,0.730743,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,374.507243,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,59.563195,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,55.823346,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,113.201651,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,0.585846,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,372.382913,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,72.206874,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,64.34878,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,128.645592,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,1.155108,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,381.430108,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,58.895385,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,55.622625,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,95.042834,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,0.615711,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,368.848502,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,58.589267,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,55.677578,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,97.375127,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,1.068138,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,394.377382,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,65.229138,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,64.115651,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,117.402278,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,0.84895,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,390.527608,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,58.664279,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,55.490137,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,96.666183,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,0.518915,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,365.265848,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,59.7535,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,55.963165,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,96.327236,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,0.479347,123,1040
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL RETURN DISTINCT t.code, s.name",before,retrieval,neo4j,372.242453,3654287,496
+S_Ts-2,2,"PROFILE MATCH (ts:TrainService)-[t:STOPS_AT]->(s:Station) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.type, t.code",before,retrieval,neo4j,59.342805,589524,30952
+S_Ts-2,3,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Nightjet"" RETURN DISTINCT ts.number, ts.completely_cancelled",before,retrieval,neo4j,55.831168,581320,1440
+S_Ts-2,4,"PROFILE MATCH (ts:TrainService) WHERE ts.type CONTAINS ""Sprinter"" RETURN DISTINCT ts.number, ts.operator",before,retrieval,neo4j,118.722917,817234,837080
+S_Ts-2,1,"PROFILE MATCH ()-[t:STOPS_AT]->(s:Station) WHERE s.name IS NOT NULL AND t.code IS NOT NULL AND s.name = ""Innsbruck Hbf"" SET t.code = ""Rainbow""",before,update,neo4j,0.75541,123,1040
