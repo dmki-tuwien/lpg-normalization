@@ -1,0 +1,48 @@
+site_name: Graph-Native LPG Normalization
+theme:
+  name: material
+  palette:
+    primary: teal
+  #favicon: assets/favicon.ico
+  # logo: assets/logo.png
+  features:
+    - content.tooltips
+    - content.footnote.tooltips
+  icon:
+    repo: fontawesome/brands/github
+repo_url: https://github.com/dmki-tuwien/lpg-normalization
+markdown_extensions:
+  - abbr
+  - attr_list
+  - footnotes
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - toc:
+        toc_depth: 3
+
+plugins:
+  - glightbox
+  - typeset
+
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Graph Object Functional Dependencies: gofd.md
+  - Evaluation:
+    - Scenarios: evaluation_scenarios.md
+    #- Results: evaluation_results.md
+ # - Source Code Documentation: source_code_documentation.md
+
+
+watch:
+ - includes
