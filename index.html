@@ -44,6 +44,8 @@
       
     
     
+      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+    
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -408,6 +410,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="source_code_documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source Code Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -494,9 +523,10 @@
 
 
 <h1 id="a-graph-native-approach-to-normalization">A Graph-Native Approach to Normalization</h1>
-<p>Welcome to the online documentation of the paper <a href="https://github.com/dmki-tuwien/lpg-normalization/blob/master/paper/extended_version.pdf">"A Graph-Native Approach to Normalization"</a>.</p>
+<p>Welcome to the online documentation accompanying the paper <a href="http://arxiv.org/abs/2603.02995">"A Graph-Native Approach to Normalization"</a>.</p>
 <p>This documentation provides details on the performed evaluation and provides a documentation for our
 <a href="https://www.python.org">Python</a> implementation of <abbr title="labeled property graph">LPG</abbr> normalization.</p>
+<p>Details on the repository structure and the source code can be found in the <a href="source_code_documentation/">Source Code Documentation</a>.</p>
 <h2 id="getting-started">Getting Started</h2>
 <ol>
 <li>
@@ -514,7 +544,7 @@ the command<br> <code>git clone https://github.com/dmki-tuwien/lpg-normalization
 <li>
 <p><em>Prepare evaluation scenarios</em> and you local environment.
 <br>
-The <a href="evaluation_scenarios/">evaluation scenarios</a> are defined the file <code>setup.yaml</code>. For available configuration options, please refer to the comments in <code>setup.yaml</code>.
+The <a href="evaluation_scenarios/">evaluation scenarios</a> are described <a href="evaluation_scenarios/">here</a>, and are defined the file <code>setup.yaml</code>. For available configuration options, please refer to the comments in <code>setup.yaml</code>.
 <br>
 Also adjust the <code>GRAPHS_PATH</code> environment variable in the file <code>.env</code> to be the <em>absolute</em> path to your <code>graphs</code> folder.
 Relative paths cannot be used due to a limitation of Docker.
@@ -556,6 +586,8 @@ On macOS, ANTLR can be installed using <a href="https://brew.sh/">Homebrew</a>:
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -567,11 +599,10 @@ On macOS, ANTLR can be installed using <a href="https://brew.sh/">Homebrew</a>:
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
   
+    <div class="md-copyright__highlight">
+      Copyright © 2026 <a href="https://johannes.schrott.onl">Johannes Schrott</a>, <a href="https://dmki-tuwien.github.io">DMKI Lab</a>, <a href="https://tuwien.ac.at">TU Wien</a>
+    </div>
   
-    Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
-    </a>
   
 </div>
       
@@ -588,7 +619,7 @@ On macOS, ANTLR can be installed using <a href="https://brew.sh/">Homebrew</a>:
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["content.tooltips", "content.footnote.tooltips"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["content.tooltips", "content.footnote.tooltips", "content.tabs.link"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="assets/javascripts/bundle.79ae519e.min.js"></script>

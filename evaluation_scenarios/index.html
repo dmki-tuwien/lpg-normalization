@@ -9,6 +9,8 @@
         <link rel="prev" href="../gofd/">
       
       
+        <link rel="next" href="../source_code_documentation/">
+      
       
         
       
@@ -43,6 +45,8 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -630,6 +634,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../source_code_documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source Code Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -936,7 +967,7 @@
 
 
 <h1 id="evaluation-scenarios">Evaluation Scenarios</h1>
-<p>We defined <a href="#scenarios">12 scenarios</a> on <a href="#graphs">6 graphs</a> for the evaluation the <a href="https://github.com/dmki-tuwien/lpg-normalization/blob/master/paper/extended_version.pdf">graph-native approach to <abbr title="labeled property graph">LPG</abbr> normalization</a></p>
+<p>We defined <a href="#scenarios">12 scenarios</a> on <a href="#graphs">6 graphs</a> for the evaluation the <a href="http://arxiv.org/abs/2603.02995">graph-native approach to <abbr title="labeled property graph">LPG</abbr> normalization</a></p>
 <h2 id="graphs">Graphs</h2>
 <ul>
 <li>
@@ -968,43 +999,108 @@
 </ul>
 <h2 id="scenarios">Scenarios</h2>
 <p>Evaluation scenarios combine <a href="#graphs">graphs</a> with dependency sets. In the following we list the minimal covers (i.e., minimal dependency sets) used for each graph.
-The dependencies use an ASCII syntax (see <a href="../gofd/#grammar">Grammar</a>) for expressing <abbr title="graph object funcitonal dependencies">GO-FDs</abbr>.</p>
+The dependencies are shown as expressions, like in the <a href="http://arxiv.org/abs/2603.02995">paper</a> use an ASCII syntax (see <a href="../gofd/#grammar">Grammar</a>) for expressing <abbr title="graph object funcitonal dependencies">GO-FDs</abbr>.</p>
 <h3 id="s_textlon"><span class="arithmatex">\(S_\text{Lon}\)</span></h3>
 <p><strong>Graph:</strong> London Public Transport</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Expressions</label><label for="__tabbed_1_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((s:\{\mathsf{Station}\}:\{\mathsf{zone},\mathsf{zoneOriginal}\})::s.\mathsf{zoneOriginal}\Rightarrow s.\mathsf{zone}\)</span></li>
+<li><span class="arithmatex">\((s:\{\mathsf{Station}\}:\{\mathsf{latitude},\mathsf{longitude}\})::s.\mathsf{latitude},s.\mathsf{longitude}\Rightarrow s\)</span></li>
+<li><span class="arithmatex">\((s:\{\mathsf{Station}\}:\emptyset)\xrightarrow{c:\{\mathsf{CONNECTED\_THROUGH}\}:\{\mathsf{line},\mathsf{color},\mathsf{type}\}}()::c.\mathsf{line}\Rightarrow c.\mathsf{color},c.\mathsf{type}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(s:Station:zone&amp;zoneOriginal)::s.zoneOriginal=&gt;s.zone</code></li>
 <li><code>(s:Station:latitude&amp;longitude)::s.latitude,s.longitude=&gt;s</code></li>
 <li><code>(s:Station)-[c:CONNECTED_THROUGH:line&amp;color&amp;type]-&gt;()::c.line=&gt;c.color,c.type</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textnw"><span class="arithmatex">\(S_\text{Nw}\)</span></h3>
 <p><strong>Graph:</strong> Northwind</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio"><input id="__tabbed_2_2" name="__tabbed_2" type="radio"><div class="tabbed-labels"><label for="__tabbed_2_1">Expressions</label><label for="__tabbed_2_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((o:\{\mathsf{Order}\}:\{\mathsf{orderID}\})::o.\mathsf{orderID}\Rightarrow o\)</span></li>
+<li><span class="arithmatex">\((o:\{\mathsf{Order}\}:\{\mathsf{orderID},\mathsf{orderDate},\mathsf{customerID},\mathsf{shipCity},\mathsf{shipPostalCode},\mathsf{shipCountry},\mathsf{shipAddress},\mathsf{shipRegion}\})::o.\mathsf{customerID}\Rightarrow o.\mathsf{shipCity},o.\mathsf{shipPostalCode},o.\mathsf{shipCountry},o.\mathsf{shipAddress},o.\mathsf{shipRegion}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(o:Order:orderID)::o.orderID=&gt;o</code></li>
 <li><code>(o:Order:orderID&amp;orderDate&amp;customerID&amp;shipCity&amp;shipPostalCode&amp;shipCountry&amp;shipAddress&amp;shipRegion)::o.customerID=&gt;o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textno-1"><span class="arithmatex">\(S_\text{No-1}\)</span></h3>
 <p><strong>Graph:</strong> No Socks</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio"><input id="__tabbed_3_2" name="__tabbed_3" type="radio"><div class="tabbed-labels"><label for="__tabbed_3_1">Expressions</label><label for="__tabbed_3_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{company},e.\mathsf{time}\Rightarrow e\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name}\Rightarrow e.\mathsf{company}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name},e.\mathsf{time}\Rightarrow e.\mathsf{venue}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{time},e.\mathsf{venue}\Rightarrow e.\mathsf{name}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(e:Event:company&amp;name&amp;time&amp;venue)::e.company,e.time=&gt;e</code></li>
 <li><code>(e:Event:company&amp;name&amp;time&amp;venue)::e.name=&gt;e.company</code></li>
 <li><code>(e:Event:company&amp;name&amp;time&amp;venue)::e.name,e.time=&gt;e.venue</code></li>
 <li><code>(e:Event:company&amp;name&amp;time&amp;venue)::e.time,e.venue=&gt;e.name</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textno-2"><span class="arithmatex">\(S_\text{No-2}\)</span></h3>
 <p><strong>Graph:</strong> No Socks</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio"><input id="__tabbed_4_2" name="__tabbed_4" type="radio"><div class="tabbed-labels"><label for="__tabbed_4_1">Expressions</label><label for="__tabbed_4_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{company},e.\mathsf{time} \Rightarrow e.\mathsf{venue}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name} \Rightarrow e.\mathsf{company}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name},e.\mathsf{time}\Rightarrow e.\mathsf{venue}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{time},e.\mathsf{venue}\Rightarrow e.\mathsf{name}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(e:Event:company&amp;name&amp;time&amp;venue)::e.company,e.time=&gt;e.venue</code></li>
 <li><code>(e:Event:company&amp;name&amp;time&amp;venue)::e.name=&gt;e.company</code></li>
 <li><code>(e:Event:company&amp;name&amp;time&amp;venue)::e.name,e.time=&gt;e.venue</code></li>
 <li><code>(e:Event:company&amp;name&amp;time&amp;venue)::e.time,e.venue=&gt;e.name</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textno-3"><span class="arithmatex">\(S_\text{No-3}\)</span></h3>
 <p><strong>Graph:</strong> No Socks</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio"><input id="__tabbed_5_2" name="__tabbed_5" type="radio"><div class="tabbed-labels"><label for="__tabbed_5_1">Expressions</label><label for="__tabbed_5_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{company},e.\mathsf{time}\Rightarrow e\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name} \Rightarrow e.\mathsf{company}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name},e.\mathsf{time} \Rightarrow e.\mathsf{venue}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{time},e.\mathsf{venue}\Rightarrow e.\mathsf{name}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name},e.\mathsf{company} \Rightarrow e.\mathsf{time}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(e:Event&amp;Confirmed:company&amp;name&amp;time&amp;venue)::e.company,e.time=&gt;e</code></li>
 <li><code>(e:Event&amp;Confirmed:company&amp;name&amp;time&amp;venue)::e.name=&gt;e.company</code></li>
@@ -1012,16 +1108,43 @@ The dependencies use an ASCII syntax (see <a href="../gofd/#grammar">Grammar</a>
 <li><code>(e:Event&amp;Confirmed:company&amp;name&amp;time&amp;venue)::e.time,e.venue=&gt;e.name</code></li>
 <li><code>(e:Event&amp;Confirmed:company&amp;name&amp;time&amp;venue)::e.name,e.company=&gt;e.time</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textoff-1"><span class="arithmatex">\(S_\text{Off-1}\)</span></h3>
 <p><strong>Graph:</strong> Offshore</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio"><input id="__tabbed_6_2" name="__tabbed_6" type="radio"><div class="tabbed-labels"><label for="__tabbed_6_1">Expressions</label><label for="__tabbed_6_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{countries},\mathsf{service\_provider},\mathsf{country\_codes}\}):: e.\mathsf{countries} \Rightarrow e.\mathsf{country\_codes}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{countries},\mathsf{service\_provider},\mathsf{country\_codes}\}):: e.\mathsf{country\_codes}\Rightarrow e.\mathsf{countries}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(e:Entity:jurisdiction_description&amp;countries&amp;service_provider&amp;country_codes):: e.countries=&gt;e.country_codes</code></li>
 <li><code>(e:Entity:jurisdiction_description&amp;countries&amp;service_provider&amp;country_codes):: e.country_codes=&gt;e.countries</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textoff-2"><span class="arithmatex">\(S_\text{Off-2}\)</span></h3>
 <p><strong>Graph:</strong> Offshore</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio"><input id="__tabbed_7_2" name="__tabbed_7" type="radio"><div class="tabbed-labels"><label for="__tabbed_7_1">Expressions</label><label for="__tabbed_7_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\})::e.\mathsf{countries},e.\mathsf{jurisdiction\_description}\Rightarrow e.\mathsf{country\_codes}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\}):: e.\mathsf{countries},e.\mathsf{sourceID}\Rightarrow e.\mathsf{country\_codes}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\})::e.\mathsf{countries},e.\mathsf{valid\_until}\Rightarrow e.\mathsf{country\_codes}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\}):: e.\mathsf{country\_codes},e.\mathsf{sourceID}\Rightarrow e.\mathsf{countries}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\}):: e.\mathsf{country\_codes},e.\mathsf{valid\_until}\Rightarrow e.\mathsf{countries}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(e:Entity:jurisdiction_description&amp;valid_until&amp;countries&amp;sourceID&amp;country_codes):: e.countries,e.jurisdiction_description=&gt;e.country_codes</code></li>
 <li><code>(e:Entity:jurisdiction_description&amp;valid_until&amp;countries&amp;sourceID&amp;country_codes):: e.countries,e.sourceID=&gt;e.country_codes</code></li>
@@ -1029,9 +1152,24 @@ The dependencies use an ASCII syntax (see <a href="../gofd/#grammar">Grammar</a>
 <li><code>(e:Entity:jurisdiction_description&amp;valid_until&amp;countries&amp;sourceID&amp;country_codes):: e.country_codes,e.sourceID=&gt;e.countries</code></li>
 <li><code>(e:Entity:jurisdiction_description&amp;valid_until&amp;countries&amp;sourceID&amp;country_codes):: e.country_codes,e.valid_until=&gt;e.countries</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textoff-3"><span class="arithmatex">\(S_\text{Off-3}\)</span></h3>
 <p><strong>Graph:</strong> Offshore</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio"><input id="__tabbed_8_2" name="__tabbed_8" type="radio"><div class="tabbed-labels"><label for="__tabbed_8_1">Expressions</label><label for="__tabbed_8_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{countries} \Rightarrow e.\mathsf{country\_codes}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{country\_codes} \Rightarrow e.\mathsf{countries}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{service\_provider} \Rightarrow e.\mathsf{sourceID}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{sourceID} \Rightarrow e.\mathsf{valid\_until}\)</span></li>
+<li><span class="arithmatex">\((e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{valid\_until}\Rightarrow \mathsf{e.sourceID}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(e:Entity:countries&amp;service_provider&amp;country_codes&amp;jurisdiction_description&amp;sourceID&amp;valid_until):: e.countries=&gt;e.country_codes</code></li>
 <li><code>(e:Entity:countries&amp;service_provider&amp;country_codes&amp;jurisdiction_description&amp;sourceID&amp;valid_until):: e.country_codes=&gt;e.countries</code></li>
@@ -1039,9 +1177,25 @@ The dependencies use an ASCII syntax (see <a href="../gofd/#grammar">Grammar</a>
 <li><code>(e:Entity:countries&amp;service_provider&amp;country_codes&amp;jurisdiction_description&amp;sourceID&amp;valid_until):: e.sourceID=&gt;e.valid_until</code></li>
 <li><code>(e:Entity:countries&amp;service_provider&amp;country_codes&amp;jurisdiction_description&amp;sourceID&amp;valid_until):: e.valid_until=&gt;e.sourceID</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textts-1"><span class="arithmatex">\(S_\text{Ts-1}\)</span></h3>
 <p><strong>Graph:</strong> Train Services</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="9:2"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio"><input id="__tabbed_9_2" name="__tabbed_9" type="radio"><div class="tabbed-labels"><label for="__tabbed_9_1">Expressions</label><label for="__tabbed_9_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\(()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{code}\}}(s:\{\mathsf{Station}\}:\{\mathsf{name}\})::s.\mathsf{name}\Rightarrow t.\mathsf{code}\)</span></li>
+<li><span class="arithmatex">\((ts:\{\mathsf{TrainService}\}:\{\mathsf{date},\mathsf{number},\mathsf{type}\})::ts.\mathsf{number},ts.\mathsf{date}\Rightarrow ts.\mathsf{type}\)</span></li>
+<li><span class="arithmatex">\((ts:\{\mathsf{TrainService}\}:\{\mathsf{date},\mathsf{number},\mathsf{operator}\})\xrightarrow{:\{\mathsf{STOPS\_AT}\}:\emptyset}():: ts.\mathsf{number},ts.\mathsf{date}\Rightarrow ts.\mathsf{operator}\)</span></li>
+<li><span class="arithmatex">\((ts:\{\mathsf{TrainService}\}:\{\mathsf{serviceid}\})\xrightarrow{:\{\mathsf{STOPS\_AT}\}:\emptyset}()::ts.\mathsf{serviceid} \Rightarrow ts\)</span></li>
+<li><span class="arithmatex">\(()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{stopid}\}}()::t.\mathsf{stopid} \Rightarrow t\)</span></li>
+<li><span class="arithmatex">\(()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{departure},\mathsf{stopid}\}}(s)::t.\mathsf{stopid}\Rightarrow s\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>()-[t:STOPS_AT:code]-&gt;(s:Station:name)::s.name=&gt;t.code</code></li>
 <li><code>(ts:TrainService:date&amp;number&amp;type)::ts.number,ts.date=&gt;ts.type</code></li>
@@ -1050,9 +1204,26 @@ The dependencies use an ASCII syntax (see <a href="../gofd/#grammar">Grammar</a>
 <li><code>()-[t:STOPS_AT:stopid]-&gt;()::t.stopid=&gt;t</code></li>
 <li><code>()-[t:STOPS_AT:departure&amp;stopid]-&gt;(s)::t.stopid=&gt;s</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textts-2"><span class="arithmatex">\(S_\text{Ts-2}\)</span></h3>
 <p><strong>Graph:</strong> Train Services</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="10:2"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio"><input id="__tabbed_10_2" name="__tabbed_10" type="radio"><div class="tabbed-labels"><label for="__tabbed_10_1">Expressions</label><label for="__tabbed_10_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\(()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{code}\}}(s:\{\mathsf{Station}\}:\{\mathsf{name}\})::s.\mathsf{name}\Rightarrow t.\mathsf{code}\)</span></li>
+<li><span class="arithmatex">\(()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{code}\}}(s:\{\mathsf{Station}\}:\{\mathsf{name}\})::t.\mathsf{code}\Rightarrow s.\mathsf{name}\)</span></li>
+<li><span class="arithmatex">\((ts:\{\mathsf{TrainService}\}:\{\mathsf{date},\mathsf{number},\mathsf{type}\})::ts.\mathsf{number},ts.\mathsf{date}\Rightarrow ts.\mathsf{type}\)</span></li>
+<li><span class="arithmatex">\((ts:\{\mathsf{TrainService}\}:\{\mathsf{date},\mathsf{number},\mathsf{operator}\})\xrightarrow{:\{\mathsf{STOPS\_AT}\}:\emptyset}():: ts.\mathsf{number},ts.\mathsf{date}\Rightarrow ts.\mathsf{operator}\)</span></li>
+<li><span class="arithmatex">\((ts:\{\mathsf{TrainService}\}:\{\mathsf{serviceid}\})\xrightarrow{:\{\mathsf{STOPS\_AT}\}:\emptyset}()::ts.\mathsf{serviceid} \Rightarrow ts\)</span></li>
+<li><span class="arithmatex">\(()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{stopid}\}}()::t.\mathsf{stopid} \Rightarrow t\)</span></li>
+<li><span class="arithmatex">\(()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{departure},\mathsf{stopid}\}}(s)::t.\mathsf{stopid}\Rightarrow s\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>()-[t:STOPS_AT:code]-&gt;(s:Station:name)::s.name=&gt;t.code</code></li>
 <li><code>()-[t:STOPS_AT:code]-&gt;(s:Station:name)::t.code=&gt;s.name</code></li>
@@ -1062,18 +1233,46 @@ The dependencies use an ASCII syntax (see <a href="../gofd/#grammar">Grammar</a>
 <li><code>()-[t:STOPS_AT:stopid]-&gt;()::t.stopid=&gt;t</code></li>
 <li><code>()-[t:STOPS_AT:departure&amp;stopid]-&gt;(s)::t.stopid=&gt;s</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textuni-1"><span class="arithmatex">\(S_\text{Uni-1}\)</span></h3>
 <p><strong>Graph:</strong> University</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="11:1"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio"><div class="tabbed-labels"><label for="__tabbed_11_1">Expressions</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<ul>
+<li><span class="arithmatex">\((c:\{\mathsf{Course}\}:\emptyset)\xleftarrow{t:\{\mathsf{TEACHES}\}:\{\mathsf{usingBook}\}}()::c=&gt;t.\mathsf{usingBook}\)</span></li>
+</ul>
+<div class="tabbed-set tabbed-alternate" data-tabs="12:1"><input checked="checked" id="__tabbed_12_1" name="__tabbed_12" type="radio"><div class="tabbed-labels"><label for="__tabbed_12_1">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <ul>
 <li><code>(c:Course)&lt;-[t:TEACHES:usingBook]-()::c=&gt;t.usingBook</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h3 id="s_textuni-2"><span class="arithmatex">\(S_\text{Uni-2}\)</span></h3>
 <p><strong>Graph:</strong> University</p>
 <p><strong>Minimal cover of dependencies:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="13:2"><input checked="checked" id="__tabbed_13_1" name="__tabbed_13" type="radio"><input id="__tabbed_13_2" name="__tabbed_13" type="radio"><div class="tabbed-labels"><label for="__tabbed_13_1">Expressions</label><label for="__tabbed_13_2">ASCII Syntax</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><span class="arithmatex">\((c:\{\mathsf{Course}\}:\{\mathsf{title}\})\xleftarrow{t:\{\mathsf{TEACHES}\}:\{\mathsf{usingBook}\}}()::c.\mathsf{title}\Rightarrow t.\mathsf{usingBook}\)</span></li>
+</ul>
+</div>
+<div class="tabbed-block">
 <ul>
 <li><code>(c:Course:title)&lt;-[t:TEACHES:usingBook]-()::c.title=&gt;t.usingBook</code></li>
 </ul>
+</div>
+</div>
+</div>
 <h2 id="queries">Queries</h2>
 <p>In our query experiment we run in total 17 queries before and after normalization on 4 <a href="#scenarios">scenarios</a>. 
 For several queries we used different variants after normalization.</p>
@@ -1310,6 +1509,8 @@ form for property graphs. VLDB J. 34, 2 (2025), 23.&nbsp;<a class="footnote-back
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -1321,11 +1522,10 @@ form for property graphs. VLDB J. 34, 2 (2025), 23.&nbsp;<a class="footnote-back
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
   
+    <div class="md-copyright__highlight">
+      Copyright © 2026 <a href="https://johannes.schrott.onl">Johannes Schrott</a>, <a href="https://dmki-tuwien.github.io">DMKI Lab</a>, <a href="https://tuwien.ac.at">TU Wien</a>
+    </div>
   
-    Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
-    </a>
   
 </div>
       
@@ -1342,7 +1542,7 @@ form for property graphs. VLDB J. 34, 2 (2025), 23.&nbsp;<a class="footnote-back
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tooltips", "content.footnote.tooltips"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tooltips", "content.footnote.tooltips", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

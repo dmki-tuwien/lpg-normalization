@@ -46,6 +46,8 @@
       
     
     
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -384,6 +386,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../source_code_documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source Code Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -444,7 +473,11 @@
 
 
 <h1 id="graph-object-functional-dependencies">Graph Object Functional Dependencies</h1>
-<p>To express the dependencies in an <abbr title="labeled property graph">LPG</abbr> relevant for normalization, we defined </p>
+<p>To express the dependencies in an <abbr title="labeled property graph">LPG</abbr> relevant for normalization, 
+in addition to the expressions used in the <a href="http://arxiv.org/abs/2603.02995">paper</a>,
+we defined an ASCII syntax, whose <a href="#grammar">grammar</a> is shown below.</p>
+<p>For the evaluation in the <a href="http://arxiv.org/abs/2603.02995">paper</a>, 
+we implemented the <abbr title="graph object funcitonal dependencies">GO-FDs</abbr> in form of a Python package, which can be found <a href="../source_code_documentation/#gnfd.GOFD">here</a>.</p>
 <h2 id="grammar">Grammar</h2>
 <p>For parsing <abbr title="graph object funcitonal dependencies">GO-FDs</abbr> an ANTLR grammar has been written, which is shown below. The Python implementation of <abbr title="graph object funcitonal dependencies">GO-FDs</abbr> (:class:<code>gnfd.GNFD</code>) is relying on this grammar.</p>
 <div class="highlight"><pre><span></span><code>grammar gnfd ;
@@ -507,6 +540,8 @@ nodePattern : LPAR varName? ((labelList propertyList?) | (COLON propertyList))? 
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -518,11 +553,10 @@ nodePattern : LPAR varName? ((labelList propertyList?) | (COLON propertyList))? 
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
   
+    <div class="md-copyright__highlight">
+      Copyright © 2026 <a href="https://johannes.schrott.onl">Johannes Schrott</a>, <a href="https://dmki-tuwien.github.io">DMKI Lab</a>, <a href="https://tuwien.ac.at">TU Wien</a>
+    </div>
   
-    Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
-    </a>
   
 </div>
       
@@ -539,7 +573,7 @@ nodePattern : LPAR varName? ((labelList propertyList?) | (COLON propertyList))? 
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tooltips", "content.footnote.tooltips"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tooltips", "content.footnote.tooltips", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
