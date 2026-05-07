@@ -1,15 +1,22 @@
 site_name: Graph-Native LPG Normalization
+extra:
+  generator: false
 theme:
   name: material
   palette:
     primary: teal
   #favicon: assets/favicon.ico
-  # logo: assets/logo.png
   features:
     - content.tooltips
     - content.footnote.tooltips
+    - content.tabs.link
   icon:
     repo: fontawesome/brands/github
+    logo: material/graph-outline
+
+
+copyright: Copyright &copy; 2026 <a href="https://johannes.schrott.onl">Johannes Schrott</a>, <a href="https://dmki-tuwien.github.io">DMKI Lab</a>, <a href="https://tuwien.ac.at">TU Wien</a>
+
 repo_url: https://github.com/dmki-tuwien/lpg-normalization
 markdown_extensions:
   - abbr
@@ -23,12 +30,33 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - toc:
         toc_depth: 3
 
 plugins:
   - glightbox
+  - table-reader
   - typeset
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - .
+          options:
+            allow_inspection: false
+            show_source: true
+            filters:
+              - "!^__"
+              - "__init__"
+              - "__bytes__"
+            show_signature_annotations: true
+            show_root_heading: true
+            ignore_init_summary: false
+            docstring_style: sphinx
+            docstring_section_style: list
+            heading_level: 4
 
 
 extra_javascript:
@@ -40,8 +68,10 @@ nav:
   - Graph Object Functional Dependencies: gofd.md
   - Evaluation:
     - Scenarios: evaluation_scenarios.md
-    #- Results: evaluation_results.md
- # - Source Code Documentation: source_code_documentation.md
+  #  - Results: evaluation_results.md
+    - Results: https://github.com/dmki-tuwien/lpg-normalization/tree/master/out
+
+  - Source Code Documentation: source_code_documentation.md
 
 
 watch:

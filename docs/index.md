@@ -1,9 +1,13 @@
 # A Graph-Native Approach to Normalization
 
-Welcome to the online documentation of the paper ["A Graph-Native Approach to Normalization"](https://github.com/dmki-tuwien/lpg-normalization/blob/master/paper/extended_version.pdf).
+Welcome to the online documentation accompanying the paper ["A Graph-Native Approach to Normalization"](http://arxiv.org/abs/2603.02995).
 
 This documentation provides details on the performed evaluation and provides a documentation for our
 [Python](https://www.python.org) implementation of LPG normalization.
+
+Details on the repository structure and the source code can be found in the [Source Code Documentation](source_code_documentation.md).
+
+Detailed results of the evaluation presented in the [paper](http://arxiv.org/abs/2603.02995) can be found [here](https://github.com/dmki-tuwien/lpg-normalization/tree/master/out).
 
 ## Getting Started
 
@@ -18,7 +22,7 @@ the command<br> `git clone https://github.com/dmki-tuwien/lpg-normalization.git 
 
 4. *Prepare evaluation scenarios* and you local environment.
 <br>
-The [evaluation scenarios](evaluation_scenarios.md) are defined the file `setup.yaml`. For available configuration options, please refer to the comments in `setup.yaml`.
+The [evaluation scenarios](evaluation_scenarios.md) are described [here](evaluation_scenarios.md), and are defined the file `setup.yaml`. For available configuration options, please refer to the comments in `setup.yaml`.
 <br>
 Also adjust the `GRAPHS_PATH` environment variable in the file `.env` to be the *absolute* path to your `graphs` folder.
 Relative paths cannot be used due to a limitation of Docker.

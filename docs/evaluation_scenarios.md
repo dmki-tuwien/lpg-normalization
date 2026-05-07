@@ -1,6 +1,9 @@
 # Evaluation Scenarios
 
-We defined [12 scenarios](#scenarios) on [6 graphs](#graphs) for the evaluation the [graph-native approach to LPG normalization](https://github.com/dmki-tuwien/lpg-normalization/blob/master/paper/extended_version.pdf)
+We defined [12 scenarios](#scenarios) on [6 graphs](#graphs) for the evaluation the [graph-native approach to LPG normalization](http://arxiv.org/abs/2603.02995)
+
+Detailed results of the evaluation presented in the paper (http://arxiv.org/abs/2603.02995) can be found [here](https://github.com/dmki-tuwien/lpg-normalization/tree/master/out).
+
 
 ## Graphs
 * **London Public Transport**<br> The _London Public Transport_ graph's sources are available on [Zenodo](https://zenodo.org/records/18479732).
@@ -25,124 +28,210 @@ We defined [12 scenarios](#scenarios) on [6 graphs](#graphs) for the evaluation 
 
 ## Scenarios
 Evaluation scenarios combine [graphs](#graphs) with dependency sets. In the following we list the minimal covers (i.e., minimal dependency sets) used for each graph.
-The dependencies use an ASCII syntax (see [Grammar](gofd.md#grammar)) for expressing GO-FDs.
+The dependencies are shown as expressions, like in the [paper](http://arxiv.org/abs/2603.02995) use an ASCII syntax (see [Grammar](gofd.md#grammar)) for expressing GO-FDs.
 
 ###  $S_\text{Lon}$
 **Graph:** London Public Transport
 
 **Minimal cover of dependencies:**
 
-*  `(s:Station:zone&zoneOriginal)::s.zoneOriginal=>s.zone`
-*  `(s:Station:latitude&longitude)::s.latitude,s.longitude=>s`
-*  `(s:Station)-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type`
+=== "Expressions"
+    * $(s:\{\mathsf{Station}\}:\{\mathsf{zone},\mathsf{zoneOriginal}\})::s.\mathsf{zoneOriginal}\Rightarrow s.\mathsf{zone}$
+    * $(s:\{\mathsf{Station}\}:\{\mathsf{latitude},\mathsf{longitude}\})::s.\mathsf{latitude},s.\mathsf{longitude}\Rightarrow s$
+    * $(s:\{\mathsf{Station}\}:\emptyset)\xrightarrow{c:\{\mathsf{CONNECTED\_THROUGH}\}:\{\mathsf{line},\mathsf{color},\mathsf{type}\}}()::c.\mathsf{line}\Rightarrow c.\mathsf{color},c.\mathsf{type}$
+
+
+=== "ASCII Syntax"
+    *  `(s:Station:zone&zoneOriginal)::s.zoneOriginal=>s.zone`
+    *  `(s:Station:latitude&longitude)::s.latitude,s.longitude=>s`
+    *  `(s:Station)-[c:CONNECTED_THROUGH:line&color&type]->()::c.line=>c.color,c.type`
 
 ###  $S_\text{Nw}$
 **Graph:** Northwind
 
 **Minimal cover of dependencies:**
 
-*  `(o:Order:orderID)::o.orderID=>o`
-*  `(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion`
+=== "Expressions" 
+    * $(o:\{\mathsf{Order}\}:\{\mathsf{orderID}\})::o.\mathsf{orderID}\Rightarrow o$
+    * $(o:\{\mathsf{Order}\}:\{\mathsf{orderID},\mathsf{orderDate},\mathsf{customerID},\mathsf{shipCity},\mathsf{shipPostalCode},\mathsf{shipCountry},\mathsf{shipAddress},\mathsf{shipRegion}\})::o.\mathsf{customerID}\Rightarrow o.\mathsf{shipCity},o.\mathsf{shipPostalCode},o.\mathsf{shipCountry},o.\mathsf{shipAddress},o.\mathsf{shipRegion}$
+
+=== "ASCII Syntax"
+    *  `(o:Order:orderID)::o.orderID=>o`
+    *  `(o:Order:orderID&orderDate&customerID&shipCity&shipPostalCode&shipCountry&shipAddress&shipRegion)::o.customerID=>o.shipCity,o.shipPostalCode,o.shipCountry,o.shipAddress,o.shipRegion`
     
 ###  $S_\text{No-1}$
 **Graph:** No Socks
 
 **Minimal cover of dependencies:**
 
-*  `(e:Event:company&name&time&venue)::e.company,e.time=>e`
-*  `(e:Event:company&name&time&venue)::e.name=>e.company`
-*  `(e:Event:company&name&time&venue)::e.name,e.time=>e.venue`
-*  `(e:Event:company&name&time&venue)::e.time,e.venue=>e.name`
+=== "Expressions"
+    * $(e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{company},e.\mathsf{time}\Rightarrow e$
+    * $(e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name}\Rightarrow e.\mathsf{company}$
+    * $(e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name},e.\mathsf{time}\Rightarrow e.\mathsf{venue}$
+    * $(e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{time},e.\mathsf{venue}\Rightarrow e.\mathsf{name}$
+
+=== "ASCII Syntax"
+    *  `(e:Event:company&name&time&venue)::e.company,e.time=>e`
+    *  `(e:Event:company&name&time&venue)::e.name=>e.company`
+    *  `(e:Event:company&name&time&venue)::e.name,e.time=>e.venue`
+    *  `(e:Event:company&name&time&venue)::e.time,e.venue=>e.name`
     
 ###  $S_\text{No-2}$
 **Graph:** No Socks
 
 **Minimal cover of dependencies:**
 
-*  `(e:Event:company&name&time&venue)::e.company,e.time=>e.venue`
-*  `(e:Event:company&name&time&venue)::e.name=>e.company`
-*  `(e:Event:company&name&time&venue)::e.name,e.time=>e.venue`
-*  `(e:Event:company&name&time&venue)::e.time,e.venue=>e.name`
+=== "Expressions"
+    * $(e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{company},e.\mathsf{time} \Rightarrow e.\mathsf{venue}$
+    * $(e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name} \Rightarrow e.\mathsf{company}$
+    * $(e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name},e.\mathsf{time}\Rightarrow e.\mathsf{venue}$
+    * $(e:\{\mathsf{Event}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{time},e.\mathsf{venue}\Rightarrow e.\mathsf{name}$
+
+=== "ASCII Syntax"
+    *  `(e:Event:company&name&time&venue)::e.company,e.time=>e.venue`
+    *  `(e:Event:company&name&time&venue)::e.name=>e.company`
+    *  `(e:Event:company&name&time&venue)::e.name,e.time=>e.venue`
+    *  `(e:Event:company&name&time&venue)::e.time,e.venue=>e.name`
     
 ###  $S_\text{No-3}$
 **Graph:** No Socks
 
 **Minimal cover of dependencies:**
 
-*  `(e:Event&Confirmed:company&name&time&venue)::e.company,e.time=>e`
-*  `(e:Event&Confirmed:company&name&time&venue)::e.name=>e.company`
-*  `(e:Event&Confirmed:company&name&time&venue)::e.name,e.time=>e.venue`
-*  `(e:Event&Confirmed:company&name&time&venue)::e.time,e.venue=>e.name`
-*  `(e:Event&Confirmed:company&name&time&venue)::e.name,e.company=>e.time`
+=== "Expressions"
+    * $(e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{company},e.\mathsf{time}\Rightarrow e$
+    * $(e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name} \Rightarrow e.\mathsf{company}$
+    * $(e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name},e.\mathsf{time} \Rightarrow e.\mathsf{venue}$
+    * $(e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{time},e.\mathsf{venue}\Rightarrow e.\mathsf{name}$
+    * $(e:\{\mathsf{Event},\mathsf{Confirmed}\}:\{\mathsf{company},\mathsf{name},\mathsf{time},\mathsf{venue}\})::e.\mathsf{name},e.\mathsf{company} \Rightarrow e.\mathsf{time}$
+
+
+=== "ASCII Syntax"
+    *  `(e:Event&Confirmed:company&name&time&venue)::e.company,e.time=>e`
+    *  `(e:Event&Confirmed:company&name&time&venue)::e.name=>e.company`
+    *  `(e:Event&Confirmed:company&name&time&venue)::e.name,e.time=>e.venue`
+    *  `(e:Event&Confirmed:company&name&time&venue)::e.time,e.venue=>e.name`
+    *  `(e:Event&Confirmed:company&name&time&venue)::e.name,e.company=>e.time`
     
 ###  $S_\text{Off-1}$
 **Graph:** Offshore
 
 **Minimal cover of dependencies:**
 
-*  `(e:Entity:jurisdiction_description&countries&service_provider&country_codes):: e.countries=>e.country_codes`
-*  `(e:Entity:jurisdiction_description&countries&service_provider&country_codes):: e.country_codes=>e.countries`
+=== "Expressions"
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{countries},\mathsf{service\_provider},\mathsf{country\_codes}\}):: e.\mathsf{countries} \Rightarrow e.\mathsf{country\_codes}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{countries},\mathsf{service\_provider},\mathsf{country\_codes}\}):: e.\mathsf{country\_codes}\Rightarrow e.\mathsf{countries}$
+
+=== "ASCII Syntax"
+    *  `(e:Entity:jurisdiction_description&countries&service_provider&country_codes):: e.countries=>e.country_codes`
+    *  `(e:Entity:jurisdiction_description&countries&service_provider&country_codes):: e.country_codes=>e.countries`
     
 ###  $S_\text{Off-2}$
 **Graph:** Offshore
 
 **Minimal cover of dependencies:**
 
-*  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.countries,e.jurisdiction_description=>e.country_codes`
-*  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.countries,e.sourceID=>e.country_codes`
-*  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.countries,e.valid_until=>e.country_codes`
-*  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.country_codes,e.sourceID=>e.countries`
-*  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.country_codes,e.valid_until=>e.countries`
+=== "Expressions"
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\})::e.\mathsf{countries},e.\mathsf{jurisdiction\_description}\Rightarrow e.\mathsf{country\_codes}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\}):: e.\mathsf{countries},e.\mathsf{sourceID}\Rightarrow e.\mathsf{country\_codes}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\})::e.\mathsf{countries},e.\mathsf{valid\_until}\Rightarrow e.\mathsf{country\_codes}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\}):: e.\mathsf{country\_codes},e.\mathsf{sourceID}\Rightarrow e.\mathsf{countries}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{jurisdiction\_description},\mathsf{valid\_until},\mathsf{countries},\mathsf{sourceID},\mathsf{country\_codes}\}):: e.\mathsf{country\_codes},e.\mathsf{valid\_until}\Rightarrow e.\mathsf{countries}$
+
+
+=== "ASCII Syntax"
+    *  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.countries,e.jurisdiction_description=>e.country_codes`
+    *  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.countries,e.sourceID=>e.country_codes`
+    *  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.countries,e.valid_until=>e.country_codes`
+    *  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.country_codes,e.sourceID=>e.countries`
+    *  `(e:Entity:jurisdiction_description&valid_until&countries&sourceID&country_codes):: e.country_codes,e.valid_until=>e.countries`
 
 ###  $S_\text{Off-3}$
 **Graph:** Offshore
 
 **Minimal cover of dependencies:**
 
-*  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.countries=>e.country_codes`
-*  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.country_codes=>e.countries`
-*  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.service_provider=>e.sourceID`
-*  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.sourceID=>e.valid_until`
-*  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.valid_until=>e.sourceID`
+=== "Expressions" 
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{countries} \Rightarrow e.\mathsf{country\_codes}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{country\_codes} \Rightarrow e.\mathsf{countries}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{service\_provider} \Rightarrow e.\mathsf{sourceID}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{sourceID} \Rightarrow e.\mathsf{valid\_until}$
+    * $(e:\{\mathsf{Entity}\}:\{\mathsf{countries}    ,\mathsf{service\_provider},\mathsf{country\_codes},\mathsf{jurisdiction\_description},\mathsf{sourceID},\mathsf{valid\_until}\})::e.\mathsf{valid\_until}\Rightarrow \mathsf{e.sourceID}$
+
+
+=== "ASCII Syntax"
+    *  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.countries=>e.country_codes`
+    *  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.country_codes=>e.countries`
+    *  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.service_provider=>e.sourceID`
+    *  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.sourceID=>e.valid_until`
+    *  `(e:Entity:countries&service_provider&country_codes&jurisdiction_description&sourceID&valid_until):: e.valid_until=>e.sourceID`
     
 ###  $S_\text{Ts-1}$
 **Graph:** Train Services
 
 **Minimal cover of dependencies:**
 
-*  `()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code`
-*  `(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type`
-*  `(ts:TrainService:date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator`
-*  `(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts`
-*  `()-[t:STOPS_AT:stopid]->()::t.stopid=>t`
-*  `()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s`
+=== "Expressions"
+    * $()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{code}\}}(s:\{\mathsf{Station}\}:\{\mathsf{name}\})::s.\mathsf{name}\Rightarrow t.\mathsf{code}$
+    * $(ts:\{\mathsf{TrainService}\}:\{\mathsf{date},\mathsf{number},\mathsf{type}\})::ts.\mathsf{number},ts.\mathsf{date}\Rightarrow ts.\mathsf{type}$
+    * $(ts:\{\mathsf{TrainService}\}:\{\mathsf{date},\mathsf{number},\mathsf{operator}\})\xrightarrow{:\{\mathsf{STOPS\_AT}\}:\emptyset}():: ts.\mathsf{number},ts.\mathsf{date}\Rightarrow ts.\mathsf{operator}$
+    * $(ts:\{\mathsf{TrainService}\}:\{\mathsf{serviceid}\})\xrightarrow{:\{\mathsf{STOPS\_AT}\}:\emptyset}()::ts.\mathsf{serviceid} \Rightarrow ts$
+    * $()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{stopid}\}}()::t.\mathsf{stopid} \Rightarrow t$
+    * $()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{departure},\mathsf{stopid}\}}(s)::t.\mathsf{stopid}\Rightarrow s$
+
+
+=== "ASCII Syntax"
+    *  `()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code`
+    *  `(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type`
+    *  `(ts:TrainService:date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator`
+    *  `(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts`
+    *  `()-[t:STOPS_AT:stopid]->()::t.stopid=>t`
+    *  `()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s`
     
 ###  $S_\text{Ts-2}$
 **Graph:** Train Services
 
 **Minimal cover of dependencies:**
 
-*  `()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code`
-*  `()-[t:STOPS_AT:code]->(s:Station:name)::t.code=>s.name`
-*  `(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type`
-*  `(ts:TrainService:date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator`
-*  `(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts`
-*  `()-[t:STOPS_AT:stopid]->()::t.stopid=>t`
-*  `()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s`
+=== "Expressions" 
+    * $()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{code}\}}(s:\{\mathsf{Station}\}:\{\mathsf{name}\})::s.\mathsf{name}\Rightarrow t.\mathsf{code}$
+    * $()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{code}\}}(s:\{\mathsf{Station}\}:\{\mathsf{name}\})::t.\mathsf{code}\Rightarrow s.\mathsf{name}$
+    * $(ts:\{\mathsf{TrainService}\}:\{\mathsf{date},\mathsf{number},\mathsf{type}\})::ts.\mathsf{number},ts.\mathsf{date}\Rightarrow ts.\mathsf{type}$
+    * $(ts:\{\mathsf{TrainService}\}:\{\mathsf{date},\mathsf{number},\mathsf{operator}\})\xrightarrow{:\{\mathsf{STOPS\_AT}\}:\emptyset}():: ts.\mathsf{number},ts.\mathsf{date}\Rightarrow ts.\mathsf{operator}$
+    * $(ts:\{\mathsf{TrainService}\}:\{\mathsf{serviceid}\})\xrightarrow{:\{\mathsf{STOPS\_AT}\}:\emptyset}()::ts.\mathsf{serviceid} \Rightarrow ts$
+    * $()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{stopid}\}}()::t.\mathsf{stopid} \Rightarrow t$
+    * $()\xrightarrow{t:\{\mathsf{STOPS\_AT}\}:\{\mathsf{departure},\mathsf{stopid}\}}(s)::t.\mathsf{stopid}\Rightarrow s$
+
+=== "ASCII Syntax"
+    *  `()-[t:STOPS_AT:code]->(s:Station:name)::s.name=>t.code`
+    *  `()-[t:STOPS_AT:code]->(s:Station:name)::t.code=>s.name`
+    *  `(ts:TrainService:date&number&type)::ts.number,ts.date=>ts.type`
+    *  `(ts:TrainService:date&number&operator)-[:STOPS_AT]->()::ts.number,ts.date=>ts.operator`
+    *  `(ts:TrainService:serviceid)-[:STOPS_AT]->()::ts.serviceid=>ts`
+    *  `()-[t:STOPS_AT:stopid]->()::t.stopid=>t`
+    *  `()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s`
     
 ###  $S_\text{Uni-1}$
 **Graph:** University
 
 **Minimal cover of dependencies:**
 
-*  `(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook`
+=== "Expressions" 
+  * $(c:\{\mathsf{Course}\}:\emptyset)\xleftarrow{t:\{\mathsf{TEACHES}\}:\{\mathsf{usingBook}\}}()::c=>t.\mathsf{usingBook}$
+
+=== "ASCII Syntax"
+    *  `(c:Course)<-[t:TEACHES:usingBook]-()::c=>t.usingBook`
     
 ###  $S_\text{Uni-2}$
 **Graph:** University
 
 **Minimal cover of dependencies:**
 
-*  `(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook`
+=== "Expressions"
+    * $(c:\{\mathsf{Course}\}:\{\mathsf{title}\})\xleftarrow{t:\{\mathsf{TEACHES}\}:\{\mathsf{usingBook}\}}()::c.\mathsf{title}\Rightarrow t.\mathsf{usingBook}$
+
+=== "ASCII Syntax"
+    *  `(c:Course:title)<-[t:TEACHES:usingBook]-()::c.title=>t.usingBook`
     
 
 ## Queries
