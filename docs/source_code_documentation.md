@@ -9,10 +9,11 @@ The [GitHub repository](https://github.com/dmki-tuwien/lpg-normalization) is str
  * `out/`: Contains the output of the evaluation as CSV files
  * `tests/`: Contains Python pytests for the dependencies and the normalization
 
-Additionally, two Jupyter Notebooks are provided:
+Additionally, three Jupyter Notebooks are provided:
 
-* `evaluation_tables_and_figures.ipynb` is provided for the further analysis of the evaluation results.
-* `normalization-skavantzos-link.ipynb` 
+ * `structural_metrics_tables_and_figures.ipynb` is provided for the further analysis of the evaluation results of the structural metrics.
+ * `query_experiment.ipynb` is provided for the analysis of the query experiment.
+ * `normalization-skavantzos-link.ipynb` 
    computes same metrics as our evaluation scenarios normalized using the method described in [^1]
 
 In the following, the [Python source code is documented](#python-documentation).

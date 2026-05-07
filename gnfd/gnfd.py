@@ -589,9 +589,6 @@ class LeftEdge(Edge):
     def minimal_pattern_intersections(self, other: Pattern):
         pass
 
-        # def less_than(self, other):
-        #     super().less_than(other)
-
     def __str__(self):
         return f"{str(self.tgt_pattern)}<-[{self._gnfd_middle}]-{str(self.src_pattern)}"
 
@@ -617,9 +614,6 @@ class RightEdge(Edge):
 
     def minimal_pattern_intersections(self, other: Pattern):
         pass
-
-    # def less_than(self, other):
-    #     super().less_than(other)
 
     def __str__(self):
         return f"{str(self.src_pattern)}-[{self._gnfd_middle}]->{str(self.tgt_pattern)}"
@@ -796,7 +790,7 @@ class Reference:
 
 @total_ordering
 class GOFD:
-    """Denotes a GN-FD that consists of a :any:`Pattern` and sets of :any:`Reference` that denote the right and left side of the descriptor of the GN-FD.
+    """Denotes a GO-FD that consists of a :any:`Pattern` and sets of :any:`Reference` that denote the right and left side of the descriptor of the GO-FD.
     GNFDs are ordered by their pattern."""
 
     def __init__(
@@ -814,9 +808,9 @@ class GOFD:
 
     @staticmethod
     def from_string(string: str):
-        """Parse a GN-FD from a string.
+        """Parse a GO-FD from a string.
 
-        :param string: The string representation of the GN-FD to create. Relies on the grammar shown in `gnfd.g4`.
+        :param string: The string representation of the GO-FD to create. Relies on the grammar shown in `gnfd.g4`.
         """
 
         # ANTLR has been run in this folder using the command `antlr4 -Dlanguage=Python3 -visitor gnfd.g4`.
