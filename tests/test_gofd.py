@@ -1,7 +1,7 @@
 import pytest
 from pandas.core.groupby import GroupBy
 
-from gnfd import *
+from gofd import *
 
 def test_node_pattern():
     a_dep_0 = GOFD.from_string("(a)::a=>a")
