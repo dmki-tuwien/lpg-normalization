@@ -1,14 +1,14 @@
 import pytest
 from testcontainers.neo4j import Neo4jContainer
 
-from gnfd import DependencySet
+from gofd import DependencySet
 from normalize import perform_graph_native_normalization
 
 # Define the container as a session-level fixture
 @pytest.fixture(scope="session")
 def neo4j_container():
     # 1. Initialize and start the container
-    with Neo4jContainer("neo4j:2025.10") as neo4j:
+    with Neo4jContainer("neo4j:2026.06") as neo4j:
         yield neo4j  # Yields the running container object
 
 

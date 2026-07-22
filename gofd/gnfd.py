@@ -13,9 +13,9 @@ import random
 
 from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
 
-from gnfd.gnfdLexer import gnfdLexer
-from gnfd.gnfdListener import gnfdListener
-from gnfd.gnfdParser import gnfdParser
+from gofd.gnfdLexer import gnfdLexer
+from gofd.gnfdListener import gnfdListener
+from gofd.gnfdParser import gnfdParser
 
 CLINGO_FACT_NODE = "node"
 CLINGO_FACT_LEFT_EDGE = "ledge"
