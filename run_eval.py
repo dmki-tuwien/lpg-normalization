@@ -15,11 +15,11 @@ from neo4j import GraphDatabase, Query, Driver
 from dotenv import load_dotenv
 from tqdm_loggable.auto import tqdm
 
-import gnfd
+import gofd
 
 from constants import *
 from normalize import perform_graph_native_normalization
-from gnfd import DependencySet
+from gofd import DependencySet
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

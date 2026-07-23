@@ -12,9 +12,11 @@ import os
 import yaml
 from starlette.middleware.cors import CORSMiddleware
 
+from gofd import gnfd
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import gnfd
-from normalize import perform_graph_native_normalization
+import gofd
+from normalize import perform_graph_native_normalization, perform_structural_normalization
 
 ROOT_PATH = (
     ""
@@ -28,14 +30,14 @@ else:
     app = FastAPI(root_path=ROOT_PATH)
 
 
-origins = [
+ORIGINS = [
     "http://localhost:3000"
 ]
 
 # 2. Add the middleware to your app
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],  # Allows GET, POST, OPTIONS, etc.
     allow_headers=["*"],  # Allows Content-Type, Authorization, etc.
@@ -349,13 +351,17 @@ def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies:
     return res
 
 @app.post("/{database}/normalize")
-def normalize(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> tuple[list[str], list[str], float]:
+def normalize(database: Literal["neo4j", "memgraph"], dependencies: list[str], method: Literal["graph-native", "structural"] = "graph-native") -> tuple[list[str], list[str], float]:
     dependencies_str_list = dependencies
-    dependencies_obj_list = gnfd.DependencySet.from_string_list(dependencies_str_list)
+    dependencies_obj_list = gofd.DependencySet.from_string_list(dependencies_str_list)
 
     with get_driver(database) as driver:
         before = time.time_ns()
-        norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list)
+        norm_res = None
+        if method == "graph-native":
+            norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list)
+        elif method == "structural":
+            norm_res = perform_structural_normalization(driver, database, "1GNF")
         after = time.time_ns()
 
     duration = after - before

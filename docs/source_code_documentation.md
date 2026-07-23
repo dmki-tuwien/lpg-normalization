@@ -4,7 +4,7 @@ This page documents the source code of the graph-native LPG normalization.
 The [GitHub repository](https://github.com/dmki-tuwien/lpg-normalization) is structured as follows:
 
  * `docs/`: The documentation of the source code of this repository. Basis for the [documentation](https://dmki-tuwien.github.io/lpg-normalization/).
- * `gnfd/`: A Python package that implements the Graph Object Functional Dependencies 
+ * `gofd/`: A Python package that implements the Graph Object Functional Dependencies 
  * `graphs/`: Contains graphs that are normalized as part of the evaluation
  * `out/`: Contains the output of the evaluation as CSV files
  * `tests/`: Contains Python pytests for the dependencies and the normalization
@@ -25,9 +25,9 @@ In the following, the [Python source code is documented](#python-documentation).
 
 ::: normalize
 
-### GNFD Package
+### GOFD Package
 
-::: gnfd
+::: gofd
 
 
 

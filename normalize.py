@@ -5,17 +5,18 @@ from typing import Any
 
 import neo4j
 from caseconverter import pascalcase, camelcase
+from typing import Literal
 
 from neo4j import Driver
 from tqdm_loggable.auto import tqdm
 
 
-from gnfd import DependencySet, GOFD, Node, Reference, Edge, GraphObject
+from gofd import DependencySet, GOFD, Node, Reference, Edge, GraphObject
 
 
 def perform_graph_native_normalization(
     driver: Driver,
-    database,
+    database: Literal["neo4j", "memgraph"],
     provided_dependencies: DependencySet,
     dep_filter: str = "all",
 ) -> (DependencySet, list[str]):
@@ -719,6 +720,71 @@ REMOVE {", ".join(map(str, all_references))}"""
     transformed_deps = DependencySet.from_string_list(transformed_deps_list)
 
     return transformed_deps, applied_transformations
+
+
+def perform_structural_normalization(driver: Driver, database: Literal["neo4j", "memgraph"], normal_form: Literal["1GNF", "2GNF", "3GNF", "3+GNF", "EGNF"]):
+    """
+    Performs structural normalization as described by Egger et al. in https://doi.org/10.14778/3797919.3797943.
+    :param driver: A :any:`neo4j.Driver`
+    :param database:
+    :param normal_form:
+    :return:
+    """
+
+    match normal_form:
+        case "1GNF":
+            with driver.session() as session:
+
+                found_non_atomic = True # To check whether there are non-atomic properties, we assume there are some!
+
+                # Retrieve all non-atomic values in edges and reify them
+                result = session.run("""
+                MATCH (n)-[e]->(m)
+                UNWIND keys(e) AS key
+                WITH n, m, e, key, e[key] AS propValue
+                WHERE propValue IS :: LIST<ANY>
+                CREATE (re:$(type(e)))
+                CREATE (n)-[:$("SRC_"+type(e))]->(re)
+                CREATE (re)-[:$("TGT_"+type(e))]->(m)
+                SET re += properties(e)
+                DELETE e
+                                """) # happens only once; after this only nodes can have complex property values.
+
+                while found_non_atomic:
+
+
+                    # Retrieve all non-atomic values in nodes (original nodes + reified)
+                    result = session.run("""
+    MATCH (n)
+    UNWIND keys(n) AS key
+    WITH n, key, n[key] AS propValue
+    WHERE propValue IS :: LIST<ANY>
+    RETURN elementId(n) AS nodeId, key AS propName, propValue
+                    """)
+
+                    found_non_atomic = False
+                    for record in result:
+                        found_non_atomic = True # There were non-atomic values, so we need another iteration!
+                        i = 0
+                        for atomic_value in record["propValue"]:
+                            session.run(f"""MERGE (n {{{record["propName"]}:"{atomic_value}"}})""")  # TODO: Check datatypes whether quotes are required (str, vs. int)
+
+                            # Mimics `getOrCreate` from https://doi.org/10.14778/3797919.3797943
+                            session.run(f"""
+    MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
+    MATCH (m) WHERE size(keys(m)) = 1 AND m.{record["propName"]} = "{atomic_value}"
+    CREATE (n)-[:`{i}`]->(m)
+    """)
+                            i += 1
+                        session.run(f"""
+    MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
+    REMOVE n.{record["propName"]}
+    """)
+            pass
+        case _:
+            raise ValueError(f"The normal form \"{normal_form}\" is not supported for structural normalization")
+
+    return DependencySet.from_string_list([]), []
 
 
 def reify_and_extract_to_new_node(

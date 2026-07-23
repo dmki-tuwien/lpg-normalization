@@ -9,10 +9,10 @@ we implemented the GO-FDs in form of a Python package, which can be found [here]
 
 ## Grammar
 
-For parsing GO-FDs an ANTLR grammar has been written, which is shown below. The Python implementation of GO-FDs (:class:`gnfd.GNFD`) is relying on this grammar.
+For parsing GO-FDs an ANTLR grammar has been written, which is shown below. The Python implementation of GO-FDs ([`GOFD`][gofd.gnfd.GOFD]) is relying on this grammar.
 
 ```
---8<-- "gnfd/gnfd.g4"
+--8<-- "gofd/gnfd.g4"
 ```
 
 
