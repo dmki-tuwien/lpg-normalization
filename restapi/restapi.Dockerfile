@@ -10,7 +10,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY normalize.py normalize.py
-COPY gnfd gnfd
+COPY gofd gofd
 COPY restapi restapi
 
 CMD ["fastapi", "run", "restapi/restapi.py"]
