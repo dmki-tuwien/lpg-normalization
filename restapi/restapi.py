@@ -12,10 +12,11 @@ import os
 import yaml
 from starlette.middleware.cors import CORSMiddleware
 
-from gofd import gnfd
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import gofd
+from gofd import gnfd
+
 from normalize import perform_graph_native_normalization, perform_structural_normalization
 
 ROOT_PATH = (
