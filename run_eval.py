@@ -5,6 +5,7 @@ import time
 import neo4j.exceptions
 import yaml
 import pandas as pd
+import duckdb
 
 from caseconverter import pascalcase
 from testcontainers.core.container import DockerContainer
@@ -55,8 +56,10 @@ NEO4J_HEAP_SIZE: str = "1" if os.getenv("NEO4J_HEAP_SIZE") is None else os.geten
 NEO4J_PAGECACHE_SIZE: str = "5" if os.getenv("NEO4J_PAGECACHE_SIZE") is None else os.getenv("NEO4J_PAGECACHE_SIZE")
 NEO4J_PLUGINS_PATH: str = "plugins" if os.getenv("NEO4J_PLUGINS_PATH") is None else os.getenv("NEO4J_PLUGINS_PATH")
 
-NUMBER_OF_RUNS = 3
+NUMBER_OF_RUNS = 1 if os.getenv("RUNS") is None else int(os.getenv("RUNS"))
+"""Number of evaluation runs."""
 
+# Database authentication
 USERNAME = (
         "neo4j" if os.getenv("USERNAME") is None else os.getenv("USERNAME")
 )
@@ -64,16 +67,22 @@ PASSWORD = (
         "password" if os.getenv("PASSWORD") is None else os.getenv("PASSWORD")
 )
 
-RUN_ID = ""
+RUN_ID = None
+"""The unique ID of one evaluation run. One evaluation session can consist of multiple runs."""
 
-SETUP_FILE = (
+SESSION_ID = uuid.uuid4()
+"""The unique ID of one evaluation session. One evaluation session can consist of multiple runs."""
+
+SETUP_FILE: str = (
         "setup.yaml" if os.getenv("SETUP_FILE") is None else os.getenv("SETUP_FILE")
 )
+"""Path to the YAML file containing the evaluation setup."""
 
-
-STOP = my_env = os.getenv("STOP", 'False').lower() in ('true', '1', 't')
+STOP = my_env = os.getenv("STOP", 'False').lower() in ('true', '1', 't', 'yes')
 if STOP:
     NUMBER_OF_RUNS = 1
+
+DUCKDB_CON = duckdb.connect("out/eval_results.duckdb")
 
 
 # Statistics and Metrics Export configuration
@@ -103,20 +112,7 @@ per_dep_metrics_df = pd.DataFrame(
         MINIMALITY_MATCHES_COL,
     ]
 )
-graph_overview_df = pd.DataFrame(
-    columns=[
-        GRAPH_COL,
-        GRAPH_SOURCE_COL,
-        NODE_COUNT_COL,
-        EDGE_COUNT_COL,
-        LABEL_COUNT_COL,
-        TYPES_COUNT_COL,
-        NO_INTER_GRAPH_DEPS_COL,
-        NO_INTRA_GRAPH_DEPS_COL,
-        ORIGIN_OF_DEPS_COL,
-        LP_POSSIBLE_COL,
-    ]
-)
+
 
 # Keeps track if graph overview has been computed for a graph
 _created_graph_overview: list = []
@@ -129,16 +125,17 @@ with open(SETUP_FILE, "r") as file:
 
 def main():
     test_docker_container_creation()
+    setup_duckdb(DUCKDB_CON)
 
-    logger.info("🚀 Start evaluation")
+    logger.info(f"🚀 Start evaluation. Session ID: {SESSION_ID}")
 
     if len(setup["graphs"]) < 1:
-        logger.error('🔥 "setup.yaml" does not contain any graph.')
+        logger.error('🔥 "setup.yaml" does not contain any graph. No evaluation is performed.')
         exit(1)
 
     for _ in tqdm(range(NUMBER_OF_RUNS), desc="run"):
         global RUN_ID
-        RUN_ID = str(uuid.uuid4())
+        RUN_ID = uuid.uuid4()
 
         for database in tqdm(["neo4j", "memgraph"], desc="System"):
             for graph in tqdm(setup["graphs"], desc="Graphs"):
@@ -169,8 +166,6 @@ def export_tables_and_plots():
     except FileExistsError:
         pass  # It's fine if the output folder is already there :)
 
-    graph_overview_df.to_csv("out/graph_overview.csv", index=False)
-    graph_overview_df.to_latex("out/graph_overview.tex", index=False)
 
     per_graph_metrics_df.to_csv("out/metrics.csv", index=False)
 
@@ -210,7 +205,7 @@ def perform_evaluation(
         container = DockerContainer("alpine")
     else:
         assert database == "neo4j" or (database == "memgraph" and is_based_on_neo4j_dump)
-        container = Neo4jContainer("neo4j:2025.12-enterprise")
+        container = Neo4jContainer("neo4j:2026.06-enterprise")
         container.with_volume_mapping(
             GRAPHS_PATH, "/tmp/graphs"
         )  # "/var/lib/neo4j/import/graphs")
@@ -476,7 +471,7 @@ RETURN value"""
 
             # 3. Get initial statistics
             logger.info("Get statistics")
-            get_graph_statistics(
+            calculate_metrics(
                 driver,
                 graph["name"],
                 "denormalized",
@@ -504,7 +499,7 @@ RETURN value"""
             )
 
             # 5. Get statistics after normalization
-            get_graph_statistics(
+            calculate_metrics(
                 driver,
                 graph["name"],
                 subset,
@@ -521,7 +516,7 @@ RETURN value"""
     logger.info(f"\tFinished experiment with graph \"{graph['name']}\"")
 
 
-def get_graph_statistics(
+def calculate_metrics(
     driver,
     graph_name: str,
     method: str | None,
@@ -548,20 +543,20 @@ def get_graph_statistics(
     overview_res: list[dict] = []
     dep_res: list[dict] = []
 
-    # # # # # # # # # # # # # # # # # # # # #
-    # Retrieve per graph metrics (1 Table and 1 Plot)
-    # # # # # # # # # # # # # # # # # # # # #
+    # # # # # # # # # # # # # # # #
+    # Retrieve per graph metrics  #
+    # # # # # # # # # # # # # # # #
 
     # it is important that all queries return under the name "res"
     statistics_def: list[tuple[str, str]] = [  # In the paper:
-        (r"$\mu_1$: NodeCount", "MATCH (n) RETURN COUNT(n) as res"),  #  µ1
-        (r"$\mu_2$: EdgeCount", "MATCH ()-[e]->() RETURN COUNT(e) as res"),  #  µ2
+        (r"NodeCount", "MATCH (n) RETURN COUNT(n) as res"),  #  µ1
+        (r"EdgeCount", "MATCH ()-[e]->() RETURN COUNT(e) as res"),  #  µ2
         (
-            r"$\mu_3$: AvgNodePropCount",
+            r"AvgNodePropCount",
             "MATCH (n) RETURN avg(size(keys(properties(n)))) AS res",
         ),  #  µ3
         (
-            r"$\mu_4$: AvgEdgePropCount",
+            r"AvgEdgePropCount",
             "MATCH ()-[e]->() RETURN avg(size(keys(properties(e)))) AS res",
         ),  #  µ4
         #     ("NodePropCount", "MATCH (n) RETURN size(keys(properties(n))) AS res"),
@@ -574,29 +569,14 @@ def get_graph_statistics(
             result = session.run(query)
             record = result.single()
             if record is not None:
-                statistics_res.append(
-                    {
-                        GRAPH_COL: graph_name,
-                        METHOD_COL: method,
-                        METRIC_COL: statistic_def[0],
-                        VALUE_COL: record["res"],
-                        DATABASE_COL: database,
-                        SUBSET_COL: subset,
-                        MINIMUM_COVER_COL: ignore_min_cov,
-                        RUN_ID_COL: RUN_ID,
-                    }
-                )
+                DUCKDB_CON.execute(f"""INSERT INTO per_graph_metric 
+    ({SESSION_ID_COL}, {RUN_ID_COL}, {GRAPH_COL}, {METHOD_COL}, {METRIC_COL}, {VALUE_COL}, {DATABASE_COL}, {SUBSET_COL}, {MINIMUM_COVER_COL}) VALUES (?,?,?,?,?,?,?,?,?)""",
+                               [SESSION_ID, RUN_ID, graph_name, method, statistic_def[0], record["res"], database, subset, ignore_min_cov])
 
-    statistics_df = pd.DataFrame(statistics_res)
 
-    if method == "denormalized":
-        timestamp = time.time_ns()
-
-    statistics_df[TIMESTAMP_COL] = pd.to_datetime(timestamp)
-
-    # # # # # # # # # # # # # # # # # # # # #
-    # Retrieve overview on Graphs based on setup.yaml (--> Table 2 in Paper)
-    # # # # # # # # # # # # # # # # # # # # #
+    # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # Retrieve overview on Graphs based on setup.yaml #
+    # # # # # # # # # # # # # # # # # # # # # # # # # #
     global _created_graph_overview
     if (
         not measured_denormalized
@@ -612,60 +592,27 @@ def get_graph_statistics(
                 graph_setup = next(
                     filter(lambda x: x["name"] == graph_name, setup["graphs"])
                 )
-                dependencies = gnfd.DependencySet.from_string_list(
+                dependencies = gofd.DependencySet.from_string_list(
                     graph_setup["dependencies"]
                 )
-                inter_deps_count = sum(
+                between_deps_count = sum(
                     map(lambda dep: dep.is_inter_graph_object, dependencies)
                 )
                 within_deps_count = sum(
                     map(lambda dep: dep.is_within_graph_object, dependencies)
                 )
-                overview_res.append(
-                    {
-                        GRAPH_COL: graph_name,
-                        GRAPH_SOURCE_COL: (
-                            graph_setup["source"]
-                            if "source" in graph_setup.keys() is not None
-                            else "unknown"
-                        ),
-                        NODE_COUNT_COL: (
-                            record["nodeCount"]
-                            if "nodeCount" in record.keys()
-                            else "unknown"
-                        ),
-                        EDGE_COUNT_COL: (
-                            record["relCount"]
-                            if "relCount" in record.keys()
-                            else "unknown"
-                        ),
-                        LABEL_COUNT_COL: (
-                            record["labelCount"]
-                            if "labelCount" in record.keys()
-                            else "unknown"
-                        ),
-                        TYPES_COUNT_COL: (
-                            record["relTypeCount"]
-                            if "relTypeCount" in record.keys()
-                            else "unknown"
-                        ),
-                        NO_INTER_GRAPH_DEPS_COL: inter_deps_count,
-                        NO_INTRA_GRAPH_DEPS_COL: within_deps_count,
-                        ORIGIN_OF_DEPS_COL: (
-                            graph_setup["dependency_origin"]
-                            if "dependency_origin" in graph_setup.keys() is not None
-                            else "unknown"
-                        ),
-                        LP_POSSIBLE_COL: (
-                            "$\\checkmark$" if dependencies.lp_suitable else "$\\times$"
-                        ),
-                    }
-                )
-        overview_df = pd.DataFrame(overview_res)
-        global graph_overview_df
-        graph_overview_df = pd.concat(
-            [graph_overview_df, overview_df], ignore_index=True
-        )
+                DUCKDB_CON.execute(f"""INSERT INTO graph_overview 
+                ( {SESSION_ID_COL},
+                {GRAPH_COL},
+                {NODE_COUNT_COL},
+                {EDGE_COUNT_COL},
+                {LABEL_COUNT_COL},
+                {TYPES_COUNT_COL},
+                {NO_BETWEEN_GRAPH_DEPS_COL},
+                {NO_WITHIN_GRAPH_DEPS_COL},
+                {LP_POSSIBLE_COL}) VALUES (?,?,?,?,?,?,?,?,?)""",
+                                   [SESSION_ID, graph_name, record["nodeCount"], record["relCount"], record["labelCount"], record["relTypeCount"], between_deps_count, within_deps_count, dependencies.lp_suitable])
+
 
     # # # # # # # # # # # # # # # # # # # # #
     # Retrieve per dependency metrics(1 Table and 1 Plot)
@@ -679,9 +626,6 @@ def get_graph_statistics(
                 c = 0
                 e = 0
 
-                m5 = 0
-                m6 = 0
-
                 # µ5
                 t.postfix = "Maximum redundancy potential"
                 mu5 = f"""
@@ -693,7 +637,10 @@ def get_graph_statistics(
                 result = session.run(mu5)
                 record = result.single()
                 if record is not None:
-                    m5 = record["res"]
+                    DUCKDB_CON.execute(f"""INSERT INTO per_dep_metric 
+                        ({SESSION_ID_COL}, {RUN_ID_COL}, {GRAPH_COL}, {METHOD_COL}, {DEPENDENCY_COL}, {METRIC_COL}, {VALUE_COL}, {DATABASE_COL}, {SUBSET_COL}, {MINIMUM_COVER_COL}) VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                                       [SESSION_ID, RUN_ID, graph_name, method, dep.to_latex(), MAX_INC_COUNT_COL, record["res"],
+                                        database, subset, ignore_min_cov])
                 i += 1
                 t.update(i)
 
@@ -709,7 +656,11 @@ def get_graph_statistics(
                 )
                 record = result.single()
                 if record is not None:
-                    m6 = record["res"]
+                    DUCKDB_CON.execute(f"""INSERT INTO per_dep_metric 
+                                            ({SESSION_ID_COL}, {RUN_ID_COL}, {GRAPH_COL}, {METHOD_COL}, {DEPENDENCY_COL}, {METRIC_COL}, {VALUE_COL}, {DATABASE_COL}, {SUBSET_COL}, {MINIMUM_COVER_COL}) VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                                       [SESSION_ID, RUN_ID, graph_name, method, dep.to_latex(), AVG_INC_COUNT_COL,
+                                        record["res"],
+                                        database, subset, ignore_min_cov])
                 i += 1
                 t.update(i)
 
@@ -729,6 +680,11 @@ def get_graph_statistics(
                 record = result.single()
                 if record is not None:
                     c = record["res"]
+                    DUCKDB_CON.execute(f"""INSERT INTO per_dep_metric 
+                                            ({SESSION_ID_COL}, {RUN_ID_COL}, {GRAPH_COL}, {METHOD_COL}, {DEPENDENCY_COL}, {METRIC_COL}, {VALUE_COL}, {DATABASE_COL}, {SUBSET_COL}, {MINIMUM_COVER_COL}) VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                                       [SESSION_ID, RUN_ID, graph_name, method, dep.to_latex(), MINIMALITY_CLUSTER_COL,
+                                        record["res"],
+                                        database, subset, ignore_min_cov])
                 i += 0.5
                 t.update(i)
 
@@ -743,25 +699,23 @@ def get_graph_statistics(
                 record = result.single()
                 if record is not None:
                     e = record["res"]
+                    DUCKDB_CON.execute(f"""INSERT INTO per_dep_metric 
+                                                                ({SESSION_ID_COL}, {RUN_ID_COL}, {GRAPH_COL}, {METHOD_COL}, {DEPENDENCY_COL}, {METRIC_COL}, {VALUE_COL}, {DATABASE_COL}, {SUBSET_COL}, {MINIMUM_COVER_COL}) VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                                       [SESSION_ID, RUN_ID, graph_name, method, dep.to_latex(), MINIMALITY_MATCHES_COL,
+                                        record["res"],
+                                        database, subset, ignore_min_cov])
 
                 minimality = 1 if e == 1 else (c - 1) / (e - 1)
+                DUCKDB_CON.execute(f"""INSERT INTO per_dep_metric 
+                                                            ({SESSION_ID_COL}, {RUN_ID_COL}, {GRAPH_COL}, {METHOD_COL}, {DEPENDENCY_COL}, {METRIC_COL}, {VALUE_COL}, {DATABASE_COL}, {SUBSET_COL}, {MINIMUM_COVER_COL}) VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                                   [SESSION_ID, RUN_ID, graph_name, method, dep.to_latex(), MINIMALITY_COL,
+                                    minimality,
+                                    database, subset, ignore_min_cov])
                 i += 0.5
                 t.update(i)
 
             t.postfix = "Finished"
-            dep_res.append(
-                {
-                    GRAPH_COL: graph_name,
-                    DATABASE_COL: "Neo4J" if database == "neo4j" else "Memgraph",
-                    DEPENDENCY_COL: dep.to_latex(),
-                    METHOD_COL: method,
-                    MAX_INC_COUNT_COL: m5,
-                    AVG_INC_COUNT_COL: m6,
-                    MINIMALITY_COL: minimality,
-                    MINIMALITY_CLUSTER_COL: c,
-                    MINIMALITY_MATCHES_COL: e,
-                }
-            )
+
 
 
     dep_df = pd.DataFrame(dep_res)
@@ -781,7 +735,61 @@ def get_graph_statistics(
         [per_graph_metrics_df, statistics_df], ignore_index=True
     )
 
+    if method == "denormalized":
+        timestamp = time.time_ns()
 
+    ts_str = str(pd.Timestamp(timestamp))
+
+    DUCKDB_CON.execute(f"""UPDATE per_graph_metric 
+     SET {TIMESTAMP_COL} = (?) WHERE {RUN_ID_COL} = '{RUN_ID}' AND {SESSION_ID_COL} = '{SESSION_ID}' AND {GRAPH_COL} = '{graph_name}' AND {METHOD_COL} = '{method}' AND {SUBSET_COL} = '{subset}'""", [ts_str])
+    statistics_df[TIMESTAMP_COL] = pd.to_datetime(timestamp)
+
+def setup_duckdb(con: duckdb.DuckDBPyConnection):
+    """Opens the DuckDB and creates the tables if they do not exist yet."""
+    con.sql(f"""
+    CREATE TABLE IF NOT EXISTS per_graph_metric (
+    {SESSION_ID_COL} UUID,
+    {RUN_ID_COL} UUID,
+    {GRAPH_COL} TEXT,
+    {METHOD_COL} TEXT,
+    {METRIC_COL} TEXT,
+    {VALUE_COL} DOUBLE,
+    {TIMESTAMP_COL} TIMESTAMP_NS,
+    {DATABASE_COL} TEXT, 
+    {SUBSET_COL} TEXT,
+    {MINIMUM_COVER_COL} BOOLEAN,
+    PRIMARY KEY ({SESSION_ID_COL}, {RUN_ID_COL}, {GRAPH_COL}, {METHOD_COL}, {METRIC_COL}, {DATABASE_COL}, {SUBSET_COL}, {MINIMUM_COVER_COL})
+);""")
+
+    con.sql(f"""
+        CREATE TABLE IF NOT EXISTS graph_overview (
+        {SESSION_ID_COL} UUID,
+        {GRAPH_COL} TEXT,
+        {NODE_COUNT_COL} INT,
+        {EDGE_COUNT_COL} INT,
+        {LABEL_COUNT_COL} INT,
+        {TYPES_COUNT_COL} INT,
+        {NO_BETWEEN_GRAPH_DEPS_COL} INT,
+        {NO_WITHIN_GRAPH_DEPS_COL} INT, 
+        {LP_POSSIBLE_COL} BOOLEAN,
+        PRIMARY KEY ({SESSION_ID_COL}, {GRAPH_COL})
+    );""")
+
+    con.sql(f"""
+        CREATE TABLE IF NOT EXISTS per_dep_metric (
+        {SESSION_ID_COL} UUID,
+        {RUN_ID_COL} UUID,
+        {GRAPH_COL} TEXT,
+        {METHOD_COL} TEXT,
+        {DEPENDENCY_COL} TEXT,
+        {METRIC_COL} TEXT,
+        {VALUE_COL} DOUBLE,
+        {TIMESTAMP_COL} TIMESTAMP_NS,
+        {DATABASE_COL} TEXT, 
+        {SUBSET_COL} TEXT,
+        {MINIMUM_COVER_COL} BOOLEAN,
+        PRIMARY KEY ({SESSION_ID_COL}, {RUN_ID_COL}, {GRAPH_COL}, {METHOD_COL}, {DEPENDENCY_COL}, {METRIC_COL}, {DATABASE_COL}, {SUBSET_COL}, {MINIMUM_COVER_COL})
+    );""")
 def test_connection_to_neo4j(uri: str, username: str = "neo4j", password: str = None):
     """Tests whether a connection to the Neo4j database is successful.
 
@@ -792,19 +800,22 @@ def test_connection_to_neo4j(uri: str, username: str = "neo4j", password: str = 
         driver.verify_connectivity()
 
 
-def test_connection_to_memgraph(uri):
+def test_connection_to_memgraph(uri: str):
+    """Tests whether a connection to the Memgraph database is successful.
+
+    :param uri: URI of the Memgraph database"""
     with GraphDatabase.driver(uri) as driver:
         driver.verify_connectivity()
 
 
 def test_docker_container_creation():
     """Tests whether the `testcontainers` package is able to create Docker containers.
-    If the creation files the evaluation is exited as no experiments can be run."""
+    If the creation failes, the evaluation is exited as no experiments can be run."""
     with tqdm(desc="Startup testing", initial=0, total=1) as t:
-        t.postfix =            'Testing Docker container creation'
+        t.postfix = 'Testing Docker container creation'
 
         with DockerContainer("alpine").with_command(
-            "echo 'Hello world!' && tail -f /dev/null"
+                "echo 'Hello world!' && tail -f /dev/null"
         ) as container:
             try:
                 container.waiting_for(LogMessageWaitStrategy("Hello world!"))
