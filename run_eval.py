@@ -154,26 +154,7 @@ def main():
 
     logger.info("✅ Finished evaluation")
 
-    export_tables_and_plots()
 
-
-def export_tables_and_plots():
-    """Exports the computed statistics as CSV and LaTeX tables."""
-    logger.info("📊 Export CSV results.")
-
-    try:
-        os.mkdir("out")
-    except FileExistsError:
-        pass  # It's fine if the output folder is already there :)
-
-
-    per_graph_metrics_df.to_csv("out/metrics.csv", index=False)
-
-    global per_dep_metrics_df
-    per_dep_metrics_df = per_dep_metrics_df.set_index(
-        [GRAPH_COL, DATABASE_COL, METHOD_COL, DEPENDENCY_COL]
-    )
-    per_dep_metrics_df.to_csv("out/per_dep_metrics.csv")
 
 
 
@@ -725,10 +706,6 @@ def calculate_metrics(
     # Add timestamp to dataframe
     statistics_df = pd.DataFrame(statistics_res)
 
-    if method == "denormalized":
-        timestamp = time.time_ns()
-
-    statistics_df[TIMESTAMP_COL] = pd.to_datetime(timestamp)
 
     global per_graph_metrics_df
     per_graph_metrics_df = pd.concat(
@@ -742,6 +719,10 @@ def calculate_metrics(
 
     DUCKDB_CON.execute(f"""UPDATE per_graph_metric 
      SET {TIMESTAMP_COL} = (?) WHERE {RUN_ID_COL} = '{RUN_ID}' AND {SESSION_ID_COL} = '{SESSION_ID}' AND {GRAPH_COL} = '{graph_name}' AND {METHOD_COL} = '{method}' AND {SUBSET_COL} = '{subset}'""", [ts_str])
+    statistics_df[TIMESTAMP_COL] = pd.to_datetime(timestamp)
+    DUCKDB_CON.execute(f"""UPDATE per_dep_metric 
+         SET {TIMESTAMP_COL} = (?) WHERE {RUN_ID_COL} = '{RUN_ID}' AND {SESSION_ID_COL} = '{SESSION_ID}' AND {GRAPH_COL} = '{graph_name}' AND {METHOD_COL} = '{method}' AND {SUBSET_COL} = '{subset}'""",
+                       [ts_str])
     statistics_df[TIMESTAMP_COL] = pd.to_datetime(timestamp)
 
 def setup_duckdb(con: duckdb.DuckDBPyConnection):
