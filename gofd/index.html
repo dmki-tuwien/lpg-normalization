@@ -386,7 +386,7 @@
   
   
     <li class="md-nav__item">
-      <a href="https://github.com/dmki-tuwien/lpg-normalization/tree/master/out" class="md-nav__link">
+      <a href="../evaluation_results/" class="md-nav__link">
         
   
   
@@ -429,6 +429,33 @@
     
   
     Source Code Documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
   
 
     
@@ -507,7 +534,7 @@ we defined an ASCII syntax, whose <a href="#grammar">grammar</a> is shown below.
 <p>For the evaluation in the <a href="http://arxiv.org/abs/2603.02995">paper</a>, 
 we implemented the <abbr title="graph object funcitonal dependencies">GO-FDs</abbr> in form of a Python package, which can be found <a href="../source_code_documentation/#gnfd.GOFD">here</a>.</p>
 <h2 id="grammar">Grammar</h2>
-<p>For parsing <abbr title="graph object funcitonal dependencies">GO-FDs</abbr> an ANTLR grammar has been written, which is shown below. The Python implementation of <abbr title="graph object funcitonal dependencies">GO-FDs</abbr> (:class:<code>gnfd.GNFD</code>) is relying on this grammar.</p>
+<p>For parsing <abbr title="graph object funcitonal dependencies">GO-FDs</abbr> an ANTLR grammar has been written, which is shown below. The Python implementation of <abbr title="graph object funcitonal dependencies">GO-FDs</abbr> (<a class="autorefs autorefs-internal" href="../source_code_documentation/#gofd.GOFD"><code>GOFD</code></a>) is relying on this grammar.</p>
 <div class="highlight"><pre><span></span><code>grammar gnfd ;
 
 AMPERSAND : '&amp;' ;
@@ -609,6 +636,8 @@ nodePattern : LPAR varName? ((labelList propertyList?) | (COLON propertyList))? 
         <script src="../javascripts/mathjax.js"></script>
       
         <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
       
     
   

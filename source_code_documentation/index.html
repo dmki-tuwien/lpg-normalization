@@ -6,8 +6,10 @@
       
       
       
-        <link rel="prev" href="../evaluation_scenarios/">
+        <link rel="prev" href="../evaluation_results/">
       
+      
+        <link rel="next" href="../troubleshooting/">
       
       
         
@@ -324,7 +326,7 @@
   
   
     <li class="md-nav__item">
-      <a href="https://github.com/dmki-tuwien/lpg-normalization/tree/master/out" class="md-nav__link">
+      <a href="../evaluation_results/" class="md-nav__link">
         
   
   
@@ -442,11 +444,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gnfd-package" class="md-nav__link">
+  <a href="#gofd-package" class="md-nav__link">
     <span class="md-ellipsis">
       
         <span class="md-typeset">
-          GNFD Package
+          GOFD Package
         </span>
       
     </span>
@@ -463,6 +465,33 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -519,11 +548,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gnfd-package" class="md-nav__link">
+  <a href="#gofd-package" class="md-nav__link">
     <span class="md-ellipsis">
       
         <span class="md-typeset">
-          GNFD Package
+          GOFD Package
         </span>
       
     </span>
@@ -562,7 +591,7 @@
 <p>The <a href="https://github.com/dmki-tuwien/lpg-normalization">GitHub repository</a> is structured as follows:</p>
 <ul>
 <li><code>docs/</code>: The documentation of the source code of this repository. Basis for the <a href="https://dmki-tuwien.github.io/lpg-normalization/">documentation</a>.</li>
-<li><code>gnfd/</code>: A Python package that implements the Graph Object Functional Dependencies </li>
+<li><code>gofd/</code>: A Python package that implements the Graph Object Functional Dependencies </li>
 <li><code>graphs/</code>: Contains graphs that are normalized as part of the evaluation</li>
 <li><code>out/</code>: Contains the output of the evaluation as CSV files</li>
 <li><code>tests/</code>: Contains Python pytests for the dependencies and the normalization</li>
@@ -615,7 +644,7 @@
 
 
 <h5 id="normalize.perform_graph_native_normalization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">perform_graph_native_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">provided_dependencies</span><span class="p">:</span> <span class="n">DependencySet</span><span class="p">,</span> <span class="n">dep_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'all'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">DependencySet</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span></code>
+            <code class="highlight language-python"><span class="n">perform_graph_native_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'neo4j'</span><span class="p">,</span> <span class="s1">'memgraph'</span><span class="p">],</span> <span class="n">provided_dependencies</span><span class="p">:</span> <span class="n">DependencySet</span><span class="p">,</span> <span class="n">dep_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'all'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">DependencySet</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span></code>
 
 </h5>
 
@@ -637,6 +666,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>database</code></b>
+              (<code><span title="typing.Literal">Literal</span>['neo4j', 'memgraph']</code>)
           –
           <div class="doc-md-description">
             <p>The name of the database in which the to be normalized graph is contained. Supported databases are: <code>"neo4j"</code> and <code>"memgraph"</code></p>
@@ -644,7 +674,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>provided_dependencies</code></b>
-              (<code><a class="autorefs autorefs-internal" title="&lt;code&gt;DependencySet&lt;/code&gt; (&lt;code&gt;gnfd.DependencySet&lt;/code&gt;)" href="#gnfd.DependencySet">DependencySet</a></code>)
+              (<code><a class="autorefs autorefs-internal" title="&lt;code&gt;DependencySet&lt;/code&gt; (&lt;code&gt;gofd.DependencySet&lt;/code&gt;)" href="#gofd.DependencySet">DependencySet</a></code>)
           –
           <div class="doc-md-description">
             <p>The dependencies to be considered for the normalization</p>
@@ -666,7 +696,7 @@
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code>(<a class="autorefs autorefs-internal" title="&lt;code&gt;DependencySet&lt;/code&gt; (&lt;code&gt;gnfd.DependencySet&lt;/code&gt;)" href="#gnfd.DependencySet">DependencySet</a>, <span title="list">list</span>[<span title="str">str</span>])</code>
+              <code>(<a class="autorefs autorefs-internal" title="&lt;code&gt;DependencySet&lt;/code&gt; (&lt;code&gt;gofd.DependencySet&lt;/code&gt;)" href="#gofd.DependencySet">DependencySet</a>, <span title="list">list</span>[<span title="str">str</span>])</code>
           –
           <div class="doc-md-description">
             
@@ -677,8 +707,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>normalize.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 16</span>
-<span class="normal"> 17</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 17</span>
 <span class="normal"> 18</span>
 <span class="normal"> 19</span>
 <span class="normal"> 20</span>
@@ -1382,9 +1411,10 @@
 <span class="normal">718</span>
 <span class="normal">719</span>
 <span class="normal">720</span>
-<span class="normal">721</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">perform_graph_native_normalization</span><span class="p">(</span>
+<span class="normal">721</span>
+<span class="normal">722</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">perform_graph_native_normalization</span><span class="p">(</span>
     <span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span>
-    <span class="n">database</span><span class="p">,</span>
+    <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"neo4j"</span><span class="p">,</span> <span class="s2">"memgraph"</span><span class="p">],</span>
     <span class="n">provided_dependencies</span><span class="p">:</span> <span class="n">DependencySet</span><span class="p">,</span>
     <span class="n">dep_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"all"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">DependencySet</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
@@ -2094,21 +2124,208 @@
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+<h5 id="normalize.perform_structural_normalization" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">perform_structural_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'neo4j'</span><span class="p">,</span> <span class="s1">'memgraph'</span><span class="p">],</span> <span class="n">normal_form</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'1GNF'</span><span class="p">,</span> <span class="s1">'2GNF'</span><span class="p">,</span> <span class="s1">'3GNF'</span><span class="p">,</span> <span class="s1">'3+GNF'</span><span class="p">,</span> <span class="s1">'EGNF'</span><span class="p">])</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Performs structural normalization as described by Egger et al. in https://doi.org/10.14778/3797919.3797943.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>driver</code></b>
+              (<code><span title="neo4j.Driver">Driver</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>A :any:<code>neo4j.Driver</code></p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>database</code></b>
+              (<code><span title="typing.Literal">Literal</span>['neo4j', 'memgraph']</code>)
+          –
+          <div class="doc-md-description">
+            
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>normal_form</code></b>
+              (<code><span title="typing.Literal">Literal</span>['1GNF', '2GNF', '3GNF', '3+GNF', 'EGNF']</code>)
+          –
+          <div class="doc-md-description">
+            
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+          –
+          <div class="doc-md-description">
+            
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>normalize.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">725</span>
+<span class="normal">726</span>
+<span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span>
+<span class="normal">730</span>
+<span class="normal">731</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span>
+<span class="normal">738</span>
+<span class="normal">739</span>
+<span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
+<span class="normal">780</span>
+<span class="normal">781</span>
+<span class="normal">782</span>
+<span class="normal">783</span>
+<span class="normal">784</span>
+<span class="normal">785</span>
+<span class="normal">786</span>
+<span class="normal">787</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">perform_structural_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"neo4j"</span><span class="p">,</span> <span class="s2">"memgraph"</span><span class="p">],</span> <span class="n">normal_form</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"1GNF"</span><span class="p">,</span> <span class="s2">"2GNF"</span><span class="p">,</span> <span class="s2">"3GNF"</span><span class="p">,</span> <span class="s2">"3+GNF"</span><span class="p">,</span> <span class="s2">"EGNF"</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Performs structural normalization as described by Egger et al. in https://doi.org/10.14778/3797919.3797943.</span>
+<span class="sd">    :param driver: A :any:`neo4j.Driver`</span>
+<span class="sd">    :param database:</span>
+<span class="sd">    :param normal_form:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    """</span>
+
+    <span class="k">match</span> <span class="n">normal_form</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">"1GNF"</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+
+                <span class="n">found_non_atomic</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># To check whether there are non-atomic properties, we assume there are some!</span>
+
+                <span class="c1"># Retrieve all non-atomic values in edges and reify them</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">                MATCH (n)-[e]-&gt;(m)</span>
+<span class="s2">                UNWIND keys(e) AS key</span>
+<span class="s2">                WITH n, m, e, key, e[key] AS propValue</span>
+<span class="s2">                WHERE propValue IS :: LIST&lt;ANY&gt;</span>
+<span class="s2">                CREATE (re:$(type(e)))</span>
+<span class="s2">                CREATE (n)-[:$("SRC_"+type(e))]-&gt;(re)</span>
+<span class="s2">                CREATE (re)-[:$("TGT_"+type(e))]-&gt;(m)</span>
+<span class="s2">                SET re += properties(e)</span>
+<span class="s2">                DELETE e</span>
+<span class="s2">                                """</span><span class="p">)</span> <span class="c1"># happens only once; after this only nodes can have complex property values.</span>
+
+                <span class="k">while</span> <span class="n">found_non_atomic</span><span class="p">:</span>
+
+
+                    <span class="c1"># Retrieve all non-atomic values in nodes (original nodes + reified)</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">    MATCH (n)</span>
+<span class="s2">    UNWIND keys(n) AS key</span>
+<span class="s2">    WITH n, key, n[key] AS propValue</span>
+<span class="s2">    WHERE propValue IS :: LIST&lt;ANY&gt;</span>
+<span class="s2">    RETURN elementId(n) AS nodeId, key AS propName, propValue</span>
+<span class="s2">                    """</span><span class="p">)</span>
+
+                    <span class="n">found_non_atomic</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                        <span class="n">found_non_atomic</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># There were non-atomic values, so we need another iteration!</span>
+                        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">for</span> <span class="n">atomic_value</span> <span class="ow">in</span> <span class="n">record</span><span class="p">[</span><span class="s2">"propValue"</span><span class="p">]:</span>
+                            <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""MERGE (n </span><span class="se">{{</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span><span class="s2">:"</span><span class="si">{</span><span class="n">atomic_value</span><span class="si">}</span><span class="s2">"</span><span class="se">}}</span><span class="s2">)"""</span><span class="p">)</span>  <span class="c1"># TODO: Check datatypes whether quotes are required (str, vs. int)</span>
+
+                            <span class="c1"># Mimics `getOrCreate` from https://doi.org/10.14778/3797919.3797943</span>
+                            <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">    MATCH (n) WHERE elementId(n) = "</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeId"</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+<span class="s2">    MATCH (m) WHERE size(keys(m)) = 1 AND m.</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span><span class="s2"> = "</span><span class="si">{</span><span class="n">atomic_value</span><span class="si">}</span><span class="s2">"</span>
+<span class="s2">    CREATE (n)-[:`</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">`]-&gt;(m)</span>
+<span class="s2">    """</span><span class="p">)</span>
+                            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">    MATCH (n) WHERE elementId(n) = "</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeId"</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+<span class="s2">    REMOVE n.</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span>
+<span class="s2">    """</span><span class="p">)</span>
+            <span class="k">pass</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The normal form </span><span class="se">\"</span><span class="si">{</span><span class="n">normal_form</span><span class="si">}</span><span class="se">\"</span><span class="s2"> is not supported for structural normalization"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DependencySet</span><span class="o">.</span><span class="n">from_string_list</span><span class="p">([]),</span> <span class="p">[]</span>
+</code></pre></div></td></tr></tbody></table></div>
+            </details>
+    </div>
+
+</div>
+
 
 
   </div>
 
     </div>
 
-</div><h3 id="gnfd-package">GNFD Package</h3>
+</div><h3 id="gofd-package">GOFD Package</h3>
 
 
 <div class="doc doc-object doc-module">
 
 
 
-<h4 id="gnfd" class="doc doc-heading">
-            <code>gnfd</code>
+<h4 id="gofd" class="doc doc-heading">
+            <code>gofd</code>
 
 
 </h4>
@@ -2138,7 +2355,7 @@
 
 
 
-<h5 id="gnfd.DependencySet" class="doc doc-heading">
+<h5 id="gofd.DependencySet" class="doc doc-heading">
             <code>DependencySet</code>
 
 
@@ -2147,7 +2364,7 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="set">set</span>[<a class="autorefs autorefs-internal" title="&lt;code&gt;GOFD&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.GOFD&lt;/code&gt;)" href="#gnfd.GOFD">GOFD</a>]</code></p>
+              Bases: <code><span title="set">set</span>[<a class="autorefs autorefs-internal" title="&lt;code&gt;GOFD&lt;/code&gt; (&lt;code&gt;gofd.gnfd.GOFD&lt;/code&gt;)" href="#gofd.GOFD">GOFD</a>]</code></p>
 
 
 
@@ -2159,7 +2376,7 @@
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/__init__.py</code></summary>
+                <summary>Source code in <code>gofd/__init__.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">12</span>
 <span class="normal">13</span>
 <span class="normal">14</span>
@@ -2208,7 +2425,7 @@
 
 
 
-<h6 id="gnfd.DependencySet.lp_suitable" class="doc doc-heading">
+<h6 id="gofd.DependencySet.lp_suitable" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">lp_suitable</span><span class="p">:</span> <span class="nb">bool</span></code>
 
   <span class="doc doc-labels">
@@ -2244,7 +2461,7 @@
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.DependencySet.from_string_list" class="doc doc-heading">
+<h6 id="gofd.DependencySet.from_string_list" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">from_string_list</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DependencySet</span></code>
 
   <span class="doc doc-labels">
@@ -2260,7 +2477,7 @@
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/__init__.py</code></summary>
+              <summary>Source code in <code>gofd/__init__.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">13</span>
 <span class="normal">14</span>
 <span class="normal">15</span>
@@ -2277,7 +2494,7 @@
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.DependencySet.is_in_global_normal_form" class="doc doc-heading">
+<h6 id="gofd.DependencySet.is_in_global_normal_form" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">is_in_global_normal_form</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
 
 </h6>
@@ -2301,7 +2518,7 @@
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/__init__.py</code></summary>
+              <summary>Source code in <code>gofd/__init__.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_in_global_normal_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -2325,7 +2542,7 @@
 
 
 
-<h5 id="gnfd.Edge" class="doc doc-heading">
+<h5 id="gofd.Edge" class="doc doc-heading">
             <code>Edge</code>
 
 
@@ -2334,7 +2551,7 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.GraphObject&lt;/code&gt;)" href="#gnfd.GraphObject">GraphObject</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Pattern&lt;/code&gt;)" href="#gnfd.Pattern">Pattern</a></code>, <code><span title="abc.ABC">ABC</span></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gofd.gnfd.GraphObject&lt;/code&gt;)" href="#gofd.GraphObject">GraphObject</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Pattern&lt;/code&gt;)" href="#gofd.Pattern">Pattern</a></code>, <code><span title="abc.ABC">ABC</span></code></p>
 
 
 
@@ -2375,7 +2592,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>src_pattern</code></b>
-              (<code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Pattern&lt;/code&gt;)" href="#gnfd.Pattern">Pattern</a> | None</code>, default:
+              (<code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Pattern&lt;/code&gt;)" href="#gofd.Pattern">Pattern</a> | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2385,7 +2602,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>tgt_pattern</code></b>
-              (<code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Pattern&lt;/code&gt;)" href="#gnfd.Pattern">Pattern</a> | None</code>, default:
+              (<code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Pattern&lt;/code&gt;)" href="#gofd.Pattern">Pattern</a> | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2403,7 +2620,7 @@
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">343</span>
 <span class="normal">344</span>
 <span class="normal">345</span>
@@ -2864,7 +3081,7 @@
 
 
 
-<h6 id="gnfd.Edge.src" class="doc doc-heading">
+<h6 id="gofd.Edge.src" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">src</span><span class="p">:</span> <span class="n">Node</span></code>
 
   <span class="doc doc-labels">
@@ -2883,7 +3100,7 @@
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Node&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Node&lt;/code&gt;)" href="#gnfd.Node">Node</a></code>
+              <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Node&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Node&lt;/code&gt;)" href="#gofd.Node">Node</a></code>
           –
           <div class="doc-md-description">
             <p>any:<code>Node</code> of the edge</p>
@@ -2899,7 +3116,7 @@
 
 
 
-<h6 id="gnfd.Edge.tgt" class="doc doc-heading">
+<h6 id="gofd.Edge.tgt" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">tgt</span><span class="p">:</span> <span class="n">Node</span></code>
 
   <span class="doc doc-labels">
@@ -2918,7 +3135,7 @@
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Node&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Node&lt;/code&gt;)" href="#gnfd.Node">Node</a></code>
+              <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Node&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Node&lt;/code&gt;)" href="#gofd.Node">Node</a></code>
           –
           <div class="doc-md-description">
             <p>any:<code>Node</code> of the edge</p>
@@ -2945,7 +3162,7 @@
 
 
 
-<h5 id="gnfd.GOFD" class="doc doc-heading">
+<h5 id="gofd.GOFD" class="doc doc-heading">
             <code>GOFD</code>
 
 
@@ -2967,7 +3184,7 @@ GNFDs are ordered by their pattern.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">791</span>
 <span class="normal">792</span>
 <span class="normal">793</span>
@@ -3152,7 +3369,7 @@ GNFDs are ordered by their pattern.</p>
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.GOFD.from_string" class="doc doc-heading">
+<h6 id="gofd.GOFD.from_string" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">from_string</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
@@ -3181,7 +3398,7 @@ GNFDs are ordered by their pattern.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">809</span>
 <span class="normal">810</span>
 <span class="normal">811</span>
@@ -3237,7 +3454,7 @@ GNFDs are ordered by their pattern.</p>
 
 
 
-<h5 id="gnfd.GraphObject" class="doc doc-heading">
+<h5 id="gofd.GraphObject" class="doc doc-heading">
             <code>GraphObject</code>
 
 
@@ -3295,7 +3512,7 @@ GNFDs are ordered by their pattern.</p>
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
@@ -3452,7 +3669,7 @@ GNFDs are ordered by their pattern.</p>
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.GraphObject.clingo_symbol" class="doc doc-heading">
+<h6 id="gofd.GraphObject.clingo_symbol" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">clingo_symbol</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
 
 </h6>
@@ -3464,7 +3681,7 @@ GNFDs are ordered by their pattern.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
@@ -3485,7 +3702,7 @@ GNFDs are ordered by their pattern.</p>
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.GraphObject.go_equals" class="doc doc-heading">
+<h6 id="gofd.GraphObject.go_equals" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">go_equals</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">GraphObject</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
@@ -3512,7 +3729,7 @@ GNFDs are ordered by their pattern.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">85</span>
 <span class="normal">86</span>
 <span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
@@ -3527,7 +3744,7 @@ GNFDs are ordered by their pattern.</p>
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.GraphObject.is_anonymous" class="doc doc-heading">
+<h6 id="gofd.GraphObject.is_anonymous" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">is_anonymous</span><span class="p">()</span></code>
 
 </h6>
@@ -3540,7 +3757,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
@@ -3568,7 +3785,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h5 id="gnfd.LeftEdge" class="doc doc-heading">
+<h5 id="gofd.LeftEdge" class="doc doc-heading">
             <code>LeftEdge</code>
 
 
@@ -3577,7 +3794,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Edge&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Edge&lt;/code&gt;)" href="#gnfd.Edge">Edge</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Edge&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Edge&lt;/code&gt;)" href="#gofd.Edge">Edge</a></code></p>
 
 
 
@@ -3591,7 +3808,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">570</span>
 <span class="normal">571</span>
 <span class="normal">572</span>
@@ -3667,7 +3884,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h5 id="gnfd.Node" class="doc doc-heading">
+<h5 id="gofd.Node" class="doc doc-heading">
             <code>Node</code>
 
 
@@ -3676,7 +3893,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.GraphObject&lt;/code&gt;)" href="#gnfd.GraphObject">GraphObject</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Pattern&lt;/code&gt;)" href="#gnfd.Pattern">Pattern</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gofd.gnfd.GraphObject&lt;/code&gt;)" href="#gofd.GraphObject">GraphObject</a></code>, <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Pattern&lt;/code&gt;)" href="#gofd.Pattern">Pattern</a></code></p>
 
 
 
@@ -3690,7 +3907,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
@@ -4012,7 +4229,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h5 id="gnfd.Pattern" class="doc doc-heading">
+<h5 id="gofd.Pattern" class="doc doc-heading">
             <code>Pattern</code>
 
 
@@ -4035,7 +4252,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span>
@@ -4236,7 +4453,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h6 id="gnfd.Pattern.leftmost_node" class="doc doc-heading">
+<h6 id="gofd.Pattern.leftmost_node" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">leftmost_node</span></code>
 
   <span class="doc doc-labels">
@@ -4270,7 +4487,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h6 id="gnfd.Pattern.rightmost_node" class="doc doc-heading">
+<h6 id="gofd.Pattern.rightmost_node" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">rightmost_node</span></code>
 
   <span class="doc doc-labels">
@@ -4306,7 +4523,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.contains_property" class="doc doc-heading">
+<h6 id="gofd.Pattern.contains_property" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">contains_property</span><span class="p">(</span><span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
@@ -4354,7 +4571,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">133</span>
 <span class="normal">134</span>
 <span class="normal">135</span>
@@ -4385,7 +4602,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.contains_var" class="doc doc-heading">
+<h6 id="gofd.Pattern.contains_var" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">contains_var</span><span class="p">(</span><span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
 
   <span class="doc doc-labels">
@@ -4426,7 +4643,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
@@ -4453,7 +4670,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.equals" class="doc doc-heading">
+<h6 id="gofd.Pattern.equals" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">equals</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Pattern</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
 
 </h6>
@@ -4477,7 +4694,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">162</span>
 <span class="normal">163</span>
 <span class="normal">164</span>
@@ -4502,7 +4719,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.get_graph_object_with_symbol" class="doc doc-heading">
+<h6 id="gofd.Pattern.get_graph_object_with_symbol" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">get_graph_object_with_symbol</span><span class="p">(</span><span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GraphObject</span> <span class="o">|</span> <span class="kc">None</span></code>
 
   <span class="doc doc-labels">
@@ -4520,7 +4737,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.GraphObject&lt;/code&gt;)" href="#gnfd.GraphObject">GraphObject</a> | None</code>
+              <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gofd.gnfd.GraphObject&lt;/code&gt;)" href="#gofd.GraphObject">GraphObject</a> | None</code>
           –
           <div class="doc-md-description">
             <p>a graph object with the given symbol</p>
@@ -4530,7 +4747,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">145</span>
 <span class="normal">146</span>
 <span class="normal">147</span>
@@ -4547,7 +4764,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.get_graph_objects" class="doc doc-heading">
+<h6 id="gofd.Pattern.get_graph_objects" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">get_graph_objects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="n">GraphObject</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
@@ -4565,7 +4782,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="set">set</span>[<a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.GraphObject&lt;/code&gt;)" href="#gnfd.GraphObject">GraphObject</a>]</code>
+              <code><span title="set">set</span>[<a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gofd.gnfd.GraphObject&lt;/code&gt;)" href="#gofd.GraphObject">GraphObject</a>]</code>
           –
           <div class="doc-md-description">
             <p>all graph objects, i.e., any :any:<code>Node</code> or :any:<code>Edge</code>.</p>
@@ -4575,7 +4792,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">185</span>
 <span class="normal">186</span>
 <span class="normal">187</span>
@@ -4592,7 +4809,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.less_than" class="doc doc-heading">
+<h6 id="gofd.Pattern.less_than" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">less_than</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
 
   <span class="doc doc-labels">
@@ -4608,7 +4825,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
@@ -4625,7 +4842,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.minimal_pattern_intersections" class="doc doc-heading">
+<h6 id="gofd.Pattern.minimal_pattern_intersections" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">minimal_pattern_intersections</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Pattern</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Pattern</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]]</span></code>
 
   <span class="doc doc-labels">
@@ -4643,7 +4860,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="list">list</span>[<span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Pattern&lt;/code&gt;)" href="#gnfd.Pattern">Pattern</a>, <span title="set">set</span>[<span title="tuple">tuple</span>[<span title="str">str</span>, <span title="str">str</span>]]]]</code>
+              <code><span title="list">list</span>[<span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Pattern&lt;/code&gt;)" href="#gofd.Pattern">Pattern</a>, <span title="set">set</span>[<span title="tuple">tuple</span>[<span title="str">str</span>, <span title="str">str</span>]]]]</code>
           –
           <div class="doc-md-description">
             <p>a list of tuples consisting of (1) the pattern that is the minimal intersection between this and the :paramref:<code>other</code> pattern and of (2) tuples denote variable correspondences between the patterns.</p>
@@ -4653,7 +4870,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">176</span>
 <span class="normal">177</span>
 <span class="normal">178</span>
@@ -4678,7 +4895,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.to_clingo_tableau" class="doc doc-heading">
+<h6 id="gofd.Pattern.to_clingo_tableau" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">to_clingo_tableau</span><span class="p">(</span><span class="n">lhs</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Reference</span><span class="p">],</span> <span class="n">constants</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
 
   <span class="doc doc-labels">
@@ -4706,7 +4923,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span>
@@ -4723,7 +4940,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Pattern.to_gql_match_where_tuple" class="doc doc-heading">
+<h6 id="gofd.Pattern.to_gql_match_where_tuple" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">to_gql_match_where_tuple</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
@@ -4751,7 +4968,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
@@ -4777,7 +4994,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h5 id="gnfd.PatternConcat" class="doc doc-heading">
+<h5 id="gofd.PatternConcat" class="doc doc-heading">
             <code>PatternConcat</code>
 
 
@@ -4786,7 +5003,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Pattern&lt;/code&gt;)" href="#gnfd.Pattern">Pattern</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Pattern&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Pattern&lt;/code&gt;)" href="#gofd.Pattern">Pattern</a></code></p>
 
 
 
@@ -4800,7 +5017,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">622</span>
 <span class="normal">623</span>
 <span class="normal">624</span>
@@ -5046,7 +5263,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h5 id="gnfd.Property" class="doc doc-heading">
+<h5 id="gofd.Property" class="doc doc-heading">
             <code>Property</code>
 
 
@@ -5067,7 +5284,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">733</span>
 <span class="normal">734</span>
 <span class="normal">735</span>
@@ -5119,7 +5336,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h5 id="gnfd.Reference" class="doc doc-heading">
+<h5 id="gofd.Reference" class="doc doc-heading">
             <code>Reference</code>
 
 
@@ -5140,7 +5357,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">747</span>
 <span class="normal">748</span>
 <span class="normal">749</span>
@@ -5245,7 +5462,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Reference.get_graph_object" class="doc doc-heading">
+<h6 id="gofd.Reference.get_graph_object" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">get_graph_object</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">GraphObject</span></code>
 
 </h6>
@@ -5259,7 +5476,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.GraphObject&lt;/code&gt;)" href="#gnfd.GraphObject">GraphObject</a></code>
+              <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GraphObject&lt;/code&gt; (&lt;code&gt;gofd.gnfd.GraphObject&lt;/code&gt;)" href="#gofd.GraphObject">GraphObject</a></code>
           –
           <div class="doc-md-description">
             <p>The graph object of the reference.</p>
@@ -5269,7 +5486,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">758</span>
 <span class="normal">759</span>
 <span class="normal">760</span>
@@ -5292,7 +5509,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 <div class="doc doc-object doc-function">
 
 
-<h6 id="gnfd.Reference.to_query_string" class="doc doc-heading">
+<h6 id="gofd.Reference.to_query_string" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">to_query_string</span><span class="p">(</span><span class="n">database</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
 
 </h6>
@@ -5316,7 +5533,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">774</span>
 <span class="normal">775</span>
 <span class="normal">776</span>
@@ -5350,7 +5567,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
 
-<h5 id="gnfd.RightEdge" class="doc doc-heading">
+<h5 id="gofd.RightEdge" class="doc doc-heading">
             <code>RightEdge</code>
 
 
@@ -5359,7 +5576,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Edge&lt;/code&gt; (&lt;code&gt;gnfd.gnfd.Edge&lt;/code&gt;)" href="#gnfd.Edge">Edge</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;Edge&lt;/code&gt; (&lt;code&gt;gofd.gnfd.Edge&lt;/code&gt;)" href="#gofd.Edge">Edge</a></code></p>
 
 
 
@@ -5373,7 +5590,7 @@ Anonymous graph objects cannot be used in the descriptor, i.e., the left and rig
 
 
               <details class="mkdocstrings-source">
-                <summary>Source code in <code>gnfd/gnfd.py</code></summary>
+                <summary>Source code in <code>gofd/gnfd.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">596</span>
 <span class="normal">597</span>
 <span class="normal">598</span>
@@ -5519,6 +5736,8 @@ form for property graphs. VLDB J. 34, 2 (2025), 23.&nbsp;<a class="footnote-back
         <script src="../javascripts/mathjax.js"></script>
       
         <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
       
     
   
