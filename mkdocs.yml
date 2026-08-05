@@ -62,16 +62,18 @@ plugins:
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js
 
 nav:
   - Home: index.md
   - Graph Object Functional Dependencies: gofd.md
   - Evaluation:
     - Scenarios: evaluation_scenarios.md
-  #  - Results: evaluation_results.md
-    - Results: https://github.com/dmki-tuwien/lpg-normalization/tree/master/out
+    - Results: evaluation_results.md
+    #- Results: https://github.com/dmki-tuwien/lpg-normalization/tree/master/out
 
   - Source Code Documentation: source_code_documentation.md
+  - Troubleshooting: troubleshooting.md
 
 
 watch:
