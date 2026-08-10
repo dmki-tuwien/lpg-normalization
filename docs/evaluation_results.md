@@ -115,7 +115,7 @@ import * as duckdb from 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm/+esm';
       });
 
       const graphDropdown = vg.menu({
-        label: 'Graph: ',
+        label: 'Scenario: ',
         from: 'current_per_graph_metric',
         column: 'graph',
         as: $filter
