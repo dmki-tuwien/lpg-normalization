@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from typing import Literal
 
 import neo4j.exceptions
 import yaml
@@ -133,7 +134,7 @@ def main():
         logger.error('🔥 "setup.yaml" does not contain any graph. No evaluation is performed.')
         exit(1)
 
-    for _ in tqdm(range(NUMBER_OF_RUNS), desc="run"):
+    for _ in tqdm(range(NUMBER_OF_RUNS), desc="Run"):
         global RUN_ID
         RUN_ID = uuid.uuid4()
 
@@ -146,7 +147,7 @@ def main():
                 for subset in tqdm(
                     subsets, desc="Dep. subset"
                 ):
-                    for algorithm in ["synthesis"]:  # ,"decomposition"]:
+                    for algorithm in ["graph-native"]:
                         for ignore_min_cov in [False]: #tqdm([True, False], desc="Min. cov."):
                             perform_evaluation(
                                 graph, database, subset, algorithm, ignore_min_cov
@@ -159,7 +160,7 @@ def main():
 
 
 def perform_evaluation(
-    graph: dict, database: str, subset: str, algorithm: str, ignore_min_cov: bool
+    graph: dict, database: Literal["neo4j", "memgraph"], subset: str, algorithm: str, ignore_min_cov: bool
 ):
     logger.info(
         f"\tPerform experiment with graph \"{graph['name']}\", database \"{database}\", subset \"{subset}\", algorithm \"{algorithm}\", and minimal cover ignored \"{ignore_min_cov}\"."
@@ -170,16 +171,18 @@ def perform_evaluation(
         "node-left",
         "edge-left",
         "all",
-    ] or algorithm not in ["synthesis", "decomposition"]:
+    ] or algorithm not in ["graph-native", "lp", "structural"] or database not in ["neo4j", "memgraph"]:
         raise ValueError('Illegal argument used for calling "perform_evaluation"')
-    DATABASE = database
+
     container: DockerContainer | Neo4jContainer
     """A testcontainer Container of Neo4j or an empty container if Memgraph is used. 
     By using it in a \"with\" clause, testcontainers automatically cleans used containers up."""
+
     driver: Driver
     """A Neo4J driver connected to the database running in :any:`container`."""
 
     is_based_on_neo4j_dump: bool = "memgraph" not in graph.keys() and "from_file" not in graph.keys()
+    """Whether the currently considered graph is based on a Neo4j dump."""
 
     # 1. Get a fresh database container
     if database == "memgraph" and not is_based_on_neo4j_dump:
@@ -256,7 +259,7 @@ def perform_evaluation(
             match database:
                 case "memgraph":
                     # We do'n't have a fresh database for memgraph --> delete everything first!
-                    with driver.session(database=DATABASE) as session:
+                    with driver.session(database=database) as session:
 
                         responsive = False
                         i = 0
@@ -290,7 +293,7 @@ def perform_evaluation(
                                     session.run(
                                         f"CALL apoc.cypher.runFile(\"{graph['neo4j']['from_file']}\");"
                                     )
-                        with driver.session(database=DATABASE) as session:
+                        with driver.session(database=database) as session:
                             responsive = False
 
                             while not responsive:
@@ -406,13 +409,13 @@ def perform_evaluation(
                                 if s.strip()
                             ]
 
-                            with driver.session(database=DATABASE) as session:
+                            with driver.session(database=database) as session:
                                 for query in create_graph_queries:
                                     #   print(query)
                                     session.run(query)
                 case _:
                     assert database == "neo4j"
-                    with driver.session(database=DATABASE) as session:
+                    with driver.session(database=database) as session:
                         res = session.run(
                             """CALL dbms.listConfig() YIELD name, value 
 WHERE name CONTAINS 'memory.pagecache.size' 
@@ -467,10 +470,10 @@ RETURN value"""
             if STOP:
                 input(f"Loaded graph {graph["name"]}. Press enter to continue ... ")
 
-            logger.info("Start normalization")
+            logger.info(f"Start normalization; method: {algorithm}")
             normalized_deps, transformations = perform_graph_native_normalization(
                 driver,
-                DATABASE,
+                database,
                 (
                     provided_dependencies
                     if ignore_min_cov or minimal_cover is None
@@ -483,7 +486,7 @@ RETURN value"""
             calculate_metrics(
                 driver,
                 graph["name"],
-                subset,
+                algorithm,
                 database,
                 normalized_deps,
                 measured_denormalized,
@@ -501,7 +504,7 @@ def calculate_metrics(
     driver,
     graph_name: str,
     method: str | None,
-    database: str,
+    database: Literal["neo4j", "memgraph"],
     dependencies: DependencySet,
     measured_denormalized,
     subset: str,
@@ -519,9 +522,9 @@ def calculate_metrics(
 
     timestamp: int = 0
     if method != "denormalized":
+        # Take the timestamp asap after normalization
         timestamp = time.time_ns()
     statistics_res: list[dict] = []
-    overview_res: list[dict] = []
     dep_res: list[dict] = []
 
     # # # # # # # # # # # # # # # #
