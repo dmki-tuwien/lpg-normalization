@@ -1,11 +1,14 @@
 import logging
+import operator
 import time
 import uuid
 from typing import Any
 
 import neo4j
 from caseconverter import pascalcase, camelcase
+from functools import reduce
 from typing import Literal
+from frozendict import frozendict
 
 from neo4j import Driver
 from tqdm_loggable.auto import tqdm
@@ -18,7 +21,12 @@ def perform_graph_native_normalization(
     driver: Driver,
     database: Literal["neo4j", "memgraph"],
     provided_dependencies: DependencySet,
-    dep_filter: str = "all",
+    dep_filter: Literal["all",
+                        "within-node",
+                        "within-edge",
+                        "within-graph-object",
+                        "between-graph-object",
+                        "with-reification"] = "all",
 ) -> (DependencySet, list[str]):
     """
     Performs graph-native normalization under consideration of the provided parameters.
@@ -69,54 +77,8 @@ def perform_graph_native_normalization(
                     time.sleep(1)
 
 
-    def validate_dep(dep):
-        """Validates whether a functional dependency holds"""
-        if dep.is_trivial:
-            return # The dependency is technically valid, although not minimal!
-
-        with driver.session(database=database) as session:
-            query = f"""
-{dep.pattern.to_gql_match_where_string()}
-WITH DISTINCT
-{",".join(map(lambda ref: str(ref)+" AS "+pascalcase(str(ref)), dep.left.union(dep.right)))}
-WITH
-{",".join(map(lambda ref: pascalcase(str(ref)), dep.left))},
-COUNT([{",".join(map(lambda ref: pascalcase(str(ref)), dep.right))}]) AS card
-RETURN avg(card) AS res
-
-"""
-            res = session.run(query)
-            record = res.single()
-            if record is not None:
-                if record["res"] != 1:
-                    raise ValueError(f'The dependency "{str(dep)}" is not functional!')
-
     # Phase 0: Filter deps according to parameter from evaluation.
-    logging.info("Filter dependencies")
-    match dep_filter:
-        case "within-node":
-            deps = DependencySet(filter(lambda dep: dep.is_within_node, deps))
-        case "within-go":
-            deps = DependencySet(filter(lambda dep: dep.is_within_graph_object, deps))
-        case "between-go":
-            deps = DependencySet(filter(lambda dep: dep.is_inter_graph_object, deps))
-        case "node-left":
-            deps = DependencySet(
-                filter(
-                    lambda dep: dep.is_within_node
-                    or isinstance(next(iter(dep.left)).get_graph_object(), Node),
-                    deps,
-                )
-            )
-        case "edge-left":
-            deps = DependencySet(
-                filter(
-                    lambda dep: isinstance(
-                        next(iter(dep.left)).get_graph_object(), Edge
-                    ),
-                    deps,
-                )
-            )
+    deps = filter_dependencies(dep_filter, deps)
 
     if len(deps) == 0:
         return (
@@ -130,9 +92,9 @@ RETURN avg(card) AS res
     sorted_deps.sort()
 
     for dep in sorted_deps:
-        validate_dep(dep)
+        validate_dependency(driver, database, dep)
 
-        if dep.is_inter_graph_object:
+        if dep.is_between_graph_object:
             inter_dep = dep
             left_gos: set[GraphObject] = set(
                 map(lambda ref: ref.get_graph_object(), dep.left)
@@ -722,14 +684,82 @@ REMOVE {", ".join(map(str, all_references))}"""
     return transformed_deps, applied_transformations
 
 
-def perform_structural_normalization(driver: Driver, database: Literal["neo4j", "memgraph"], normal_form: Literal["1GNF", "2GNF", "3GNF", "3+GNF", "EGNF"]):
+def filter_dependencies(dep_filter: Literal["within-node",
+                                            "within-edge",
+                                            "within-graph-object",
+                                            "between-graph-object",
+                                            "with-reification"],
+                        deps: DependencySet) -> DependencySet:
+    logging.info("Filter dependencies")
+    match dep_filter:
+        case "within-node":
+            deps = DependencySet(filter(lambda dep: dep.is_within_node, deps))
+        case "within-edge":
+            deps = DependencySet(filter(lambda dep: dep.is_within_edge, deps))
+        case "within-graph-object":
+            deps = DependencySet(filter(lambda dep: dep.is_within_graph_object, deps))
+        case "between-graph-object":
+            deps = DependencySet(filter(lambda dep: dep.is_between_graph_object, deps))
+        case "with-reification":
+            deps = DependencySet(
+                filter(
+                    lambda dep: dep.is_within_node
+                                or isinstance(next(iter(dep.left)).get_graph_object(), Node),
+                    deps,
+                )
+            )
+        case "without-reification":
+            deps = DependencySet(
+                filter(
+                    lambda dep: isinstance(
+                        next(iter(dep.left)).get_graph_object(), Edge
+                    ),
+                    deps,
+                )
+            )
+    return deps
+
+
+def perform_structural_normalization(driver: Driver,
+                                     database: Literal["neo4j", "memgraph"],
+                                     normal_form: Literal["1GNF", "2GNF", "3GNF", "3+GNF", "EGNF"],
+                                     provided_dependencies: DependencySet = DependencySet(),
+                                     dep_filter: str = "all",
+                                     ):
     """
     Performs structural normalization as described by Egger et al. in https://doi.org/10.14778/3797919.3797943.
     :param driver: A :any:`neo4j.Driver`
-    :param database:
-    :param normal_form:
-    :return:
+    :param database: The graph database system containing the graph to be normalized. Currently only Neo4j is supported, Memgraph will follow.
+    :param normal_form: The normal form the normalized graph should fulfill.
     """
+    if database == "memgraph":
+        raise NotImplementedError("Structural normalization is currently only implemented for `neo4j`.")
+
+    def get_or_create_single_prop(property_name: str, value) -> str:
+        # Mimics `getOrCreate` from https://doi.org/10.14778/3797919.3797943
+        return get_or_create_dict(frozendict({property_name: value}))
+
+    def get_or_create_dict(d: dict) -> str:
+        """:returns: the node id"""
+        query: str = ""
+
+        if len(d) > 0:
+            query = "MERGE (n {"
+            props = []
+            for k in d.keys():
+                v = d[k]
+                if v is not None and isinstance(v, bool | int | float):
+                    props.append(f"`{k}`:{v}")
+                elif v is not None:
+                    props.append(f"`{k}`:\"{v}\"")
+            query += ", ".join(props)
+            query += "}) RETURN elementId(n) as nodeId LIMIT 1"
+        else:
+            query = """MERGE (n) RETURN elementId(n) as nodeId LIMIT 1"""
+        res = session.run(query)
+        
+        for record in res:
+            return str(record["nodeId"])
 
     match normal_form:
         case "1GNF":
@@ -738,7 +768,7 @@ def perform_structural_normalization(driver: Driver, database: Literal["neo4j", 
                 found_non_atomic = True # To check whether there are non-atomic properties, we assume there are some!
 
                 # Retrieve all non-atomic values in edges and reify them
-                result = session.run("""
+                session.run("""
                 MATCH (n)-[e]->(m)
                 UNWIND keys(e) AS key
                 WITH n, m, e, key, e[key] AS propValue
@@ -747,8 +777,7 @@ def perform_structural_normalization(driver: Driver, database: Literal["neo4j", 
                 CREATE (n)-[:$("SRC_"+type(e))]->(re)
                 CREATE (re)-[:$("TGT_"+type(e))]->(m)
                 SET re += properties(e)
-                DELETE e
-                                """) # happens only once; after this only nodes can have complex property values.
+                DELETE e""") # happens only once; after this only nodes can have complex property values.
 
                 while found_non_atomic:
 
@@ -764,28 +793,123 @@ def perform_structural_normalization(driver: Driver, database: Literal["neo4j", 
 
                     found_non_atomic = False
                     for record in result:
+                        # The loop is accessed when there were non-atomic values
                         found_non_atomic = True # There were non-atomic values, so we need another iteration!
                         i = 0
                         for atomic_value in record["propValue"]:
-                            session.run(f"""MERGE (n {{{record["propName"]}:"{atomic_value}"}})""")  # TODO: Check datatypes whether quotes are required (str, vs. int)
+                            get_or_create_single_prop(record["propName"], atomic_value)
 
-                            # Mimics `getOrCreate` from https://doi.org/10.14778/3797919.3797943
-                            session.run(f"""
-    MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
-    MATCH (m) WHERE size(keys(m)) = 1 AND m.{record["propName"]} = "{atomic_value}"
-    CREATE (n)-[:`{i}`]->(m)
-    """)
+                            if isinstance(atomic_value, bool | int | float):
+                                session.run(f"""
+                                MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
+                                MATCH (m) WHERE size(keys(m)) = 1 AND m.{record["propName"]} = {atomic_value}
+                                CREATE (n)-[:`{i}`]->(m)
+                                """)
+                            else:
+                                session.run(f"""
+                                MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
+                                MATCH (m) WHERE size(keys(m)) = 1 AND m.{record["propName"]} = "{atomic_value}"
+                                CREATE (n)-[:`{record["propName"]}` {{`{i}`:{i}}}]->(m)
+                                """)
+
+
                             i += 1
                         session.run(f"""
     MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
     REMOVE n.{record["propName"]}
     """)
             pass
+
+        case "2GNF":
+            deps: DependencySet
+            if dep_filter != all:
+                deps = filter_dependencies(dep_filter, provided_dependencies)
+            else:
+                deps = provided_dependencies
+
+
+            L: DependencySet = DependencySet()
+            C: set(tuple[GOFD, GOFD]) = set()
+            # TODO: use a named tuple for the conflicting deps
+            for dep in deps:
+                if len(set(map(lambda r: r.get_graph_object(), dep.left)).intersection(set(map(lambda r: r.get_graph_object(), dep.right)))) == 0:
+                    # TODO check whether left side is part of a key ...
+                    L.add(dep)
+                    for d in deps:
+                        if dep.is_conflicting_with(d):
+                            if len(set(filter(lambda tup: tup[0] == d and tup[1] == dep, C))) == 0:
+                                C.add((dep, d))
+                            L.remove(dep)
+                            L.remove(d)
+            # this corresponds to the end of line 7 in the pseudo code
+
+            with driver.session() as session:
+                result = session.run("""
+                    MATCH (n)
+                    RETURN elementId(n) as nodeId, labels(n) as nodeLabels
+                                    """)
+                for record in result:
+                    for c in C:
+                        # As B should be the same in c0 and c1, we use the one from c0
+                        a1: set[Reference] = c[0].left
+                        a2: set[Reference] = c[1].left
+
+                        b: set[Reference] = c[0].right
+                        if next(iter(b)).get_graph_object().labels.issubset(set(record["nodeLabels"])):
+                            # The algorithm suddenly treats A1, A2 and B as a single reference, so we just assume they are all references of one node each ...
+                            resB = session.run(f"""
+                                                MATCH (n)
+                                                WHERE elementId(n) = {record["nodeId"]} 
+                                                RETURN {", ".join(map(lambda ref: f"n.{ref.reference.key} as {ref.reference.key}", b))}
+                                                                """)
+                            resA1 = session.run(f"""
+                                                MATCH (n)
+                                                WHERE labels(n) = [{", ".join(next(iter(a1)).get_graph_object().labels)}]
+                                                RETURN {", ".join(map(lambda ref: f"n.{ref.reference.key} as {ref.reference.key}", a1))}
+                                                                """)
+                            resA2 = session.run(f"""
+                                                MATCH (n)
+                                                WHERE labels(n) = [{", ".join(next(iter(a2)).get_graph_object().labels)}]
+                                                RETURN {", ".join(map(lambda ref: f"n.{ref.reference.key} as {ref.reference.key}", a2))}
+                                                                """)
+
+                            bId: dict = get_or_create_dict(resB.single().data())
+                            a1Id: dict = get_or_create_dict(resA1.single().data())
+                            a2Id: dict = get_or_create_dict(resA2.single().data())
+
+                            session.run(f"MERGE (n)-[m:NO_LABEL_PROVIDED]->(o) WHERE elementId(n) = {a1Id} AND elementId(o) = {bId}")
+                            session.run(f"MERGE (n)-[m:NO_LABEL_PROVIDED]->(o) WHERE elementId(n) = {a2Id} AND elementId(o) = {bId}")
+
+                    for dep in L:
+                        if len(set(map(lambda r: r.get_graph_object(), dep.left)).intersection(
+                            set(map(lambda r: r.get_graph_object(), dep.right)))) == 0:
+
         case _:
-            raise ValueError(f"The normal form \"{normal_form}\" is not supported for structural normalization")
+            raise ValueError(f"The normal form \"{normal_form}\" is not supported (yet) for structural normalization")
 
     return DependencySet.from_string_list([]), []
 
+def validate_dependency(driver, database, dep):
+    """Validates whether a functional dependency holds"""
+    if dep.is_trivial:
+        return # The dependency is technically valid, although not minimal!
+
+    with driver.session(database=database) as session:
+        query = f"""
+{dep.pattern.to_gql_match_where_string()}
+WITH DISTINCT
+{",".join(map(lambda ref: str(ref)+" AS "+pascalcase(str(ref)), dep.left.union(dep.right)))}
+WITH
+{",".join(map(lambda ref: pascalcase(str(ref)), dep.left))},
+COUNT([{",".join(map(lambda ref: pascalcase(str(ref)), dep.right))}]) AS card
+RETURN avg(card) AS res
+
+"""
+        res = session.run(query)
+        record = res.single()
+        if record is not None:
+            if record["res"] != 1:
+                raise ValueError(f'The dependency "{str(dep)}" is not functional!')
 
 def reify_and_extract_to_new_node(
     edge: Edge,

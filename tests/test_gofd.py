@@ -193,7 +193,21 @@ def test_sorted_deps():
 
     l = list(dep_set)
     l.sort()
-    pass
+
+def test_is_conflicting():
+    ab_dep_0 = GOFD.from_string("(a:A),(b:B:Hi)::a=>b.Hi")
+    ab_dep_1 = GOFD.from_string("(a:A),(b:B:Hi)::a=>b.Hi")
+
+    cb_dep_0 = GOFD.from_string("(c:C),(b:B:Hi)::c=>b.Hi")
+    cb_dep_1 = GOFD.from_string("(c:C),(b:B:Ho)::c=>b.Ho")
+
+    abd_dep_0 = GOFD.from_string("(a:A&D),(b:B:Hi)::a=>b.Hi")
+    abe_dep_0 = GOFD.from_string("(a:A&E),(b:B:Hi)::a=>b.Hi")
+
+    assert ab_dep_0.is_conflicting_with(cb_dep_0)
+    assert not ab_dep_0.is_conflicting_with(cb_dep_1)
+    assert not ab_dep_0.is_conflicting_with(ab_dep_1)
+    assert not abd_dep_0.is_conflicting_with(abe_dep_0)
 
 # def test_minimal_pattern_intersections():
 #     # Case 1

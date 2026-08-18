@@ -18,3 +18,4 @@ mkdocs-material
 mkdocs-glightbox
 mkdocs-table-reader-plugin
 duckdb
+frozendict

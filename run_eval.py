@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+import uuid
 from typing import Literal
 
 import neo4j.exceptions
@@ -143,7 +144,12 @@ def main():
                 if STOP:
                     subsets = ["all"]
                 else:
-                    subsets = ["all", "node-left", "edge-left"]
+                    subsets = ["all",
+                               "within-node",
+                               "within-edge",
+                               "within-graph-object",
+                               "between-graph-object",
+                               "with-reification"]
                 for subset in tqdm(
                     subsets, desc="Dep. subset"
                 ):
@@ -166,11 +172,12 @@ def perform_evaluation(
         f"\tPerform experiment with graph \"{graph['name']}\", database \"{database}\", subset \"{subset}\", algorithm \"{algorithm}\", and minimal cover ignored \"{ignore_min_cov}\"."
     )
     if subset not in [
-        "within-node",
-        "within-go",
-        "node-left",
-        "edge-left",
         "all",
+        "within-node",
+        "within-edge",
+        "within-graph-object",
+        "between-graph-object",
+        "with-reification"
     ] or algorithm not in ["graph-native", "lp", "structural"] or database not in ["neo4j", "memgraph"]:
         raise ValueError('Illegal argument used for calling "perform_evaluation"')
 
@@ -216,20 +223,20 @@ def perform_evaluation(
 
         container.with_command(f'bash -c "{start_sh}"')
 
+    # 2. Wait for the container to become responsive
     with container:
         if database == "memgraph":
             uri = MEMGRAPH_URI
             if is_based_on_neo4j_dump:
                 logger.info("Start Neo4J for data import to Memgraph.")
         if database == "neo4j" or is_based_on_neo4j_dump:
-            logger.info("Wait for Neo4J to clean query caches.")
+            logger.info("⏳ Wait for Neo4J to clean query caches.")
             # Neo4J Enterprise is not immediately coming online (although logs say different things)
             container.waiting_for(LogMessageWaitStrategy("db.clearQueryCaches():"))
             # and even after this additional intermediate log message it takes further ~15 seconds
-       #     if "neo4j" in graph.keys() and "from_dump" in graph["neo4j"].keys():
 
             i = 0
-            with tqdm(desc="Wait for Neo4J to become responsive", initial=i) as t:
+            with tqdm(desc="⏳ Wait for Neo4j to become responsive", initial=i) as t:
                 responsive = False
                 while not responsive:
                     responsive = True
@@ -239,14 +246,13 @@ def perform_evaluation(
                             with d.session(database="neo4j") as session:
                                 session.run("MATCH (n) RETURN n LIMIT 1")
                     except neo4j.exceptions.DatabaseUnavailable:
+                        # Neo4j is not responsible je
                         responsive = False
                         time.sleep(1)
                         i += 1
                         t.update(i)
-                t.postfix = "Neo4J is now responsive"
+                t.postfix = "✅ Neo4j is now responsive"
 
-         #   else:
-         #       time.sleep(1)
 
         with (
             container.get_driver()
@@ -255,7 +261,7 @@ def perform_evaluation(
         ) as driver:
             # connects to
 
-            # 2. Insert denormalized graph if its loaded from a file
+        # 2. Insert denormalized graph if its loaded from a file
             match database:
                 case "memgraph":
                     # We do'n't have a fresh database for memgraph --> delete everything first!
@@ -453,7 +459,7 @@ RETURN value"""
 
             measured_denormalized = False
 
-            # 3. Get initial statistics
+        # 4. Get initial statistics
             logger.info("Get statistics")
             calculate_metrics(
                 driver,
@@ -497,7 +503,7 @@ RETURN value"""
             if STOP:
                 input(f"Normalized graph {graph["name"]}. Press enter to continue ... ")
 
-    logger.info(f"\tFinished experiment with graph \"{graph['name']}\"")
+    logger.info(f"✅ Finished experiment with graph \"{graph['name']}\" and method \"{algorithm}\"")
 
 
 def calculate_metrics(
@@ -580,7 +586,7 @@ def calculate_metrics(
                     graph_setup["dependencies"]
                 )
                 between_deps_count = sum(
-                    map(lambda dep: dep.is_inter_graph_object, dependencies)
+                    map(lambda dep: dep.is_between_graph_object, dependencies)
                 )
                 within_deps_count = sum(
                     map(lambda dep: dep.is_within_graph_object, dependencies)
