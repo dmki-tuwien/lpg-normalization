@@ -847,7 +847,7 @@ class GOFD:
             return False
 
     @property
-    def is_inter_graph_object(self):
+    def is_between_graph_object(self):
         return not self.is_within_graph_object
 
     def to_latex(self):
@@ -855,9 +855,54 @@ class GOFD:
 
     @property
     def is_trivial(self):
-        return len(set(map(str, self.right)).intersection(set(map(str, self.left)))) > 0
+        return set(map(str, self.right)).issubset(set(map(str, self.left)))
 
-    # Comparison is based in pattern!
+    def is_conflicting_with(self, other: GOFD) -> bool:
+        """Whether a GOFD is conflicting with another GOFD, as defined in https://doi.org/10.14778/3797919.3797943
+        :param other: The GOFD against whether this GOFD should be checked for being conflicting
+        :returns: Whether the two GOFDs are conflicting"""
+
+        distinct_left = False
+        """Whether both GOFD have distinct A"""
+
+        intersecting_right = False
+        """Whether both GOFD have the same B (i.e, compatible GO pattern and equal referenced prop. keys)"""
+
+        a1labels = set(map(lambda r: "&".join(sorted(r.get_graph_object().labels)), self.left))
+        a1props = set(map(lambda r: "&".join(sorted(r.get_graph_object().properties)), self.left))
+        a2labels = set(map(lambda r: "&".join(sorted(r.get_graph_object().labels)), other.left))
+        a2props = set(map(lambda r: "&".join(sorted(r.get_graph_object().properties)), other.left))
+        b1labels = set(map(lambda r: "&".join(sorted(r.get_graph_object().labels)), self.right))
+        b1props = set(map(lambda r: "&".join(sorted(r.get_graph_object().properties)), self.right))
+        b1refs = set(map(lambda r: r.reference.key, self.right))
+        b2labels = set(map(lambda r: "&".join(sorted(r.get_graph_object().labels)), other.right))
+        b2props = set(map(lambda r: "&".join(sorted(r.get_graph_object().properties)), other.right))
+        b2refs = set(map(lambda r: r.reference.key, other.right))
+
+        def is_empty_set(s: set) -> bool:
+            return (len(s) == 1 and len(s.intersection({""})) == 1) or (len(s) == 0)
+
+        def is_intersecting(s1: set[str], s2: set[str]) -> bool:
+            for s1l in map(lambda s: s.split("&"),  s1):
+                for s2l in map(lambda s: s.split("&"), s2):
+                    if len(set(s1l).intersection(set(s2l))) > 0 or len(set(s2l).intersection(set(s1l))) > 0:
+                        return True
+            return False
+
+        intersecting_right = (is_intersecting(b1props, b2props) and
+                          is_intersecting(b1labels, b2labels) and
+                          (len(b1refs) == len(b1refs.intersection(b2refs))))
+
+
+
+        distinct_left = ((not is_intersecting(a1props, a2props) or is_empty_set(a1props) or is_empty_set(a2props)) and
+                         (not is_intersecting(a1labels, a2labels)  or is_empty_set(a1labels) or is_empty_set(a2labels))) # Whether the keys on the left side are the same or not is not of interest
+
+        return distinct_left and intersecting_right
+
+
+
+    # Comparison is based on patterns for automated more-general than sorting!
 
     def __eq__(self, other):
         if not isinstance(other, GOFD):

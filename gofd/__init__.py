@@ -18,7 +18,7 @@ class DependencySet(set[GOFD]):
 
     def is_in_global_normal_form(self) -> bool:
         """:returns: :any:`True` when there is no inter-graph dependency, :any:`False` otherwise."""
-        return sum(map(lambda dep: dep.is_inter_graph_object, self)) == 0
+        return sum(map(lambda dep: dep.is_between_graph_object, self)) == 0
 
     @property
     def lp_suitable(self) -> bool:
