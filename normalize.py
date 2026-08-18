@@ -883,6 +883,7 @@ def perform_structural_normalization(driver: Driver,
                     for dep in L:
                         if len(set(map(lambda r: r.get_graph_object(), dep.left)).intersection(
                             set(map(lambda r: r.get_graph_object(), dep.right)))) == 0:
+                                pass    
 
         case _:
             raise ValueError(f"The normal form \"{normal_form}\" is not supported (yet) for structural normalization")
