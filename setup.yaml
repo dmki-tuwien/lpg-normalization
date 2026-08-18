@@ -26,6 +26,37 @@ graphs:
 #    minimal_cover:
 #      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
 
+  - id: "off4"
+    category: "Real-world data"
+    name: "Off-4"
+    name_html: "Offshore 4" # Based on Egger et al.
+    neo4j:
+      from_dump: graphs/offshore.dump
+    dependencies:
+      - "(e:Entity:service_provider&sourceID&valid_until)::e.service_provider=>e.sourceID,e.valid_until"
+      - "(e:Entity:closed_date&incorporation_date&registration_date)::e.closed_date,e.incorporation_date=>e.registration_date"
+      - "(e:Entity:ibcRUC&struck_off&lastEditTimestamp&inactivation_date)::e.ibcRUC,e.struck_off,e.lastEditTimestamp=>e.inactivation_date"
+      - "(e:Entity:country_codes&company_type)::e.country_codes=>e.company_type"
+    minimal_cover:
+      - "(e:Entity:service_provider&sourceID&valid_until)::e.service_provider=>e.sourceID,e.valid_until"
+      - "(e:Entity:closed_date&incorporation_date&registration_date)::e.closed_date,e.incorporation_date=>e.registration_date"
+      - "(e:Entity:ibcRUC&struck_off&lastEditTimestamp&inactivation_date)::e.ibcRUC,e.struck_off,e.lastEditTimestamp=>e.inactivation_date"
+      - "(e:Entity:country_codes&company_type)::e.country_codes=>e.company_type"
+
+  - id: "nw2"
+    name: "Nw-2"
+    name_html: "Northwind 2"
+    category: "Real-world data"
+    neo4j:
+      from_file: graphs/northwind/scripts/northwind.cypher
+    dependencies:
+      - "(c:Customer:city&shipCity&shipCountry&country)::c.city=>c.shipCity,c.shipCountry,c.country"
+      - "(p:Product:unitPrice&unitsInStock&quantityPerUnit&unitsOnOrder&reorderLevel&discontinued)::p.unitPrice,p.unitsInStock=>p.quantityPerUnit,p.unitsOnOrder,p.reorderLevel,p.discontinued"
+    minimal_cover:
+      - "(c:Customer:city&shipCity&shipCountry&country)::c.city=>c.shipCity,c.shipCountry,c.country"
+      - "(p:Product:unitPrice&unitsInStock&quantityPerUnit&unitsOnOrder&reorderLevel&discontinued)::p.unitPrice,p.unitsInStock=>p.quantityPerUnit,p.unitsOnOrder,p.reorderLevel,p.discontinued"
+    dependency_origin: "\\citet{skavantzos_third_2025}"
+    source: "\\url{https://github.com/neo4j-graph-examples/northwind}"
 
   - id: "ts1"
     category: "Real-world data"
@@ -210,9 +241,9 @@ graphs:
     dependency_origin: "User provided"
     source: "\\cite{skavantzos_third_2025}"
 
-  - id: "nw"
-    name: "Nw"
-    name_html: "Northwind"
+  - id: "nw1"
+    name: "Nw-1"
+    name_html: "Northwind 1"
     category: "Real-world data"
     neo4j:
       from_file: graphs/northwind/scripts/northwind.cypher
