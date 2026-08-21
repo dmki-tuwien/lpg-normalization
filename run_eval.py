@@ -306,23 +306,21 @@ def perform_evaluation(
                                 responsive = True
 
                                 try:
-                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                    session.run("CREATE INDEX ON :__MigrationNode__;")
                                 except neo4j.exceptions.TransientError:
                                     responsive = False
-                                    time.sleep(1)
+                                    time.sleep(2)
 
-                            session.run("CREATE INDEX ON :__MigrationNode__;")
 
                             while not responsive:
                                 responsive = True
 
                                 try:
-                                    session.run("MATCH (n) RETURN n LIMIT 1")
+                                    session.run("CREATE INDEX ON :__MigrationNode__(__elementId__);")
                                 except neo4j.exceptions.TransientError:
                                     responsive = False
-                                time.sleep(1)
+                                time.sleep(2)
 
-                            session.run("CREATE INDEX ON :__MigrationNode__(__elementId__);")
 
                             while not responsive:
                                 responsive = True
