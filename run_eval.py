@@ -139,7 +139,7 @@ def main():
         global RUN_ID
         RUN_ID = uuid.uuid4()
 
-        for database in tqdm(["neo4j", "memgraph"], desc="System"):
+        for database in tqdm(["memgraph", "neo4j"], desc="System"):
             for graph in tqdm(setup["graphs"], desc="Graphs"):
                 if STOP:
                     subsets = ["all"]
@@ -311,6 +311,7 @@ def perform_evaluation(
                                     responsive = False
                                     time.sleep(2)
 
+                            responsive = False
 
                             while not responsive:
                                 responsive = True
@@ -321,6 +322,7 @@ def perform_evaluation(
                                     responsive = False
                                     time.sleep(2)
 
+                            responsive = False
 
                             while not responsive:
                                 responsive = True
@@ -336,6 +338,7 @@ def perform_evaluation(
                                     responsive = False
                                     time.sleep(2)
 
+                            responsive = False
 
                             while not responsive:
                                 responsive = True
@@ -354,6 +357,7 @@ def perform_evaluation(
                                     responsive = False
                                     time.sleep(2)
 
+                            responsive = False
 
                             while not responsive:
                                 responsive = True
@@ -367,6 +371,7 @@ def perform_evaluation(
                                     responsive = False
                                     time.sleep(2)
 
+                            responsive = False
 
                             while not responsive:
                                 responsive = True
@@ -377,6 +382,7 @@ def perform_evaluation(
                                     responsive = False
                                     time.sleep(2)
 
+                            responsive = False
 
                             while not responsive:
                                 responsive = True
@@ -387,6 +393,7 @@ def perform_evaluation(
                                     responsive = False
                                     time.sleep(2)
 
+                            responsive = False
 
                             while not responsive:
                                 responsive = True
