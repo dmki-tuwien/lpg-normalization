@@ -2,7 +2,10 @@
 
 We defined [12 scenarios](#scenarios) on [6 graphs](#graphs) for the evaluation the [graph-native approach to LPG normalization](http://arxiv.org/abs/2603.02995)
 
-Detailed results of the evaluation presented in the paper (http://arxiv.org/abs/2603.02995) can be found [here](https://github.com/dmki-tuwien/lpg-normalization/tree/master/out).
+Detailed results of the evaluation presented in the paper 
+([published version at EDBT 2027](https://dx.doi.org/10.48786/edbt.2027.06);
+[arXiv version](http://arxiv.org/abs/2603.02995))
+can be found [on the dedicated results page](evaluation_results.md).
 
 
 ## Graphs

@@ -25,7 +25,8 @@
     <a href="https://github.com/dmki-tuwien/lpg-normalization/raw/refs/heads/master/out/query_aggregated_classified.csv">Download as CSV<a/>
   </div>
 
-  <p style="font-size: small">The visualization utilizes <a href="https://idl.uw.edu/mosaic/vgplot/?lang=js">Mosaic vgplot</a>
+  <p style="font-size: small">
+The visualization utilizes <a href="https://idl.uw.edu/mosaic/vgplot/?lang=js">Mosaic vgplot</a>
 and <a href="https://duckdb.org/docs/lts/clients/wasm/overview">DuckDB</a>. 
 The data the visualizations are based on are available in the form of a DuckDB on <a href="https://github.com/dmki-tuwien/lpg-normalization/blob/master/out/eval_results.duckdb">GitHub</a>.
 </p>
@@ -62,11 +63,11 @@ import * as duckdb from 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm/+esm';
         connection: conn 
       });
       
-      const sessionInfoResult = await conn.query(`SELECT DISTINCT session_id, timestamp, COUNT(distinct run_id) as runs FROM per_graph_metric WHERE  timestamp = (SELECT max(timestamp) FROM per_graph_metric) GROUP BY session_id, timestamp`);
+      const sessionInfoResult = await conn.query(`SELECT DISTINCT session_id, MAX(timestamp) as t, COUNT(distinct run_id) as runs FROM per_graph_metric WHERE session_id = ( SELECT DISTINCT session_id FROM per_dep_metric WHERE  timestamp = (SELECT max(timestamp) FROM per_dep_metric)) GROUP BY session_id`);
       const sessionFinished = document.getElementById('session-finished');
       const sessionId = document.getElementById('session-id');
       const sessionData = sessionInfoResult.toArray().map(row => row.toJSON());
-      sessionFinished.innerHTML = new Date(sessionData[0].timestamp).toLocaleString();
+      sessionFinished.innerHTML = new Date(sessionData[0].t).toLocaleString();
       const currentSession = sessionData[0].session_id;
       sessionId.innerHTML = currentSession;
       document.getElementById("no-of-runs").innerHTML = sessionData[0].runs;
