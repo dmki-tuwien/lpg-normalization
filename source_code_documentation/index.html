@@ -644,7 +644,7 @@
 
 
 <h5 id="normalize.perform_graph_native_normalization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">perform_graph_native_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'neo4j'</span><span class="p">,</span> <span class="s1">'memgraph'</span><span class="p">],</span> <span class="n">provided_dependencies</span><span class="p">:</span> <span class="n">DependencySet</span><span class="p">,</span> <span class="n">dep_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'all'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">DependencySet</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span></code>
+            <code class="highlight language-python"><span class="n">perform_graph_native_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'neo4j'</span><span class="p">,</span> <span class="s1">'memgraph'</span><span class="p">],</span> <span class="n">provided_dependencies</span><span class="p">:</span> <span class="n">DependencySet</span><span class="p">,</span> <span class="n">dep_filter</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'all'</span><span class="p">,</span> <span class="s1">'within-node'</span><span class="p">,</span> <span class="s1">'within-edge'</span><span class="p">,</span> <span class="s1">'within-graph-object'</span><span class="p">,</span> <span class="s1">'between-graph-object'</span><span class="p">,</span> <span class="s1">'with-reification'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'all'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">DependencySet</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span></code>
 
 </h5>
 
@@ -682,7 +682,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>dep_filter</code></b>
-              (<code><span title="str">str</span></code>, default:
+              (<code><span title="typing.Literal">Literal</span>['all', 'within-node', 'within-edge', 'within-graph-object', 'between-graph-object', 'with-reification']</code>, default:
                   <code>'all'</code>
 )
           –
@@ -707,10 +707,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>normalize.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 17</span>
-<span class="normal"> 18</span>
-<span class="normal"> 19</span>
-<span class="normal"> 20</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 20</span>
 <span class="normal"> 21</span>
 <span class="normal"> 22</span>
 <span class="normal"> 23</span>
@@ -1374,49 +1371,16 @@
 <span class="normal">681</span>
 <span class="normal">682</span>
 <span class="normal">683</span>
-<span class="normal">684</span>
-<span class="normal">685</span>
-<span class="normal">686</span>
-<span class="normal">687</span>
-<span class="normal">688</span>
-<span class="normal">689</span>
-<span class="normal">690</span>
-<span class="normal">691</span>
-<span class="normal">692</span>
-<span class="normal">693</span>
-<span class="normal">694</span>
-<span class="normal">695</span>
-<span class="normal">696</span>
-<span class="normal">697</span>
-<span class="normal">698</span>
-<span class="normal">699</span>
-<span class="normal">700</span>
-<span class="normal">701</span>
-<span class="normal">702</span>
-<span class="normal">703</span>
-<span class="normal">704</span>
-<span class="normal">705</span>
-<span class="normal">706</span>
-<span class="normal">707</span>
-<span class="normal">708</span>
-<span class="normal">709</span>
-<span class="normal">710</span>
-<span class="normal">711</span>
-<span class="normal">712</span>
-<span class="normal">713</span>
-<span class="normal">714</span>
-<span class="normal">715</span>
-<span class="normal">716</span>
-<span class="normal">717</span>
-<span class="normal">718</span>
-<span class="normal">719</span>
-<span class="normal">720</span>
-<span class="normal">721</span>
-<span class="normal">722</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">perform_graph_native_normalization</span><span class="p">(</span>
+<span class="normal">684</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">perform_graph_native_normalization</span><span class="p">(</span>
     <span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span>
     <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"neo4j"</span><span class="p">,</span> <span class="s2">"memgraph"</span><span class="p">],</span>
     <span class="n">provided_dependencies</span><span class="p">:</span> <span class="n">DependencySet</span><span class="p">,</span>
-    <span class="n">dep_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"all"</span><span class="p">,</span>
+    <span class="n">dep_filter</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"all"</span><span class="p">,</span>
+                        <span class="s2">"within-node"</span><span class="p">,</span>
+                        <span class="s2">"within-edge"</span><span class="p">,</span>
+                        <span class="s2">"within-graph-object"</span><span class="p">,</span>
+                        <span class="s2">"between-graph-object"</span><span class="p">,</span>
+                        <span class="s2">"with-reification"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"all"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">DependencySet</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Performs graph-native normalization under consideration of the provided parameters.</span>
@@ -1467,54 +1431,8 @@
                     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">validate_dep</span><span class="p">(</span><span class="n">dep</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""Validates whether a functional dependency holds"""</span>
-        <span class="k">if</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_trivial</span><span class="p">:</span>
-            <span class="k">return</span> <span class="c1"># The dependency is technically valid, although not minimal!</span>
-
-        <span class="k">with</span> <span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-            <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"""</span>
-<span class="si">{</span><span class="n">dep</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">to_gql_match_where_string</span><span class="p">()</span><span class="si">}</span>
-<span class="s2">WITH DISTINCT</span>
-<span class="si">{</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span><span class="o">+</span><span class="s2">" AS "</span><span class="o">+</span><span class="n">pascalcase</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)),</span><span class="w"> </span><span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">dep</span><span class="o">.</span><span class="n">right</span><span class="p">)))</span><span class="si">}</span>
-<span class="s2">WITH</span>
-<span class="si">{</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="n">pascalcase</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)),</span><span class="w"> </span><span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="p">))</span><span class="si">}</span><span class="s2">,</span>
-<span class="s2">COUNT([</span><span class="si">{</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="n">pascalcase</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)),</span><span class="w"> </span><span class="n">dep</span><span class="o">.</span><span class="n">right</span><span class="p">))</span><span class="si">}</span><span class="s2">]) AS card</span>
-<span class="s2">RETURN avg(card) AS res</span>
-
-<span class="s2">"""</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-            <span class="n">record</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">single</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="s2">"res"</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'The dependency "</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span><span class="si">}</span><span class="s1">" is not functional!'</span><span class="p">)</span>
-
     <span class="c1"># Phase 0: Filter deps according to parameter from evaluation.</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Filter dependencies"</span><span class="p">)</span>
-    <span class="k">match</span> <span class="n">dep_filter</span><span class="p">:</span>
-        <span class="k">case</span> <span class="s2">"within-node"</span><span class="p">:</span>
-            <span class="n">deps</span> <span class="o">=</span> <span class="n">DependencySet</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_within_node</span><span class="p">,</span> <span class="n">deps</span><span class="p">))</span>
-        <span class="k">case</span> <span class="s2">"within-go"</span><span class="p">:</span>
-            <span class="n">deps</span> <span class="o">=</span> <span class="n">DependencySet</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_within_graph_object</span><span class="p">,</span> <span class="n">deps</span><span class="p">))</span>
-        <span class="k">case</span> <span class="s2">"between-go"</span><span class="p">:</span>
-            <span class="n">deps</span> <span class="o">=</span> <span class="n">DependencySet</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_inter_graph_object</span><span class="p">,</span> <span class="n">deps</span><span class="p">))</span>
-        <span class="k">case</span> <span class="s2">"node-left"</span><span class="p">:</span>
-            <span class="n">deps</span> <span class="o">=</span> <span class="n">DependencySet</span><span class="p">(</span>
-                <span class="nb">filter</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_within_node</span>
-                    <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="p">))</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">(),</span> <span class="n">Node</span><span class="p">),</span>
-                    <span class="n">deps</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-        <span class="k">case</span> <span class="s2">"edge-left"</span><span class="p">:</span>
-            <span class="n">deps</span> <span class="o">=</span> <span class="n">DependencySet</span><span class="p">(</span>
-                <span class="nb">filter</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span>
-                        <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="p">))</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">(),</span> <span class="n">Edge</span>
-                    <span class="p">),</span>
-                    <span class="n">deps</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+    <span class="n">deps</span> <span class="o">=</span> <span class="n">filter_dependencies</span><span class="p">(</span><span class="n">dep_filter</span><span class="p">,</span> <span class="n">deps</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">deps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -1528,9 +1446,9 @@
     <span class="n">sorted_deps</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">sorted_deps</span><span class="p">:</span>
-        <span class="n">validate_dep</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
+        <span class="n">validate_dependency</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_inter_graph_object</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_between_graph_object</span><span class="p">:</span>
             <span class="n">inter_dep</span> <span class="o">=</span> <span class="n">dep</span>
             <span class="n">left_gos</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">GraphObject</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
                 <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">ref</span><span class="p">:</span> <span class="n">ref</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">(),</span> <span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
@@ -2128,7 +2046,7 @@
 
 
 <h5 id="normalize.perform_structural_normalization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">perform_structural_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'neo4j'</span><span class="p">,</span> <span class="s1">'memgraph'</span><span class="p">],</span> <span class="n">normal_form</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'1GNF'</span><span class="p">,</span> <span class="s1">'2GNF'</span><span class="p">,</span> <span class="s1">'3GNF'</span><span class="p">,</span> <span class="s1">'3+GNF'</span><span class="p">,</span> <span class="s1">'EGNF'</span><span class="p">])</span></code>
+            <code class="highlight language-python"><span class="n">perform_structural_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'neo4j'</span><span class="p">,</span> <span class="s1">'memgraph'</span><span class="p">],</span> <span class="n">normal_form</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'1GNF'</span><span class="p">,</span> <span class="s1">'2GNF'</span><span class="p">,</span> <span class="s1">'3GNF'</span><span class="p">,</span> <span class="s1">'3+GNF'</span><span class="p">,</span> <span class="s1">'EGNF'</span><span class="p">],</span> <span class="n">provided_dependencies</span><span class="p">:</span> <span class="n">DependencySet</span> <span class="o">=</span> <span class="n">DependencySet</span><span class="p">(),</span> <span class="n">dep_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'all'</span><span class="p">)</span></code>
 
 </h5>
 
@@ -2153,7 +2071,7 @@
               (<code><span title="typing.Literal">Literal</span>['neo4j', 'memgraph']</code>)
           –
           <div class="doc-md-description">
-            
+            <p>The graph database system containing the graph to be normalized. Currently only Neo4j is supported, Memgraph will follow.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2161,18 +2079,7 @@
               (<code><span title="typing.Literal">Literal</span>['1GNF', '2GNF', '3GNF', '3+GNF', 'EGNF']</code>)
           –
           <div class="doc-md-description">
-            
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-          –
-          <div class="doc-md-description">
-            
+            <p>The normal form the normalized graph should fulfill.</p>
           </div>
         </li>
     </ul>
@@ -2180,7 +2087,9 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>normalize.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">725</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">723</span>
+<span class="normal">724</span>
+<span class="normal">725</span>
 <span class="normal">726</span>
 <span class="normal">727</span>
 <span class="normal">728</span>
@@ -2242,14 +2151,150 @@
 <span class="normal">784</span>
 <span class="normal">785</span>
 <span class="normal">786</span>
-<span class="normal">787</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">perform_structural_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"neo4j"</span><span class="p">,</span> <span class="s2">"memgraph"</span><span class="p">],</span> <span class="n">normal_form</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"1GNF"</span><span class="p">,</span> <span class="s2">"2GNF"</span><span class="p">,</span> <span class="s2">"3GNF"</span><span class="p">,</span> <span class="s2">"3+GNF"</span><span class="p">,</span> <span class="s2">"EGNF"</span><span class="p">]):</span>
+<span class="normal">787</span>
+<span class="normal">788</span>
+<span class="normal">789</span>
+<span class="normal">790</span>
+<span class="normal">791</span>
+<span class="normal">792</span>
+<span class="normal">793</span>
+<span class="normal">794</span>
+<span class="normal">795</span>
+<span class="normal">796</span>
+<span class="normal">797</span>
+<span class="normal">798</span>
+<span class="normal">799</span>
+<span class="normal">800</span>
+<span class="normal">801</span>
+<span class="normal">802</span>
+<span class="normal">803</span>
+<span class="normal">804</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span>
+<span class="normal">808</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span>
+<span class="normal">812</span>
+<span class="normal">813</span>
+<span class="normal">814</span>
+<span class="normal">815</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span>
+<span class="normal">827</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
+<span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
+<span class="normal">890</span>
+<span class="normal">891</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">perform_structural_normalization</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">Driver</span><span class="p">,</span>
+                                     <span class="n">database</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"neo4j"</span><span class="p">,</span> <span class="s2">"memgraph"</span><span class="p">],</span>
+                                     <span class="n">normal_form</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"1GNF"</span><span class="p">,</span> <span class="s2">"2GNF"</span><span class="p">,</span> <span class="s2">"3GNF"</span><span class="p">,</span> <span class="s2">"3+GNF"</span><span class="p">,</span> <span class="s2">"EGNF"</span><span class="p">],</span>
+                                     <span class="n">provided_dependencies</span><span class="p">:</span> <span class="n">DependencySet</span> <span class="o">=</span> <span class="n">DependencySet</span><span class="p">(),</span>
+                                     <span class="n">dep_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"all"</span><span class="p">,</span>
+                                     <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Performs structural normalization as described by Egger et al. in https://doi.org/10.14778/3797919.3797943.</span>
 <span class="sd">    :param driver: A :any:`neo4j.Driver`</span>
-<span class="sd">    :param database:</span>
-<span class="sd">    :param normal_form:</span>
-<span class="sd">    :return:</span>
+<span class="sd">    :param database: The graph database system containing the graph to be normalized. Currently only Neo4j is supported, Memgraph will follow.</span>
+<span class="sd">    :param normal_form: The normal form the normalized graph should fulfill.</span>
 <span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">database</span> <span class="o">==</span> <span class="s2">"memgraph"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Structural normalization is currently only implemented for `neo4j`."</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_or_create_single_prop</span><span class="p">(</span><span class="n">property_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># Mimics `getOrCreate` from https://doi.org/10.14778/3797919.3797943</span>
+        <span class="k">return</span> <span class="n">get_or_create_dict</span><span class="p">(</span><span class="n">frozendict</span><span class="p">({</span><span class="n">property_name</span><span class="p">:</span> <span class="n">value</span><span class="p">}))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_or_create_dict</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">""":returns: the node id"""</span>
+        <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s2">"MERGE (n {"</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">):</span>
+                    <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">`:</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">`:</span><span class="se">\"</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="se">\"</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">query</span> <span class="o">+=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+            <span class="n">query</span> <span class="o">+=</span> <span class="s2">"}) RETURN elementId(n) as nodeId LIMIT 1"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s2">"""MERGE (n) RETURN elementId(n) as nodeId LIMIT 1"""</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeId"</span><span class="p">])</span>
 
     <span class="k">match</span> <span class="n">normal_form</span><span class="p">:</span>
         <span class="k">case</span> <span class="s2">"1GNF"</span><span class="p">:</span>
@@ -2258,7 +2303,7 @@
                 <span class="n">found_non_atomic</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># To check whether there are non-atomic properties, we assume there are some!</span>
 
                 <span class="c1"># Retrieve all non-atomic values in edges and reify them</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"""</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"""</span>
 <span class="s2">                MATCH (n)-[e]-&gt;(m)</span>
 <span class="s2">                UNWIND keys(e) AS key</span>
 <span class="s2">                WITH n, m, e, key, e[key] AS propValue</span>
@@ -2267,8 +2312,7 @@
 <span class="s2">                CREATE (n)-[:$("SRC_"+type(e))]-&gt;(re)</span>
 <span class="s2">                CREATE (re)-[:$("TGT_"+type(e))]-&gt;(m)</span>
 <span class="s2">                SET re += properties(e)</span>
-<span class="s2">                DELETE e</span>
-<span class="s2">                                """</span><span class="p">)</span> <span class="c1"># happens only once; after this only nodes can have complex property values.</span>
+<span class="s2">                DELETE e"""</span><span class="p">)</span> <span class="c1"># happens only once; after this only nodes can have complex property values.</span>
 
                 <span class="k">while</span> <span class="n">found_non_atomic</span><span class="p">:</span>
 
@@ -2284,27 +2328,165 @@
 
                     <span class="n">found_non_atomic</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                        <span class="c1"># The loop is accessed when there were non-atomic values</span>
                         <span class="n">found_non_atomic</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># There were non-atomic values, so we need another iteration!</span>
                         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
                         <span class="k">for</span> <span class="n">atomic_value</span> <span class="ow">in</span> <span class="n">record</span><span class="p">[</span><span class="s2">"propValue"</span><span class="p">]:</span>
-                            <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""MERGE (n </span><span class="se">{{</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span><span class="s2">:"</span><span class="si">{</span><span class="n">atomic_value</span><span class="si">}</span><span class="s2">"</span><span class="se">}}</span><span class="s2">)"""</span><span class="p">)</span>  <span class="c1"># TODO: Check datatypes whether quotes are required (str, vs. int)</span>
+                            <span class="n">get_or_create_single_prop</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">],</span> <span class="n">atomic_value</span><span class="p">)</span>
 
-                            <span class="c1"># Mimics `getOrCreate` from https://doi.org/10.14778/3797919.3797943</span>
-                            <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
-<span class="s2">    MATCH (n) WHERE elementId(n) = "</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeId"</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
-<span class="s2">    MATCH (m) WHERE size(keys(m)) = 1 AND m.</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span><span class="s2"> = "</span><span class="si">{</span><span class="n">atomic_value</span><span class="si">}</span><span class="s2">"</span>
-<span class="s2">    CREATE (n)-[:`</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">`]-&gt;(m)</span>
-<span class="s2">    """</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomic_value</span><span class="p">,</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">):</span>
+                                <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">                                MATCH (n) WHERE elementId(n) = "</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeId"</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+<span class="s2">                                MATCH (m) WHERE size(keys(m)) = 1 AND m.</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">atomic_value</span><span class="si">}</span>
+<span class="s2">                                CREATE (n)-[:`</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">`]-&gt;(m)</span>
+<span class="s2">                                """</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">                                MATCH (n) WHERE elementId(n) = "</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeId"</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+<span class="s2">                                MATCH (m) WHERE size(keys(m)) = 1 AND m.</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span><span class="s2"> = "</span><span class="si">{</span><span class="n">atomic_value</span><span class="si">}</span><span class="s2">"</span>
+<span class="s2">                                CREATE (n)-[:`</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span><span class="s2">` </span><span class="se">{{</span><span class="s2">`</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">`:</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="se">}}</span><span class="s2">]-&gt;(m)</span>
+<span class="s2">                                """</span><span class="p">)</span>
+
+
                             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
                         <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">    MATCH (n) WHERE elementId(n) = "</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeId"</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
 <span class="s2">    REMOVE n.</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"propName"</span><span class="p">]</span><span class="si">}</span>
 <span class="s2">    """</span><span class="p">)</span>
             <span class="k">pass</span>
+
+        <span class="k">case</span> <span class="s2">"2GNF"</span><span class="p">:</span>
+            <span class="n">deps</span><span class="p">:</span> <span class="n">DependencySet</span>
+            <span class="k">if</span> <span class="n">dep_filter</span> <span class="o">!=</span> <span class="nb">all</span><span class="p">:</span>
+                <span class="n">deps</span> <span class="o">=</span> <span class="n">filter_dependencies</span><span class="p">(</span><span class="n">dep_filter</span><span class="p">,</span> <span class="n">provided_dependencies</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">deps</span> <span class="o">=</span> <span class="n">provided_dependencies</span>
+
+
+            <span class="n">L</span><span class="p">:</span> <span class="n">DependencySet</span> <span class="o">=</span> <span class="n">DependencySet</span><span class="p">()</span>
+            <span class="n">C</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="nb">tuple</span><span class="p">[</span><span class="n">GOFD</span><span class="p">,</span> <span class="n">GOFD</span><span class="p">])</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="c1"># TODO: use a named tuple for the conflicting deps</span>
+            <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">(),</span> <span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="p">))</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">(),</span> <span class="n">dep</span><span class="o">.</span><span class="n">right</span><span class="p">))))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># TODO check whether left side is part of a key ...</span>
+                    <span class="n">L</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_conflicting_with</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">d</span> <span class="ow">and</span> <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">dep</span><span class="p">,</span> <span class="n">C</span><span class="p">)))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">C</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">dep</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+                            <span class="n">L</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
+                            <span class="n">L</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="c1"># this corresponds to the end of line 7 in the pseudo code</span>
+
+            <span class="k">with</span> <span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">                    MATCH (n)</span>
+<span class="s2">                    RETURN elementId(n) as nodeId, labels(n) as nodeLabels</span>
+<span class="s2">                                    """</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">C</span><span class="p">:</span>
+                        <span class="c1"># As B should be the same in c0 and c1, we use the one from c0</span>
+                        <span class="n">a1</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Reference</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">left</span>
+                        <span class="n">a2</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Reference</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">left</span>
+
+                        <span class="n">b</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Reference</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">right</span>
+                        <span class="k">if</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">b</span><span class="p">))</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeLabels"</span><span class="p">])):</span>
+                            <span class="c1"># The algorithm suddenly treats A1, A2 and B as a single reference, so we just assume they are all references of one node each ...</span>
+                            <span class="n">resB</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">                                                MATCH (n)</span>
+<span class="s2">                                                WHERE elementId(n) = </span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s2">"nodeId"</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span>
+<span class="s2">                                                RETURN </span><span class="si">{</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="sa">f</span><span class="s2">"n.</span><span class="si">{</span><span class="n">ref</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2"> as </span><span class="si">{</span><span class="n">ref</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">))</span><span class="si">}</span>
+<span class="s2">                                                                """</span><span class="p">)</span>
+                            <span class="n">resA1</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">                                                MATCH (n)</span>
+<span class="s2">                                                WHERE labels(n) = [</span><span class="si">{</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">a1</span><span class="p">))</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span><span class="si">}</span><span class="s2">]</span>
+<span class="s2">                                                RETURN </span><span class="si">{</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="sa">f</span><span class="s2">"n.</span><span class="si">{</span><span class="n">ref</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2"> as </span><span class="si">{</span><span class="n">ref</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span><span class="w"> </span><span class="n">a1</span><span class="p">))</span><span class="si">}</span>
+<span class="s2">                                                                """</span><span class="p">)</span>
+                            <span class="n">resA2</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">                                                MATCH (n)</span>
+<span class="s2">                                                WHERE labels(n) = [</span><span class="si">{</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">a2</span><span class="p">))</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span><span class="si">}</span><span class="s2">]</span>
+<span class="s2">                                                RETURN </span><span class="si">{</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="sa">f</span><span class="s2">"n.</span><span class="si">{</span><span class="n">ref</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2"> as </span><span class="si">{</span><span class="n">ref</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span><span class="w"> </span><span class="n">a2</span><span class="p">))</span><span class="si">}</span>
+<span class="s2">                                                                """</span><span class="p">)</span>
+
+                            <span class="n">bId</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">get_or_create_dict</span><span class="p">(</span><span class="n">resB</span><span class="o">.</span><span class="n">single</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">())</span>
+                            <span class="n">a1Id</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">get_or_create_dict</span><span class="p">(</span><span class="n">resA1</span><span class="o">.</span><span class="n">single</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">())</span>
+                            <span class="n">a2Id</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">get_or_create_dict</span><span class="p">(</span><span class="n">resA2</span><span class="o">.</span><span class="n">single</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">())</span>
+
+                            <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"MERGE (n)-[m:NO_LABEL_PROVIDED]-&gt;(o) WHERE elementId(n) = </span><span class="si">{</span><span class="n">a1Id</span><span class="si">}</span><span class="s2"> AND elementId(o) = </span><span class="si">{</span><span class="n">bId</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                            <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"MERGE (n)-[m:NO_LABEL_PROVIDED]-&gt;(o) WHERE elementId(n) = </span><span class="si">{</span><span class="n">a2Id</span><span class="si">}</span><span class="s2"> AND elementId(o) = </span><span class="si">{</span><span class="n">bId</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">L</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">(),</span> <span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="p">))</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+                            <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">(),</span> <span class="n">dep</span><span class="o">.</span><span class="n">right</span><span class="p">))))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="k">pass</span>    
+
         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The normal form </span><span class="se">\"</span><span class="si">{</span><span class="n">normal_form</span><span class="si">}</span><span class="se">\"</span><span class="s2"> is not supported (yet) for structural normalization"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">DependencySet</span><span class="o">.</span><span class="n">from_string_list</span><span class="p">([]),</span> <span class="p">[]</span>
+</code></pre></div></td></tr></tbody></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="normalize.validate_dependency" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">validate_dependency</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Validates whether a functional dependency holds</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>normalize.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">893</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span>
+<span class="normal">903</span>
+<span class="normal">904</span>
+<span class="normal">905</span>
+<span class="normal">906</span>
+<span class="normal">907</span>
+<span class="normal">908</span>
+<span class="normal">909</span>
+<span class="normal">910</span>
+<span class="normal">911</span>
+<span class="normal">912</span>
+<span class="normal">913</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_dependency</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">dep</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Validates whether a functional dependency holds"""</span>
+    <span class="k">if</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_trivial</span><span class="p">:</span>
+        <span class="k">return</span> <span class="c1"># The dependency is technically valid, although not minimal!</span>
+
+    <span class="k">with</span> <span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="n">database</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"""</span>
+<span class="si">{</span><span class="n">dep</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">to_gql_match_where_string</span><span class="p">()</span><span class="si">}</span>
+<span class="s2">WITH DISTINCT</span>
+<span class="si">{</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span><span class="o">+</span><span class="s2">" AS "</span><span class="o">+</span><span class="n">pascalcase</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)),</span><span class="w"> </span><span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">dep</span><span class="o">.</span><span class="n">right</span><span class="p">)))</span><span class="si">}</span>
+<span class="s2">WITH</span>
+<span class="si">{</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="n">pascalcase</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)),</span><span class="w"> </span><span class="n">dep</span><span class="o">.</span><span class="n">left</span><span class="p">))</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">COUNT([</span><span class="si">{</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">ref</span><span class="p">:</span><span class="w"> </span><span class="n">pascalcase</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)),</span><span class="w"> </span><span class="n">dep</span><span class="o">.</span><span class="n">right</span><span class="p">))</span><span class="si">}</span><span class="s2">]) AS card</span>
+<span class="s2">RETURN avg(card) AS res</span>
+
+<span class="s2">"""</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">single</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="s2">"res"</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'The dependency "</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span><span class="si">}</span><span class="s1">" is not functional!'</span><span class="p">)</span>
 </code></pre></div></td></tr></tbody></table></div>
             </details>
     </div>
@@ -2401,7 +2583,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_in_global_normal_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">""":returns: :any:`True` when there is no inter-graph dependency, :any:`False` otherwise."""</span>
-        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_inter_graph_object</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_between_graph_object</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">lp_suitable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -2523,7 +2705,7 @@
 <span class="normal">20</span>
 <span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_in_global_normal_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">""":returns: :any:`True` when there is no inter-graph dependency, :any:`False` otherwise."""</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_inter_graph_object</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dep</span><span class="p">:</span> <span class="n">dep</span><span class="o">.</span><span class="n">is_between_graph_object</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
 </code></pre></div></td></tr></tbody></table></div>
             </details>
     </div>
@@ -3267,7 +3449,52 @@ GNFDs are ordered by their pattern.</p>
 <span class="normal">870</span>
 <span class="normal">871</span>
 <span class="normal">872</span>
-<span class="normal">873</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@total_ordering</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
+<span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
+<span class="normal">890</span>
+<span class="normal">891</span>
+<span class="normal">892</span>
+<span class="normal">893</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span>
+<span class="normal">903</span>
+<span class="normal">904</span>
+<span class="normal">905</span>
+<span class="normal">906</span>
+<span class="normal">907</span>
+<span class="normal">908</span>
+<span class="normal">909</span>
+<span class="normal">910</span>
+<span class="normal">911</span>
+<span class="normal">912</span>
+<span class="normal">913</span>
+<span class="normal">914</span>
+<span class="normal">915</span>
+<span class="normal">916</span>
+<span class="normal">917</span>
+<span class="normal">918</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@total_ordering</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GOFD</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Denotes a GO-FD that consists of a :any:`Pattern` and sets of :any:`Reference` that denote the right and left side of the descriptor of the GO-FD.</span>
 <span class="sd">    GNFDs are ordered by their pattern."""</span>
@@ -3326,7 +3553,7 @@ GNFDs are ordered by their pattern.</p>
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">is_inter_graph_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_between_graph_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_within_graph_object</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_latex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -3334,9 +3561,54 @@ GNFDs are ordered by their pattern.</p>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_trivial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">))</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">))))</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">))</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">)))</span>
 
-    <span class="c1"># Comparison is based in pattern!</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_conflicting_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">GOFD</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Whether a GOFD is conflicting with another GOFD, as defined in https://doi.org/10.14778/3797919.3797943</span>
+<span class="sd">        :param other: The GOFD against whether this GOFD should be checked for being conflicting</span>
+<span class="sd">        :returns: Whether the two GOFDs are conflicting"""</span>
+
+        <span class="n">distinct_left</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">        </span><span class="sd">"""Whether both GOFD have distinct A"""</span>
+
+        <span class="n">intersecting_right</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">        </span><span class="sd">"""Whether both GOFD have the same B (i.e, compatible GO pattern and equal referenced prop. keys)"""</span>
+
+        <span class="n">a1labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">))</span>
+        <span class="n">a1props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">))</span>
+        <span class="n">a2labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)),</span> <span class="n">other</span><span class="o">.</span><span class="n">left</span><span class="p">))</span>
+        <span class="n">a2props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">)),</span> <span class="n">other</span><span class="o">.</span><span class="n">left</span><span class="p">))</span>
+        <span class="n">b1labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+        <span class="n">b1props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+        <span class="n">b1refs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+        <span class="n">b2labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)),</span> <span class="n">other</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+        <span class="n">b2props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">)),</span> <span class="n">other</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+        <span class="n">b2refs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">is_empty_set</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">set</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">intersection</span><span class="p">({</span><span class="s2">""</span><span class="p">}))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">is_intersecting</span><span class="p">(</span><span class="n">s1</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">s2</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">s1l</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"&amp;"</span><span class="p">),</span>  <span class="n">s1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">s2l</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"&amp;"</span><span class="p">),</span> <span class="n">s2</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s1l</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s2l</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s2l</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s1l</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">intersecting_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">is_intersecting</span><span class="p">(</span><span class="n">b1props</span><span class="p">,</span> <span class="n">b2props</span><span class="p">)</span> <span class="ow">and</span>
+                          <span class="n">is_intersecting</span><span class="p">(</span><span class="n">b1labels</span><span class="p">,</span> <span class="n">b2labels</span><span class="p">)</span> <span class="ow">and</span>
+                          <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b1refs</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b1refs</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b2refs</span><span class="p">))))</span>
+
+
+
+        <span class="n">distinct_left</span> <span class="o">=</span> <span class="p">((</span><span class="ow">not</span> <span class="n">is_intersecting</span><span class="p">(</span><span class="n">a1props</span><span class="p">,</span> <span class="n">a2props</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_empty_set</span><span class="p">(</span><span class="n">a1props</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_empty_set</span><span class="p">(</span><span class="n">a2props</span><span class="p">))</span> <span class="ow">and</span>
+                         <span class="p">(</span><span class="ow">not</span> <span class="n">is_intersecting</span><span class="p">(</span><span class="n">a1labels</span><span class="p">,</span> <span class="n">a2labels</span><span class="p">)</span>  <span class="ow">or</span> <span class="n">is_empty_set</span><span class="p">(</span><span class="n">a1labels</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_empty_set</span><span class="p">(</span><span class="n">a2labels</span><span class="p">)))</span> <span class="c1"># Whether the keys on the left side are the same or not is not of interest</span>
+
+        <span class="k">return</span> <span class="n">distinct_left</span> <span class="ow">and</span> <span class="n">intersecting_right</span>
+
+
+
+    <span class="c1"># Comparison is based on patterns for automated more-general than sorting!</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">GOFD</span><span class="p">):</span>
@@ -3436,6 +3708,136 @@ GNFDs are ordered by their pattern.</p>
     <span class="n">walker</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">listener</span><span class="p">,</span> <span class="n">tree</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">listener</span><span class="o">.</span><span class="n">dependency</span>
+</code></pre></div></td></tr></tbody></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h6 id="gofd.GOFD.is_conflicting_with" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">is_conflicting_with</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">GOFD</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span></code>
+
+</h6>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Whether a GOFD is conflicting with another GOFD, as defined in https://doi.org/10.14778/3797919.3797943</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>other</code></b>
+              (<code><a class="autorefs autorefs-internal" title="&lt;code&gt;GOFD&lt;/code&gt; (&lt;code&gt;gofd.gnfd.GOFD&lt;/code&gt;)" href="#gofd.GOFD">GOFD</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The GOFD against whether this GOFD should be checked for being conflicting</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="bool">bool</span></code>
+          –
+          <div class="doc-md-description">
+            <p>Whether the two GOFDs are conflicting</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>gofd/gnfd.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
+<span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
+<span class="normal">890</span>
+<span class="normal">891</span>
+<span class="normal">892</span>
+<span class="normal">893</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_conflicting_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">GOFD</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Whether a GOFD is conflicting with another GOFD, as defined in https://doi.org/10.14778/3797919.3797943</span>
+<span class="sd">    :param other: The GOFD against whether this GOFD should be checked for being conflicting</span>
+<span class="sd">    :returns: Whether the two GOFDs are conflicting"""</span>
+
+    <span class="n">distinct_left</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">"""Whether both GOFD have distinct A"""</span>
+
+    <span class="n">intersecting_right</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">"""Whether both GOFD have the same B (i.e, compatible GO pattern and equal referenced prop. keys)"""</span>
+
+    <span class="n">a1labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">))</span>
+    <span class="n">a1props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">))</span>
+    <span class="n">a2labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)),</span> <span class="n">other</span><span class="o">.</span><span class="n">left</span><span class="p">))</span>
+    <span class="n">a2props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">)),</span> <span class="n">other</span><span class="o">.</span><span class="n">left</span><span class="p">))</span>
+    <span class="n">b1labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="n">b1props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="n">b1refs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="n">b2labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">labels</span><span class="p">)),</span> <span class="n">other</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="n">b2props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="s2">"&amp;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_graph_object</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">)),</span> <span class="n">other</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+    <span class="n">b2refs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">right</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_empty_set</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">set</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">intersection</span><span class="p">({</span><span class="s2">""</span><span class="p">}))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_intersecting</span><span class="p">(</span><span class="n">s1</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">s2</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">s1l</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"&amp;"</span><span class="p">),</span>  <span class="n">s1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">s2l</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"&amp;"</span><span class="p">),</span> <span class="n">s2</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s1l</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s2l</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s2l</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s1l</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">intersecting_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">is_intersecting</span><span class="p">(</span><span class="n">b1props</span><span class="p">,</span> <span class="n">b2props</span><span class="p">)</span> <span class="ow">and</span>
+                      <span class="n">is_intersecting</span><span class="p">(</span><span class="n">b1labels</span><span class="p">,</span> <span class="n">b2labels</span><span class="p">)</span> <span class="ow">and</span>
+                      <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b1refs</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b1refs</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b2refs</span><span class="p">))))</span>
+
+
+
+    <span class="n">distinct_left</span> <span class="o">=</span> <span class="p">((</span><span class="ow">not</span> <span class="n">is_intersecting</span><span class="p">(</span><span class="n">a1props</span><span class="p">,</span> <span class="n">a2props</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_empty_set</span><span class="p">(</span><span class="n">a1props</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_empty_set</span><span class="p">(</span><span class="n">a2props</span><span class="p">))</span> <span class="ow">and</span>
+                     <span class="p">(</span><span class="ow">not</span> <span class="n">is_intersecting</span><span class="p">(</span><span class="n">a1labels</span><span class="p">,</span> <span class="n">a2labels</span><span class="p">)</span>  <span class="ow">or</span> <span class="n">is_empty_set</span><span class="p">(</span><span class="n">a1labels</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_empty_set</span><span class="p">(</span><span class="n">a2labels</span><span class="p">)))</span> <span class="c1"># Whether the keys on the left side are the same or not is not of interest</span>
+
+    <span class="k">return</span> <span class="n">distinct_left</span> <span class="ow">and</span> <span class="n">intersecting_right</span>
 </code></pre></div></td></tr></tbody></table></div>
             </details>
     </div>
