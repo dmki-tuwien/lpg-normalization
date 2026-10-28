@@ -42,6 +42,9 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          inventories:
+            - https://docs.python.org/3.13/objects.inv
+            - https://neo4j.com/docs/api/python-driver/current/objects.inv
           paths:
             - .
           options:
