@@ -191,7 +191,7 @@ def test_sorted_deps():
         "()-[t:STOPS_AT:stopid]->()::t.stopid=>t",
         "()-[t:STOPS_AT:departure&stopid]->(s)::t.stopid=>s"])
 
-    l = list(dep_set)
+    l: list[GOFD] = list(dep_set)
     l.sort()
 
 def test_is_conflicting():

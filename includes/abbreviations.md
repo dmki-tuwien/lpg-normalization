@@ -1,4 +1,5 @@
 *[API]: application programming interface
+*[CSV]: comma-separated value
 *[gFDs]: graph-tailored functional dependencies
 *[GO-FDs]: graph object funcitonal dependencies
 *[GUI]: graphical user interface

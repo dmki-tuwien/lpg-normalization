@@ -6,7 +6,7 @@ else:
     from gnfdParser import gnfdParser
 
 # This class defines a complete listener for a parse tree produced by gnfdParser.
-class gnfdListener(ParseTreeListener):
+class gofdListener(ParseTreeListener):
 
     # Enter a parse tree produced by gnfdParser#dependency.
     def enterDependency(self, ctx:gnfdParser.DependencyContext):

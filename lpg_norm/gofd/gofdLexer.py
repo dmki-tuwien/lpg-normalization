@@ -31,7 +31,7 @@ def serializedATN():
         1,0,0,0,57,58,5,41,0,0,58,26,1,0,0,0,3,0,42,44,0
     ]
 
-class gnfdLexer(Lexer):
+class gofdLexer(Lexer):
 
     atn = ATNDeserializer().deserialize(serializedATN())
 

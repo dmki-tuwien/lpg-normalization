@@ -13,9 +13,9 @@ import random
 
 from antlr4 import InputStream, CommonTokenStream, ParseTreeWalker
 
-from gofd.gnfdLexer import gnfdLexer
-from gofd.gnfdListener import gnfdListener
-from gofd.gnfdParser import gnfdParser
+from lpg_norm.gofd.gofdLexer import gofdLexer
+from lpg_norm.gofd.gofdListener import gofdListener
+from lpg_norm.gofd.gofdParser import gofdParser
 
 CLINGO_FACT_NODE = "node"
 CLINGO_FACT_LEFT_EDGE = "ledge"
@@ -815,9 +815,9 @@ class GOFD:
 
         # ANTLR has been run in this folder using the command `antlr4 -Dlanguage=Python3 -visitor gnfd.g4`.
         input_stream = InputStream(string)
-        lexer = gnfdLexer(input_stream)
+        lexer = gofdLexer(input_stream)
         stream = CommonTokenStream(lexer)
-        parser = gnfdParser(stream)
+        parser = gofdParser(stream)
         tree = parser.dependency()
         listener = _GNFDListener()
 
@@ -918,19 +918,19 @@ class GOFD:
         return hash(str(self))
 
 
-class _GNFDListener(gnfdListener):
+class _GNFDListener(gofdListener):
     def __init__(self):
         self.dependency: GOFD
         self.stack: list = []
 
-    def exitDependency(self, ctx: gnfdParser.DependencyContext):
+    def exitDependency(self, ctx: gofdParser.DependencyContext):
         right = self.stack.pop()
         left = self.stack.pop()
         pattern = self.stack.pop()
 
         self.dependency = GOFD(pattern, left, right)
 
-    def exitReference(self, ctx: gnfdParser.ReferenceContext):
+    def exitReference(self, ctx: gofdParser.ReferenceContext):
         ref = ctx.getText().split(".")
         pattern: Pattern = self.stack[0]
 
@@ -962,13 +962,13 @@ class _GNFDListener(gnfdListener):
             self.stack.pop() # Second pop needed, as for each mentioned variable name a string is pushed to the stack
         self.stack.append(ref_objects)
 
-    def exitLeft(self, ctx: gnfdParser.LeftContext):
+    def exitLeft(self, ctx: gofdParser.LeftContext):
         self.exitReferenceList(ctx)
 
-    def exitRight(self, ctx: gnfdParser.RightContext):
+    def exitRight(self, ctx: gofdParser.RightContext):
         self.exitReferenceList(ctx)
 
-    def exitPattern(self, ctx: gnfdParser.PatternContext):
+    def exitPattern(self, ctx: gofdParser.PatternContext):
         if ctx.getChildCount() == 3:
             right = self.stack.pop()
             left = self.stack.pop()
@@ -1132,7 +1132,7 @@ class _GNFDListener(gnfdListener):
                                 )
                             )
 
-    def exitNodePattern(self, ctx: gnfdParser.NodePatternContext):
+    def exitNodePattern(self, ctx: gofdParser.NodePatternContext):
         node: Node = Node()
         name = ""
         props = set()
@@ -1175,15 +1175,15 @@ class _GNFDListener(gnfdListener):
 
         self.stack.append(node)
 
-    def enterLabelList(self, ctx: gnfdParser.LabelListContext):
+    def enterLabelList(self, ctx: gofdParser.LabelListContext):
         self.stack.append(
             set(map(str.strip, ctx.getText().replace(":", "").split("&")))
         )  # [1:] removes the leading colon of the list
 
-    def enterPropertyList(self, ctx: gnfdParser.PropertyListContext):
+    def enterPropertyList(self, ctx: gofdParser.PropertyListContext):
         self.stack.append(
             set(map(str.strip, ctx.getText().replace(":", "").split("&")))
         )  # [1:] removes the leading colon of the list
 
-    def exitVarName(self, ctx: gnfdParser.VarNameContext):
+    def exitVarName(self, ctx: gofdParser.VarNameContext):
         self.stack.append(ctx.getText())

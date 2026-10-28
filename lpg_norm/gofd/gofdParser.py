@@ -59,7 +59,7 @@ def serializedATN():
         118,129,133,137
     ]
 
-class gnfdParser ( Parser ):
+class gofdParser (Parser):
 
     grammarFileName = "gnfd.g4"
 
@@ -125,31 +125,31 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def pattern(self):
-            return self.getTypedRuleContext(gnfdParser.PatternContext,0)
+            return self.getTypedRuleContext(gofdParser.PatternContext, 0)
 
 
         def COLON(self, i:int=None):
             if i is None:
-                return self.getTokens(gnfdParser.COLON)
+                return self.getTokens(gofdParser.COLON)
             else:
-                return self.getToken(gnfdParser.COLON, i)
+                return self.getToken(gofdParser.COLON, i)
 
         def left(self):
-            return self.getTypedRuleContext(gnfdParser.LeftContext,0)
+            return self.getTypedRuleContext(gofdParser.LeftContext, 0)
 
 
         def DETERMINES(self):
-            return self.getToken(gnfdParser.DETERMINES, 0)
+            return self.getToken(gofdParser.DETERMINES, 0)
 
         def right(self):
-            return self.getTypedRuleContext(gnfdParser.RightContext,0)
+            return self.getTypedRuleContext(gofdParser.RightContext, 0)
 
 
         def EOF(self):
-            return self.getToken(gnfdParser.EOF, 0)
+            return self.getToken(gofdParser.EOF, 0)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_dependency
+            return gofdParser.RULE_dependency
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterDependency" ):
@@ -170,24 +170,24 @@ class gnfdParser ( Parser ):
 
     def dependency(self):
 
-        localctx = gnfdParser.DependencyContext(self, self._ctx, self.state)
+        localctx = gofdParser.DependencyContext(self, self._ctx, self.state)
         self.enterRule(localctx, 0, self.RULE_dependency)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 24
             self.pattern(0)
             self.state = 25
-            self.match(gnfdParser.COLON)
+            self.match(gofdParser.COLON)
             self.state = 26
-            self.match(gnfdParser.COLON)
+            self.match(gofdParser.COLON)
             self.state = 27
             self.left()
             self.state = 28
-            self.match(gnfdParser.DETERMINES)
+            self.match(gofdParser.DETERMINES)
             self.state = 29
             self.right()
             self.state = 30
-            self.match(gnfdParser.EOF)
+            self.match(gofdParser.EOF)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -206,19 +206,19 @@ class gnfdParser ( Parser ):
 
         def reference(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(gnfdParser.ReferenceContext)
+                return self.getTypedRuleContexts(gofdParser.ReferenceContext)
             else:
-                return self.getTypedRuleContext(gnfdParser.ReferenceContext,i)
+                return self.getTypedRuleContext(gofdParser.ReferenceContext, i)
 
 
         def COMMA(self, i:int=None):
             if i is None:
-                return self.getTokens(gnfdParser.COMMA)
+                return self.getTokens(gofdParser.COMMA)
             else:
-                return self.getToken(gnfdParser.COMMA, i)
+                return self.getToken(gofdParser.COMMA, i)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_left
+            return gofdParser.RULE_left
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterLeft" ):
@@ -239,7 +239,7 @@ class gnfdParser ( Parser ):
 
     def left(self):
 
-        localctx = gnfdParser.LeftContext(self, self._ctx, self.state)
+        localctx = gofdParser.LeftContext(self, self._ctx, self.state)
         self.enterRule(localctx, 2, self.RULE_left)
         self._la = 0 # Token type
         try:
@@ -251,7 +251,7 @@ class gnfdParser ( Parser ):
             _la = self._input.LA(1)
             while _la==3:
                 self.state = 33
-                self.match(gnfdParser.COMMA)
+                self.match(gofdParser.COMMA)
                 self.state = 34
                 self.reference()
                 self.state = 39
@@ -276,19 +276,19 @@ class gnfdParser ( Parser ):
 
         def reference(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(gnfdParser.ReferenceContext)
+                return self.getTypedRuleContexts(gofdParser.ReferenceContext)
             else:
-                return self.getTypedRuleContext(gnfdParser.ReferenceContext,i)
+                return self.getTypedRuleContext(gofdParser.ReferenceContext, i)
 
 
         def COMMA(self, i:int=None):
             if i is None:
-                return self.getTokens(gnfdParser.COMMA)
+                return self.getTokens(gofdParser.COMMA)
             else:
-                return self.getToken(gnfdParser.COMMA, i)
+                return self.getToken(gofdParser.COMMA, i)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_right
+            return gofdParser.RULE_right
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterRight" ):
@@ -309,7 +309,7 @@ class gnfdParser ( Parser ):
 
     def right(self):
 
-        localctx = gnfdParser.RightContext(self, self._ctx, self.state)
+        localctx = gofdParser.RightContext(self, self._ctx, self.state)
         self.enterRule(localctx, 4, self.RULE_right)
         self._la = 0 # Token type
         try:
@@ -321,7 +321,7 @@ class gnfdParser ( Parser ):
             _la = self._input.LA(1)
             while _la==3:
                 self.state = 41
-                self.match(gnfdParser.COMMA)
+                self.match(gofdParser.COMMA)
                 self.state = 42
                 self.reference()
                 self.state = 47
@@ -345,15 +345,15 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def varName(self):
-            return self.getTypedRuleContext(gnfdParser.VarNameContext,0)
+            return self.getTypedRuleContext(gofdParser.VarNameContext, 0)
 
 
         def property_(self):
-            return self.getTypedRuleContext(gnfdParser.PropertyContext,0)
+            return self.getTypedRuleContext(gofdParser.PropertyContext, 0)
 
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_reference
+            return gofdParser.RULE_reference
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterReference" ):
@@ -374,7 +374,7 @@ class gnfdParser ( Parser ):
 
     def reference(self):
 
-        localctx = gnfdParser.ReferenceContext(self, self._ctx, self.state)
+        localctx = gofdParser.ReferenceContext(self, self._ctx, self.state)
         self.enterRule(localctx, 6, self.RULE_reference)
         try:
             self.state = 50
@@ -410,18 +410,18 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def varName(self):
-            return self.getTypedRuleContext(gnfdParser.VarNameContext,0)
+            return self.getTypedRuleContext(gofdParser.VarNameContext, 0)
 
 
         def DOT(self):
-            return self.getToken(gnfdParser.DOT, 0)
+            return self.getToken(gofdParser.DOT, 0)
 
         def propertyKey(self):
-            return self.getTypedRuleContext(gnfdParser.PropertyKeyContext,0)
+            return self.getTypedRuleContext(gofdParser.PropertyKeyContext, 0)
 
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_property
+            return gofdParser.RULE_property
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterProperty" ):
@@ -442,14 +442,14 @@ class gnfdParser ( Parser ):
 
     def property_(self):
 
-        localctx = gnfdParser.PropertyContext(self, self._ctx, self.state)
+        localctx = gofdParser.PropertyContext(self, self._ctx, self.state)
         self.enterRule(localctx, 8, self.RULE_property)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 52
             self.varName()
             self.state = 53
-            self.match(gnfdParser.DOT)
+            self.match(gofdParser.DOT)
             self.state = 54
             self.propertyKey()
         except RecognitionException as re:
@@ -469,54 +469,54 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def nodePattern(self):
-            return self.getTypedRuleContext(gnfdParser.NodePatternContext,0)
+            return self.getTypedRuleContext(gofdParser.NodePatternContext, 0)
 
 
         def pattern(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(gnfdParser.PatternContext)
+                return self.getTypedRuleContexts(gofdParser.PatternContext)
             else:
-                return self.getTypedRuleContext(gnfdParser.PatternContext,i)
+                return self.getTypedRuleContext(gofdParser.PatternContext, i)
 
 
         def LANGLE(self):
-            return self.getToken(gnfdParser.LANGLE, 0)
+            return self.getToken(gofdParser.LANGLE, 0)
 
         def DASH(self, i:int=None):
             if i is None:
-                return self.getTokens(gnfdParser.DASH)
+                return self.getTokens(gofdParser.DASH)
             else:
-                return self.getToken(gnfdParser.DASH, i)
+                return self.getToken(gofdParser.DASH, i)
 
         def LBRACK(self):
-            return self.getToken(gnfdParser.LBRACK, 0)
+            return self.getToken(gofdParser.LBRACK, 0)
 
         def RBRACK(self):
-            return self.getToken(gnfdParser.RBRACK, 0)
+            return self.getToken(gofdParser.RBRACK, 0)
 
         def varName(self):
-            return self.getTypedRuleContext(gnfdParser.VarNameContext,0)
+            return self.getTypedRuleContext(gofdParser.VarNameContext, 0)
 
 
         def labelList(self):
-            return self.getTypedRuleContext(gnfdParser.LabelListContext,0)
+            return self.getTypedRuleContext(gofdParser.LabelListContext, 0)
 
 
         def COLON(self):
-            return self.getToken(gnfdParser.COLON, 0)
+            return self.getToken(gofdParser.COLON, 0)
 
         def propertyList(self):
-            return self.getTypedRuleContext(gnfdParser.PropertyListContext,0)
+            return self.getTypedRuleContext(gofdParser.PropertyListContext, 0)
 
 
         def RANGLE(self):
-            return self.getToken(gnfdParser.RANGLE, 0)
+            return self.getToken(gofdParser.RANGLE, 0)
 
         def COMMA(self):
-            return self.getToken(gnfdParser.COMMA, 0)
+            return self.getToken(gofdParser.COMMA, 0)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_pattern
+            return gofdParser.RULE_pattern
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterPattern" ):
@@ -537,7 +537,7 @@ class gnfdParser ( Parser ):
     def pattern(self, _p:int=0):
         _parentctx = self._ctx
         _parentState = self.state
-        localctx = gnfdParser.PatternContext(self, self._ctx, _parentState)
+        localctx = gofdParser.PatternContext(self, self._ctx, _parentState)
         _prevctx = localctx
         _startState = 10
         self.enterRecursionRule(localctx, 10, self.RULE_pattern, _p)
@@ -559,18 +559,18 @@ class gnfdParser ( Parser ):
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,9,self._ctx)
                     if la_ == 1:
-                        localctx = gnfdParser.PatternContext(self, _parentctx, _parentState)
+                        localctx = gofdParser.PatternContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_pattern)
                         self.state = 59
                         if not self.precpred(self._ctx, 3):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
                         self.state = 60
-                        self.match(gnfdParser.LANGLE)
+                        self.match(gofdParser.LANGLE)
                         self.state = 61
-                        self.match(gnfdParser.DASH)
+                        self.match(gofdParser.DASH)
                         self.state = 62
-                        self.match(gnfdParser.LBRACK)
+                        self.match(gofdParser.LBRACK)
                         self.state = 64
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
@@ -596,30 +596,30 @@ class gnfdParser ( Parser ):
 
                         elif la_ == 2:
                             self.state = 70
-                            self.match(gnfdParser.COLON)
+                            self.match(gofdParser.COLON)
                             self.state = 71
                             self.propertyList()
 
 
                         self.state = 74
-                        self.match(gnfdParser.RBRACK)
+                        self.match(gofdParser.RBRACK)
                         self.state = 75
-                        self.match(gnfdParser.DASH)
+                        self.match(gofdParser.DASH)
                         self.state = 76
                         self.pattern(4)
                         pass
 
                     elif la_ == 2:
-                        localctx = gnfdParser.PatternContext(self, _parentctx, _parentState)
+                        localctx = gofdParser.PatternContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_pattern)
                         self.state = 77
                         if not self.precpred(self._ctx, 2):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
                         self.state = 78
-                        self.match(gnfdParser.DASH)
+                        self.match(gofdParser.DASH)
                         self.state = 79
-                        self.match(gnfdParser.LBRACK)
+                        self.match(gofdParser.LBRACK)
                         self.state = 81
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
@@ -645,30 +645,30 @@ class gnfdParser ( Parser ):
 
                         elif la_ == 2:
                             self.state = 87
-                            self.match(gnfdParser.COLON)
+                            self.match(gofdParser.COLON)
                             self.state = 88
                             self.propertyList()
 
 
                         self.state = 91
-                        self.match(gnfdParser.RBRACK)
+                        self.match(gofdParser.RBRACK)
                         self.state = 92
-                        self.match(gnfdParser.DASH)
+                        self.match(gofdParser.DASH)
                         self.state = 93
-                        self.match(gnfdParser.RANGLE)
+                        self.match(gofdParser.RANGLE)
                         self.state = 94
                         self.pattern(3)
                         pass
 
                     elif la_ == 3:
-                        localctx = gnfdParser.PatternContext(self, _parentctx, _parentState)
+                        localctx = gofdParser.PatternContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_pattern)
                         self.state = 95
                         if not self.precpred(self._ctx, 1):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 1)")
                         self.state = 96
-                        self.match(gnfdParser.COMMA)
+                        self.match(gofdParser.COMMA)
                         self.state = 97
                         self.pattern(2)
                         pass
@@ -695,23 +695,23 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def COLON(self):
-            return self.getToken(gnfdParser.COLON, 0)
+            return self.getToken(gofdParser.COLON, 0)
 
         def label(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(gnfdParser.LabelContext)
+                return self.getTypedRuleContexts(gofdParser.LabelContext)
             else:
-                return self.getTypedRuleContext(gnfdParser.LabelContext,i)
+                return self.getTypedRuleContext(gofdParser.LabelContext, i)
 
 
         def AMPERSAND(self, i:int=None):
             if i is None:
-                return self.getTokens(gnfdParser.AMPERSAND)
+                return self.getTokens(gofdParser.AMPERSAND)
             else:
-                return self.getToken(gnfdParser.AMPERSAND, i)
+                return self.getToken(gofdParser.AMPERSAND, i)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_labelList
+            return gofdParser.RULE_labelList
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterLabelList" ):
@@ -732,13 +732,13 @@ class gnfdParser ( Parser ):
 
     def labelList(self):
 
-        localctx = gnfdParser.LabelListContext(self, self._ctx, self.state)
+        localctx = gofdParser.LabelListContext(self, self._ctx, self.state)
         self.enterRule(localctx, 12, self.RULE_labelList)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 103
-            self.match(gnfdParser.COLON)
+            self.match(gofdParser.COLON)
             self.state = 104
             self.label()
             self.state = 109
@@ -746,7 +746,7 @@ class gnfdParser ( Parser ):
             _la = self._input.LA(1)
             while _la==1:
                 self.state = 105
-                self.match(gnfdParser.AMPERSAND)
+                self.match(gofdParser.AMPERSAND)
                 self.state = 106
                 self.label()
                 self.state = 111
@@ -770,23 +770,23 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def COLON(self):
-            return self.getToken(gnfdParser.COLON, 0)
+            return self.getToken(gofdParser.COLON, 0)
 
         def propertyKey(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(gnfdParser.PropertyKeyContext)
+                return self.getTypedRuleContexts(gofdParser.PropertyKeyContext)
             else:
-                return self.getTypedRuleContext(gnfdParser.PropertyKeyContext,i)
+                return self.getTypedRuleContext(gofdParser.PropertyKeyContext, i)
 
 
         def AMPERSAND(self, i:int=None):
             if i is None:
-                return self.getTokens(gnfdParser.AMPERSAND)
+                return self.getTokens(gofdParser.AMPERSAND)
             else:
-                return self.getToken(gnfdParser.AMPERSAND, i)
+                return self.getToken(gofdParser.AMPERSAND, i)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_propertyList
+            return gofdParser.RULE_propertyList
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterPropertyList" ):
@@ -807,13 +807,13 @@ class gnfdParser ( Parser ):
 
     def propertyList(self):
 
-        localctx = gnfdParser.PropertyListContext(self, self._ctx, self.state)
+        localctx = gofdParser.PropertyListContext(self, self._ctx, self.state)
         self.enterRule(localctx, 14, self.RULE_propertyList)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 112
-            self.match(gnfdParser.COLON)
+            self.match(gofdParser.COLON)
             self.state = 113
             self.propertyKey()
             self.state = 118
@@ -821,7 +821,7 @@ class gnfdParser ( Parser ):
             _la = self._input.LA(1)
             while _la==1:
                 self.state = 114
-                self.match(gnfdParser.AMPERSAND)
+                self.match(gofdParser.AMPERSAND)
                 self.state = 115
                 self.propertyKey()
                 self.state = 120
@@ -845,10 +845,10 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def IDENTIFIER(self):
-            return self.getToken(gnfdParser.IDENTIFIER, 0)
+            return self.getToken(gofdParser.IDENTIFIER, 0)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_label
+            return gofdParser.RULE_label
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterLabel" ):
@@ -869,12 +869,12 @@ class gnfdParser ( Parser ):
 
     def label(self):
 
-        localctx = gnfdParser.LabelContext(self, self._ctx, self.state)
+        localctx = gofdParser.LabelContext(self, self._ctx, self.state)
         self.enterRule(localctx, 16, self.RULE_label)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 121
-            self.match(gnfdParser.IDENTIFIER)
+            self.match(gofdParser.IDENTIFIER)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -892,10 +892,10 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def IDENTIFIER(self):
-            return self.getToken(gnfdParser.IDENTIFIER, 0)
+            return self.getToken(gofdParser.IDENTIFIER, 0)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_varName
+            return gofdParser.RULE_varName
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterVarName" ):
@@ -916,12 +916,12 @@ class gnfdParser ( Parser ):
 
     def varName(self):
 
-        localctx = gnfdParser.VarNameContext(self, self._ctx, self.state)
+        localctx = gofdParser.VarNameContext(self, self._ctx, self.state)
         self.enterRule(localctx, 18, self.RULE_varName)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 123
-            self.match(gnfdParser.IDENTIFIER)
+            self.match(gofdParser.IDENTIFIER)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -939,10 +939,10 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def IDENTIFIER(self):
-            return self.getToken(gnfdParser.IDENTIFIER, 0)
+            return self.getToken(gofdParser.IDENTIFIER, 0)
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_propertyKey
+            return gofdParser.RULE_propertyKey
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterPropertyKey" ):
@@ -963,12 +963,12 @@ class gnfdParser ( Parser ):
 
     def propertyKey(self):
 
-        localctx = gnfdParser.PropertyKeyContext(self, self._ctx, self.state)
+        localctx = gofdParser.PropertyKeyContext(self, self._ctx, self.state)
         self.enterRule(localctx, 20, self.RULE_propertyKey)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 125
-            self.match(gnfdParser.IDENTIFIER)
+            self.match(gofdParser.IDENTIFIER)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -986,28 +986,28 @@ class gnfdParser ( Parser ):
             self.parser = parser
 
         def LPAR(self):
-            return self.getToken(gnfdParser.LPAR, 0)
+            return self.getToken(gofdParser.LPAR, 0)
 
         def RPAR(self):
-            return self.getToken(gnfdParser.RPAR, 0)
+            return self.getToken(gofdParser.RPAR, 0)
 
         def varName(self):
-            return self.getTypedRuleContext(gnfdParser.VarNameContext,0)
+            return self.getTypedRuleContext(gofdParser.VarNameContext, 0)
 
 
         def labelList(self):
-            return self.getTypedRuleContext(gnfdParser.LabelListContext,0)
+            return self.getTypedRuleContext(gofdParser.LabelListContext, 0)
 
 
         def COLON(self):
-            return self.getToken(gnfdParser.COLON, 0)
+            return self.getToken(gofdParser.COLON, 0)
 
         def propertyList(self):
-            return self.getTypedRuleContext(gnfdParser.PropertyListContext,0)
+            return self.getTypedRuleContext(gofdParser.PropertyListContext, 0)
 
 
         def getRuleIndex(self):
-            return gnfdParser.RULE_nodePattern
+            return gofdParser.RULE_nodePattern
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterNodePattern" ):
@@ -1028,13 +1028,13 @@ class gnfdParser ( Parser ):
 
     def nodePattern(self):
 
-        localctx = gnfdParser.NodePatternContext(self, self._ctx, self.state)
+        localctx = gofdParser.NodePatternContext(self, self._ctx, self.state)
         self.enterRule(localctx, 22, self.RULE_nodePattern)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 127
-            self.match(gnfdParser.LPAR)
+            self.match(gofdParser.LPAR)
             self.state = 129
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -1060,13 +1060,13 @@ class gnfdParser ( Parser ):
 
             elif la_ == 2:
                 self.state = 135
-                self.match(gnfdParser.COLON)
+                self.match(gofdParser.COLON)
                 self.state = 136
                 self.propertyList()
 
 
             self.state = 139
-            self.match(gnfdParser.RPAR)
+            self.match(gofdParser.RPAR)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)

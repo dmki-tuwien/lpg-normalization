@@ -3,7 +3,7 @@ import time
 
 from caseconverter import pascalcase
 from dotenv import load_dotenv
-from fastapi import FastAPI, status
+from fastapi import FastAPI
 from neo4j import GraphDatabase, Driver, Query
 from pydantic import BaseModel
 from typing import Literal
@@ -13,7 +13,7 @@ import yaml
 from starlette.middleware.cors import CORSMiddleware
 
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 import gofd
 from gofd import gnfd
 

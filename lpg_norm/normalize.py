@@ -1,32 +1,28 @@
 import logging
-import operator
 import time
 import uuid
-from typing import Any
+from typing import Any, Literal
 
 import neo4j
-from caseconverter import pascalcase, camelcase
-from functools import reduce
-from typing import Literal
+from caseconverter import camelcase, pascalcase
 from frozendict import frozendict
-
 from neo4j import Driver
 from tqdm_loggable.auto import tqdm
 
-
-from gofd import DependencySet, GOFD, Node, Reference, Edge, GraphObject
+from gofd import GOFD, DependencySet, Edge, GraphObject, Node, Reference
 
 
 def perform_graph_native_normalization(
-    driver: Driver,
-    database: Literal["neo4j", "memgraph"],
-    provided_dependencies: DependencySet,
-    dep_filter: Literal["all",
-                        "within-node",
-                        "within-edge",
-                        "within-graph-object",
-                        "between-graph-object",
-                        "with-reification"] = "all",
+        driver: Driver,
+        database: Literal["neo4j", "memgraph"],
+        provided_dependencies: DependencySet,
+        dep_filter: Literal["all",
+        "within-node",
+        "within-edge",
+        "within-graph-object",
+        "between-graph-object",
+        "with-reification",
+        "without-reification"] = "all",
 ) -> (DependencySet, list[str]):
     """
     Performs graph-native normalization under consideration of the provided parameters.
@@ -43,11 +39,11 @@ def perform_graph_native_normalization(
     """
 
     """A local copy of the provided dependencies that, e.g., may be filtered."""
-    deps = provided_dependencies
+    deps: DependencySet = provided_dependencies
 
-    """A list of strings of queries that create indices"""
+    """A list of query strings that create indices"""
     index_queries: set[str] = set()
-    """A list of strings of the queries that perform the transformations"""
+    """A list of query strings that perform the transformations"""
     transformation_queries: set[str] = set()
     """A list of strings of the queries that remove properties"""
     remove_queries: set[str] = set()
@@ -75,7 +71,6 @@ def perform_graph_native_normalization(
                 except neo4j.exceptions.TransientError:
                     responsive = False
                     time.sleep(1)
-
 
     # Phase 0: Filter deps according to parameter from evaluation.
     deps = filter_dependencies(dep_filter, deps)
@@ -110,13 +105,13 @@ def perform_graph_native_normalization(
                         )
 
                         if (
-                            right_ref.is_property_variable
-                            and len(left_references) > 0
-                            and isinstance(right_ref.get_graph_object(), Node)
-                            and (
+                                right_ref.is_property_variable
+                                and len(left_references) > 0
+                                and isinstance(right_ref.get_graph_object(), Node)
+                                and (
                                 right_ref.get_graph_object() is left_go.src
                                 or right_ref.get_graph_object() is left_go.tgt
-                            )
+                        )
                         ):
                             logging.info("between-ep-np")
                             assert isinstance(right_ref.get_graph_object(), Node)
@@ -136,7 +131,8 @@ def perform_graph_native_normalization(
                                 )
                             else:
                                 assert database == "memgraph"
-                                index_queries.add(f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
+                                index_queries.add(
+                                    f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
 
                             orig_edge_label = next(iter(edge.labels))
                             if database == "neo4j":
@@ -162,7 +158,6 @@ def perform_graph_native_normalization(
                                 index_queries.add(
                                     f"CREATE EDGE INDEX ON :{orig_edge_label} ({next(iter(edge.properties))})"
                                 )
-
 
                             new_properties: str = ", ".join(
                                 map(
@@ -193,7 +188,7 @@ def perform_graph_native_normalization(
                                 )
 
                             index_queries.add(
-f"""
+                                f"""
 {dep.pattern.to_gql_match_where_string()} 
 WITH DISTINCT {node.symbol}
 SET {node.symbol}.`{rand}`="{rand}"
@@ -206,7 +201,7 @@ SET {node.symbol}.`{rand}`="{rand}"
                                 )[0]
                             )
                             remove_queries.add(
-    f"""
+                                f"""
 {cleanup_pattern} 
 WHERE {node.symbol}.`{rand}`="{rand}"
 WITH DISTINCT {node.symbol}
@@ -215,14 +210,12 @@ REMOVE {node.symbol}.`{rand}`
 """
                             )
 
-
                             delete_queries.add(
                                 f"""
 MATCH ({"".join(map(lambda lab: f":{lab}", edge.src.labels))})-[{edge.symbol}{"".join(map(lambda lab: f":{lab}", edge.labels))}]->({"".join(map(lambda lab: f":{lab}", edge.tgt.labels))})
 WITH DISTINCT {edge.symbol}
 DELETE {edge.symbol}"""
                             )
-
 
                             remove_queries.add(
                                 f"""
@@ -245,13 +238,13 @@ REMOVE {", ".join(map(str, left_references))}"""
                             applied_transformations.append("between-ep-np")
 
                         elif (
-                            right_ref.is_graph_object_variable
-                            and len(left_references) > 0
-                            and isinstance(right_ref.get_graph_object(), Node)
-                            and (
-                                right_ref.get_graph_object() is left_go.src
-                                or right_ref.get_graph_object() is left_go.tgt
-                            )
+                                right_ref.is_graph_object_variable
+                                and len(left_references) > 0
+                                and isinstance(right_ref.get_graph_object(), Node)
+                                and (
+                                        right_ref.get_graph_object() is left_go.src
+                                        or right_ref.get_graph_object() is left_go.tgt
+                                )
                         ):
                             logging.info("between-ep-n")
 
@@ -268,7 +261,8 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 )
                             else:
                                 assert database == "memgraph"
-                                index_queries.add(f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
+                                index_queries.add(
+                                    f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
 
                             orig_edge_label = next(iter(edge.labels))
                             if database == "neo4j":
@@ -294,7 +288,6 @@ REMOVE {", ".join(map(str, left_references))}"""
                                 index_queries.add(
                                     f"CREATE EDGE INDEX ON :{orig_edge_label} ({next(iter(edge.properties))})"
                                 )
-
 
                             new_properties: str = ", ".join(
                                 map(
@@ -344,27 +337,27 @@ REMOVE {", ".join(map(str, left_references))}"""
                     node = left_go
                     for right_ref in inter_dep.right:
                         left_is_go = (
-                            len(
-                                set(
-                                    filter(
-                                        lambda ref: "." not in str(ref), inter_dep.left
+                                len(
+                                    set(
+                                        filter(
+                                            lambda ref: "." not in str(ref), inter_dep.left
+                                        )
                                     )
                                 )
-                            )
-                            > 0
+                                > 0
                         )
                         left_references: set[Reference] = set(
                             filter(lambda ref: "." in str(ref), inter_dep.left)
                         )
 
                         if (
-                            "." in str(right_ref)
-                            and left_is_go
-                            and isinstance(right_ref.get_graph_object(), Edge)
-                            and (
+                                "." in str(right_ref)
+                                and left_is_go
+                                and isinstance(right_ref.get_graph_object(), Edge)
+                                and (
                                 right_ref.get_graph_object().src is node
                                 or right_ref.get_graph_object().tgt is node
-                            )
+                        )
                         ):
                             logging.info("between-n-ep")
 
@@ -393,13 +386,13 @@ REMOVE {right_ref}"""
                             applied_transformations.append("between-n-ep")
 
                         elif (
-                            right_ref.is_property_variable
-                            and not left_is_go
-                            and isinstance(right_ref.get_graph_object(), Edge)
-                            and (
-                                right_ref.get_graph_object().src is node
-                                or right_ref.get_graph_object().tgt is node
-                            )
+                                right_ref.is_property_variable
+                                and not left_is_go
+                                and isinstance(right_ref.get_graph_object(), Edge)
+                                and (
+                                        right_ref.get_graph_object().src is node
+                                        or right_ref.get_graph_object().tgt is node
+                                )
                         ):
                             logging.info("between-np-ep")
 
@@ -421,7 +414,6 @@ REMOVE {right_ref}"""
                                 index_queries.add(
                                     f"""CREATE INDEX ON :{new_label}({",".join(map(pascalcase, map(str, left_references)))})""")
 
-
                             new_properties: str = ", ".join(
                                 map(
                                     lambda ref: f"{pascalcase(ref)} : {ref}",
@@ -438,7 +430,6 @@ REMOVE {right_ref}"""
                                 index_queries.add(
                                     f"CREATE INDEX ON :{next(iter(node.labels))}(`{rand}`)"
                                 )
-
 
                             transformation_queries.add(
                                 f"""
@@ -506,9 +497,9 @@ REMOVE {node.symbol}.`{rand}`
             #  ψ_L1 (psi_L1)  #
             # # # # # # # # # #
             if (
-                dep.is_within_node
-                and len(left_references) > 0
-                and len(right_references) > 0
+                    dep.is_within_node
+                    and len(left_references) > 0
+                    and len(right_references) > 0
             ):
                 logging.info("within-n")
                 node: Node = dep.right.pop().get_graph_object()
@@ -580,9 +571,9 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}
             #  ψ_L2 (psi_L2)  #
             # # # # # # # # # #
             elif (
-                dep.is_within_edge
-                and len(left_references) > 0
-                and len(right_references) > 0
+                    dep.is_within_edge
+                    and len(left_references) > 0
+                    and len(right_references) > 0
             ):  # ψ_L2 (psi_L2)  --> Reification
                 logging.info("Within e")
 
@@ -621,7 +612,6 @@ REMOVE {", ".join(map(str, right_references.union(left_references)))}
                     index_queries.add(
                         f"CREATE EDGE INDEX ON :{orig_edge_label}({next(iter(edge.properties))})"
                     )
-
 
                 new_properties: str = ", ".join(
                     map(lambda ref: f"{pascalcase(ref)} : {ref}", map(str, new_props))
@@ -684,11 +674,13 @@ REMOVE {", ".join(map(str, all_references))}"""
     return transformed_deps, applied_transformations
 
 
-def filter_dependencies(dep_filter: Literal["within-node",
-                                            "within-edge",
-                                            "within-graph-object",
-                                            "between-graph-object",
-                                            "with-reification"],
+def filter_dependencies(dep_filter: Literal["all",
+"within-node",
+"within-edge",
+"within-graph-object",
+"between-graph-object",
+"with-reification",
+"without-reification"],
                         deps: DependencySet) -> DependencySet:
     logging.info("Filter dependencies")
     match dep_filter:
@@ -727,13 +719,14 @@ def perform_structural_normalization(driver: Driver,
                                      dep_filter: str = "all",
                                      ):
     """
-    Performs structural normalization as described by Egger et al. in https://doi.org/10.14778/3797919.3797943.
+    Performs Structural Normalization as described by Egger et al. in https://doi.org/10.14778/3797919.3797943.
+    Currently, this implementation of Structural Normalization is still incomplete and experimental.
     :param driver: A :any:`neo4j.Driver`
-    :param database: The graph database system containing the graph to be normalized. Currently only Neo4j is supported, Memgraph will follow.
+    :param database: The graph database system containing the graph to be normalized. Currently only Neo4j is supported, Memgraph will follow eventually.
     :param normal_form: The normal form the normalized graph should fulfill.
     """
     if database == "memgraph":
-        raise NotImplementedError("Structural normalization is currently only implemented for `neo4j`.")
+        raise NotImplementedError("Structural Normalization is currently only implemented for `Nseo4j`.")
 
     def get_or_create_single_prop(property_name: str, value) -> str:
         # Mimics `getOrCreate` from https://doi.org/10.14778/3797919.3797943
@@ -746,7 +739,7 @@ def perform_structural_normalization(driver: Driver,
         if len(d) > 0:
             query = "MERGE (n {"
             props = []
-            for k in d.keys():
+            for k in d:
                 v = d[k]
                 if v is not None and isinstance(v, bool | int | float):
                     props.append(f"`{k}`:{v}")
@@ -757,7 +750,7 @@ def perform_structural_normalization(driver: Driver,
         else:
             query = """MERGE (n) RETURN elementId(n) as nodeId LIMIT 1"""
         res = session.run(query)
-        
+
         for record in res:
             return str(record["nodeId"])
 
@@ -765,7 +758,7 @@ def perform_structural_normalization(driver: Driver,
         case "1GNF":
             with driver.session() as session:
 
-                found_non_atomic = True # To check whether there are non-atomic properties, we assume there are some!
+                found_non_atomic = True  # To check whether there are non-atomic properties, we assume there are some!
 
                 # Retrieve all non-atomic values in edges and reify them
                 session.run("""
@@ -777,10 +770,9 @@ def perform_structural_normalization(driver: Driver,
                 CREATE (n)-[:$("SRC_"+type(e))]->(re)
                 CREATE (re)-[:$("TGT_"+type(e))]->(m)
                 SET re += properties(e)
-                DELETE e""") # happens only once; after this only nodes can have complex property values.
+                DELETE e""")  # happens only once; after this only nodes can have complex property values.
 
                 while found_non_atomic:
-
 
                     # Retrieve all non-atomic values in nodes (original nodes + reified)
                     result = session.run("""
@@ -794,7 +786,7 @@ def perform_structural_normalization(driver: Driver,
                     found_non_atomic = False
                     for record in result:
                         # The loop is accessed when there were non-atomic values
-                        found_non_atomic = True # There were non-atomic values, so we need another iteration!
+                        found_non_atomic = True  # There were non-atomic values, so we need another iteration!
                         i = 0
                         for atomic_value in record["propValue"]:
                             get_or_create_single_prop(record["propName"], atomic_value)
@@ -812,13 +804,11 @@ def perform_structural_normalization(driver: Driver,
                                 CREATE (n)-[:`{record["propName"]}` {{`{i}`:{i}}}]->(m)
                                 """)
 
-
                             i += 1
                         session.run(f"""
     MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
     REMOVE n.{record["propName"]}
     """)
-            pass
 
         case "2GNF":
             deps: DependencySet
@@ -827,12 +817,12 @@ def perform_structural_normalization(driver: Driver,
             else:
                 deps = provided_dependencies
 
-
             L: DependencySet = DependencySet()
             C: set(tuple[GOFD, GOFD]) = set()
             # TODO: use a named tuple for the conflicting deps
             for dep in deps:
-                if len(set(map(lambda r: r.get_graph_object(), dep.left)).intersection(set(map(lambda r: r.get_graph_object(), dep.right)))) == 0:
+                if len(set(map(lambda r: r.get_graph_object(), dep.left)).intersection(
+                        set(map(lambda r: r.get_graph_object(), dep.right)))) == 0:
                     # TODO check whether left side is part of a key ...
                     L.add(dep)
                     for d in deps:
@@ -877,49 +867,51 @@ def perform_structural_normalization(driver: Driver,
                             a1Id: dict = get_or_create_dict(resA1.single().data())
                             a2Id: dict = get_or_create_dict(resA2.single().data())
 
-                            session.run(f"MERGE (n)-[m:NO_LABEL_PROVIDED]->(o) WHERE elementId(n) = {a1Id} AND elementId(o) = {bId}")
-                            session.run(f"MERGE (n)-[m:NO_LABEL_PROVIDED]->(o) WHERE elementId(n) = {a2Id} AND elementId(o) = {bId}")
+                            session.run(
+                                f"MERGE (n)-[m:NO_LABEL_PROVIDED]->(o) WHERE elementId(n) = {a1Id} AND elementId(o) = {bId}")
+                            session.run(
+                                f"MERGE (n)-[m:NO_LABEL_PROVIDED]->(o) WHERE elementId(n) = {a2Id} AND elementId(o) = {bId}")
 
                     for dep in L:
                         if len(set(map(lambda r: r.get_graph_object(), dep.left)).intersection(
-                            set(map(lambda r: r.get_graph_object(), dep.right)))) == 0:
-                                pass    
+                                set(map(lambda r: r.get_graph_object(), dep.right)))) == 0:
+                            pass
 
         case _:
-            raise ValueError(f"The normal form \"{normal_form}\" is not supported (yet) for structural normalization")
+            raise ValueError(f"The normal form \"{normal_form}\" is not supported (yet) for Structural Normalization")
 
     return DependencySet.from_string_list([]), []
+
 
 def validate_dependency(driver, database, dep):
     """Validates whether a functional dependency holds"""
     if dep.is_trivial:
-        return # The dependency is technically valid, although not minimal!
+        return  # The dependency is technically valid, although not minimal!
 
     with driver.session(database=database) as session:
         query = f"""
 {dep.pattern.to_gql_match_where_string()}
 WITH DISTINCT
-{",".join(map(lambda ref: str(ref)+" AS "+pascalcase(str(ref)), dep.left.union(dep.right)))}
+{",".join(map(lambda ref: str(ref) + " AS " + pascalcase(str(ref)), dep.left.union(dep.right)))}
 WITH
 {",".join(map(lambda ref: pascalcase(str(ref)), dep.left))},
 COUNT([{",".join(map(lambda ref: pascalcase(str(ref)), dep.right))}]) AS card
 RETURN avg(card) AS res
-
 """
         res = session.run(query)
         record = res.single()
-        if record is not None:
-            if record["res"] != 1:
-                raise ValueError(f'The dependency "{str(dep)}" is not functional!')
+        if record is not None and record["res"] != 1:
+            raise ValueError(f'The dependency "{dep!s}" is not functional!')
+
 
 def reify_and_extract_to_new_node(
-    edge: Edge,
-    i: int | Any,
-    inter_dep: GOFD,
-    new_label: str,
-    new_properties: str,
-    new_props: list[Reference],
-    transformation_queries: set[str],
+        edge: Edge,
+        i: int | Any,
+        inter_dep: GOFD,
+        new_label: str,
+        new_properties: str,
+        new_props: list[Reference],
+        transformation_queries: set[str],
 ):
     edge_label = next(iter(edge.labels))
 
@@ -934,14 +926,4 @@ def reify_and_extract_to_new_node(
     MERGE (x{i})-[:{new_label.upper()}]->(newNode)
     ON CREATE SET x{i} += properties({edge.symbol})
 """
-    ) # Reification may have already happened for another dep. --> Merge!
-
-    print(        f"""
-    {inter_dep.pattern.to_gql_match_where_string()} 
-    CREATE (x{i}:$(type({edge.symbol})))
-    CREATE ({edge.src.symbol})-[:$("SRC_"+type({edge.symbol}))]->(x{i})
-    CREATE (x{i})-[:$("TGT_"+type({edge.symbol}))]->({edge.tgt.symbol})
-    MERGE (newNode:{new_label} {{{new_properties}}})
-    MERGE (x{i})-[:{new_label.upper()}]->(newNode)
-    ON CREATE SET x{i} += properties({edge.symbol})
-""")
+    )  # Reification may have already happened for another dep. --> Merge!
