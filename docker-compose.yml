@@ -79,18 +79,10 @@ services:
     profiles:
       - eval
 
-  docs-webserver:
-    image: nginx:latest
-    volumes:
-      - ./docs/_build/html:/usr/share/nginx/html:ro
-    ports:
-      - "8000:80"
-    profiles:
-      - docs
   restapi:
     build:
-      context: .
-      dockerfile: ./restapi/restapi.Dockerfile
+      context: lpg_norm
+      dockerfile: restapi/restapi.Dockerfile
     env_file:
       - .env
     environment:

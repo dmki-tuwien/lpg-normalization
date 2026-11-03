@@ -1,8 +1,8 @@
 import pytest
 from testcontainers.neo4j import Neo4jContainer
 
-from gofd import DependencySet
-from normalize import perform_graph_native_normalization
+from lpg_norm.gofd import DependencySet
+from lpg_norm.normalize import perform_graph_native_normalization
 
 # Define the container as a session-level fixture
 @pytest.fixture(scope="session")
@@ -149,7 +149,7 @@ def test_graph_merge_exists(graph_merge):
     (["(a:A)-[b:B:y1]->(c:C)::a=>b.y1"],
      "MATCH (a:A)-[b:B]->(c:C) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND a.By1=\"y1\" RETURN count(*) as count"),
     (["(a:A:x1)-[b:B:y1]->(c:C)::a.x1=>b.y1"],
-     "MATCH (a:A)-[b:B]->(c:C) MATCH (a)-[:AX1BY1]->(d:Ax1by1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(*) as count")
+     "MATCH (a:A)-[b:B]->(c:C) MATCH (a)-[:AX1]->(d:Ax1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(*) as count")
 ])
 def test_graph_simple(graph_simple, dependency_strings, result_query):
     provided_dependencies = DependencySet.from_string_list(dependency_strings)
@@ -182,7 +182,7 @@ def test_graph_simple(graph_simple, dependency_strings, result_query):
     (["(a:A)-[b:B:y1]->(c:C)::a=>b.y1"],
      "MATCH (a:A)-[b:B]->(c:C) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND a.By1=\"y1\" RETURN count(DISTINCT [a, a.By1])-1 as count"), # For this query 2 is expected, but since the expectation in this test is always 1, we do -1
     (["(a:A:x1)-[b:B:y1]->(c:C)::a.x1=>b.y1"],
-     "MATCH (a:A)-[b:B]->(c:C) MATCH (a)-[:AX1BY1]->(d:Ax1by1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(DISTINCT d) as count") # TODO!
+     "MATCH (a:A)-[b:B]->(c:C) MATCH (a)-[:AX1]->(d:Ax1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(DISTINCT d) as count") # TODO!
 ])
 def test_graph_merge(graph_merge, dependency_strings, result_query):
     provided_dependencies = DependencySet.from_string_list(dependency_strings)

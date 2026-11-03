@@ -4,8 +4,7 @@ __author__ = "Johannes Schrott"
 __email__ = "johannes.schrott@tuwien.ac.at"
 
 
-from .gnfd import *
-import neo4j
+from .gofd import *
 
 __all__ = ['Node','Edge', 'GOFD', 'LeftEdge', 'Pattern', 'PatternConcat', 'RightEdge', 'DependencySet']
 

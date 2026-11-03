@@ -9,6 +9,7 @@ from neo4j import Driver
 from tqdm_loggable.auto import tqdm
 
 from lpg_norm.gofd import GOFD, DependencySet, Edge, GraphObject, Node, Reference
+from lpg_norm.logger import QueryLogger
 
 
 def perform_graph_native_normalization(
@@ -49,6 +50,7 @@ def perform_graph_native_normalization(
 
     """A local instance of the logger, if no logger was provided"""
     if logger is None:
+        logging.setLoggerClass(QueryLogger)
         logger = logging.getLogger(__name__)
 
     """A local copy of the provided dependencies that, e.g., may be filtered."""
@@ -85,6 +87,7 @@ def perform_graph_native_normalization(
                 responsive = True
                 try:
                     session.run(query)
+                    logger.query(query)
                 except neo4j.exceptions.TransientError:
                     # Neo4j may still be busy with the previous query
                     responsive = False
@@ -183,6 +186,7 @@ def perform_graph_native_normalization(
                         deps,
                     )
                 )
+        logger.info(f"Dependencies after filtering: {"\n".join({str(dep) for dep in deps})}")
         return deps
 
     def _get_random_string() -> str:
@@ -225,7 +229,7 @@ def perform_graph_native_normalization(
     sorted_deps.sort()
 
     for dep in sorted_deps:
-        validate_dependency(driver, database, dep)
+        validate_dependency(driver, database, dep, logger)
 
         if dep.is_between_graph_object:
             inter_dep = dep
@@ -453,7 +457,7 @@ REMOVE {right_ref}"""
                             logger.info("between-np-ep")
 
                             merge_key_elements = list(
-                                map(str, left_property_variables.union({right_ref}))
+                                map(str, left_property_variables)
                             )
                             merge_key_elements.sort()
                             within_merge_key: str = ",".join(merge_key_elements)
@@ -663,13 +667,19 @@ REMOVE {", ".join(map(str, all_property_variables))}"""
 
         i += 1
 
+    logger.info("Create indices for transformations")
     for query in tqdm(index_queries, desc="  Indices"):
-        logger.info(query)
         _apply_transformation_query(query)
+
+    logger.info("Create and merge new graph objects")
     for query in tqdm(transformation_queries, desc="  Query"):
         _apply_transformation_query(query)
+
+    logger.info("Remove no longer needed property values")
     for query in tqdm(remove_queries, desc="  Cleanup (REMOVE)"):
         _apply_transformation_query(query)
+
+    logger.info("Delete no longer needed graph objects")
     for query in tqdm(delete_queries, desc="  Cleanup (DELETE)"):
         _apply_transformation_query(query)
 
@@ -851,9 +861,11 @@ REMOVE {", ".join(map(str, all_property_variables))}"""
 #     return DependencySet.from_string_list([]), []
 
 
-def validate_dependency(driver, database, dep):
+def validate_dependency(driver, database, dep, logger):
     """Validates whether a functional dependency holds"""
+    logger.info(f"Validate dependency \"{str(dep)}\"")
     if dep.is_trivial:
+        logger.info(f"\"{str(dep)}\" is trivial.")
         return  # The dependency is technically valid, although not minimal!
 
     with driver.session(database=database) as session:
@@ -864,11 +876,12 @@ WITH DISTINCT
 WITH
 {",".join(pascalcase(str(ref)) for ref in dep.left)},
 COUNT([{",".join(pascalcase(str(ref)) for ref in  dep.right)}]) AS card
-RETURN avg(card) AS res
+RETURN avg(card)=1 AS res
 """
         res = session.run(query)
+        logger.query(query)
         record = res.single()
-        if record is not None and record["res"] != 1:
+        if record is not None and not record["res"]:
             raise ValueError(f'The dependency "{dep!s}" is not functional!')
 
 

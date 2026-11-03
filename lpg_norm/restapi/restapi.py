@@ -1,23 +1,48 @@
+import asyncio
+import logging
+import os
 import sys
 import time
-
-from caseconverter import pascalcase
-from dotenv import load_dotenv
-from fastapi import FastAPI
-from neo4j import GraphDatabase, Driver, Query
-from pydantic import BaseModel
 from typing import Literal
 
-import os
 import yaml
+from caseconverter import pascalcase
+from dotenv import load_dotenv
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from neo4j import Driver, GraphDatabase, Query
+from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from lpg_norm import gofd
+from lpg_norm.logger import QueryLogger
+from lpg_norm.normalize import (
+    perform_graph_native_normalization,  # perform_structural_normalization
+)
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-import gofd
-from gofd import gnfd
+class WebSocketLogHandler(logging.Handler):
+    """Custom logging handler that distributes logs to active asyncio queues."""
 
-from normalize import perform_graph_native_normalization, perform_structural_normalization
+    def __init__(self):
+        super().__init__()
+        self.queues: set[asyncio.Queue] = set()
+
+    def emit(self, record: logging.LogRecord):
+        msg = self.format(record)
+        # put_nowait ensures the log call is non-blocking
+        for queue in list(self.queues):
+            try:
+                queue.put_nowait(msg)
+            except asyncio.QueueFull:
+                pass
+
+
+
+ws_handler = WebSocketLogHandler()
+formatter = logging.Formatter("[%(asctime)s] %(levelname)s: %(message)s")
+ws_handler.setFormatter(formatter)
+
+
 
 ROOT_PATH = (
     ""
@@ -35,7 +60,6 @@ ORIGINS = [
     "http://localhost:3000"
 ]
 
-# 2. Add the middleware to your app
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ORIGINS,
@@ -43,6 +67,13 @@ app.add_middleware(
     allow_methods=["*"],  # Allows GET, POST, OPTIONS, etc.
     allow_headers=["*"],  # Allows Content-Type, Authorization, etc.
 )
+
+logging.setLoggerClass(QueryLogger)
+logger = logging.getLogger("lpg-norm-rest")
+logger.addHandler(ws_handler)
+logger.setLevel(logging.INFO)
+
+
 
 setup: dict
 """The configuration of the demo scenarios."""
@@ -93,11 +124,15 @@ class ScenarioDef(BaseModel):
 
 @app.get("/health")
 def get_health() -> bool:
-    """Returns `true` when the API is healthy."""
+    """Returns `true` when the API is healthy, i.e., connections to both, Neo4j and Memgraph can be established."""
     try:
         return get_database_health("neo4j") and get_database_health("memgraph")
     except Exception:
         return False
+
+@app.post("/reset")
+def total_reset():
+    return reset("neo4j") and reset("memgraph")
 
 @app.get("/{database}/health")
 def get_database_health(database: Literal["neo4j", "memgraph"]):
@@ -114,27 +149,29 @@ def get_database_health(database: Literal["neo4j", "memgraph"]):
 @app.post("/{database}/reset")
 def reset(database:  Literal["neo4j", "memgraph"]):
     """Resets the database system, i.e., removes all nodes and edges."""
-    with get_driver(database).session(database=database) as session:
-        session.run("MATCH (n) DETACH DELETE n")
+    try:
+        with get_driver(database).session(database=database) as session:
+            query = "MATCH (n) DETACH DELETE n"
+            session.run(query)
+            logger.info(f"Reset `{database}`.")
+            logger.query(query)
+    except Exception as e:
+        logger.error(f"Failed to reset `{database}`: {e}")
 
     return True
 
-@app.post("/reset")
-def total_reset():
-    return reset("neo4j") and reset("memgraph")
 
 @app.get("/{database}/scenarios")
 def get_scenarios(database: Literal["neo4j", "memgraph"]) -> list[ScenarioDef]:
     """Retrieves the names and IDs of available scenarios as a `list`"""
 
-    res: list[ScenarioDef] = list(
-        map(lambda map_entry: {"id": map_entry["id"], "name": map_entry["name_html"], "category": map_entry["category"]},
+    res: list[ScenarioDef] = [{"id": map_entry["id"], "name": map_entry["name_html"], "category": map_entry["category"]} for map_entry in
            filter(
-               lambda filter_entry: ("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or ("from_file" in filter_entry.keys()),
+               lambda filter_entry: ("neo4j" in filter_entry and "from_file" in filter_entry["neo4j"]) or ("from_file" in filter_entry),
                 setup["graphs"]
            )
-           )
-    )
+           ]
+
 
     return res
 
@@ -147,27 +184,29 @@ def load_scenario(database: Literal["neo4j", "memgraph"], id: str) -> bool:
     driver = get_driver(database)
     graph = next(filter(lambda filter_entry:
                        (
-                           ("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or
-                           ("from_file" in filter_entry.keys())
+                           ("neo4j" in filter_entry and "from_file" in filter_entry["neo4j"]) or
+                           ("from_file" in filter_entry)
                        ) and id == filter_entry["id"],
         setup["graphs"]))
+
+    logger.info(f"Load scenario \"{id}\" into \"{database}\".")
     match database:
         case "memgraph":
-            if "from_file" in graph.keys():
+            if "from_file" in graph:
                 file = graph["from_file"]
-            elif "memgraph" in graph.keys():
+            elif "memgraph" in graph:
                 file = graph["memgraph"]["from_file"]
             else:
                 neo_driver = get_driver("neo4j")
 
                 with neo_driver.session(database="neo4j") as session:
-                    if "from_file" in graph.keys():
-                        session.run(
-                            f"CALL apoc.cypher.runFile(\"{graph['from_file']}\");"
-                        )
+                    if "from_file" in graph:
+                        query = f"CALL apoc.cypher.runFile(\"{graph['from_file']}\");"
+                        session.run(query)
+                        logger.query(query)
                     elif (
-                            "neo4j" in graph.keys()
-                            and "from_file" in graph["neo4j"].keys()
+                            "neo4j" in graph
+                            and "from_file" in graph["neo4j"]
                     ):
                         session.run(
                             f"CALL apoc.cypher.runFile(\"{graph['neo4j']['from_file']}\");"
@@ -222,36 +261,35 @@ REMOVE n.__elementId__;""")
                         session.run(query)
         case _:
             with driver.session(database=database) as session:
-                if "from_file" in graph.keys():
+                if "from_file" in graph:
                     session.run(
                         f"CALL apoc.cypher.runFile(\"{graph['from_file']}\");"
                     )
                 elif (
-                        "neo4j" in graph.keys()
-                        and "from_file" in graph["neo4j"].keys()
+                        "neo4j" in graph
+                        and "from_file" in graph["neo4j"]
                 ):
                     session.run(
                         f"CALL apoc.cypher.runFile(\"{graph['neo4j']['from_file']}\");"
                     )
-                    pass
     return True
 
 @app.get("/{database}/scenarios/{id}/dependencies")
 def get_dependencies(database: Literal["neo4j", "memgraph"], id: str) -> list[str]:
-    res: list[str] = next(map(lambda map_entry: map_entry["dependencies"], filter(
-            lambda filter_entry: filter_entry["id"] == id and (("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or (
-                        "from_file" in filter_entry.keys())),
-            setup["graphs"])))
+    res: list[str] = next(map_entry["dependencies"] for map_entry in filter(
+            lambda filter_entry: filter_entry["id"] == id and (("neo4j" in filter_entry and "from_file" in filter_entry["neo4j"]) or (
+                        "from_file" in filter_entry)),
+            setup["graphs"]))
 
     return res
 
 
 @app.get("/{database}/scenarios/{id}/minimal_cover")
 def get_minimal_cover(database: Literal["neo4j", "memgraph"], id: str) -> list[str]:
-    res: list[str] = next(map(lambda map_entry: map_entry["minimal_cover"], filter(
-            lambda filter_entry: filter_entry["id"] == id and (("neo4j" in filter_entry.keys() and "from_file" in filter_entry["neo4j"].keys()) or (
-                        "from_file" in filter_entry.keys())),
-            setup["graphs"])))
+    res: list[str] = next(map_entry["minimal_cover"] for map_entry in filter(
+            lambda filter_entry: filter_entry["id"] == id and (("neo4j" in filter_entry and "from_file" in filter_entry["neo4j"]) or (
+                        "from_file" in filter_entry)),
+            setup["graphs"]))
     return res
 
 @app.get("/{database}/statistics/graph")
@@ -280,10 +318,10 @@ RETURN count(uniqueComponents) AS res"""
 RETURN count(DISTINCT component_id) AS res"""
         }
 
-    res = dict()
+    res: dict = {}
 
     with get_driver(database).session() as session:
-        for statistics_def_key in statistics_def.keys():
+        for statistics_def_key in statistics_def:
             query = Query(statistics_def[statistics_def_key])
             result = session.run(query)
             record = result.single()
@@ -294,16 +332,16 @@ RETURN count(DISTINCT component_id) AS res"""
 
 @app.post("/{database}/statistics/dependencies")
 def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> dict[str, dict[str, float]]:
-    res = dict()
+    res = {}
 
     for dep_str in dependencies:
-        res[dep_str] = dict()
-        dep = gnfd.GOFD.from_string(dep_str)
+        res[dep_str] = {}
+        dep = gofd.GOFD.from_string(dep_str)
 
         with get_driver(database).session() as session:
             result = session.run(f"""
                     {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH  
-                    {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))}, 
+                    {",".join(f"{left.to_query_string(database)!s} AS x{pascalcase(str(left))}" for left in dep.left)}, 
                     count(*) AS red
                     RETURN max(red) AS res
                                                     """)
@@ -315,7 +353,7 @@ def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies:
         with get_driver(database).session() as session:
             result = session.run(f"""
                     {dep.pattern.to_gql_match_where_string().split("WHERE")[0]} WITH
-                    {",".join(map(lambda left: str(left.to_query_string(database)) + " AS x" + pascalcase(str(left)), dep.left))},
+                    {",".join(f"{left.to_query_string(database)!s} AS x{pascalcase(str(left))}" for left in dep.left)},
                     count(*) AS red
                     RETURN avg(red) AS res
                                                     """)
@@ -329,8 +367,8 @@ def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies:
             result = session.run(f"""
                     {dep.pattern.to_gql_match_where_string().split("WHERE")[0]}
                     RETURN count(DISTINCT {{
-                    {", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))},
-                    {", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
+                    {", ".join(f"x{pascalcase(str(left))}: {left}" for left in dep.left)},
+                    {", ".join(f"x{pascalcase(str(right))}: {right}" for right in dep.right)}
                     }}) AS res""")
             record = result.single()
             if record is not None:
@@ -340,8 +378,8 @@ def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies:
             result = session.run(f"""
                     {dep.pattern.to_gql_match_where_string().split("WHERE")[0]}
                     RETURN count({{
-                    {", ".join(map(lambda left: f"x{pascalcase(str(left))}: {left}", dep.left))},
-                    {", ".join(map(lambda right: f"x{pascalcase(str(right))}: {right}", dep.right))}
+                    {", ".join(f"x{pascalcase(str(left))}: {left}" for left in dep.left)},
+                    {", ".join(f"x{pascalcase(str(right))}: {right}" for right in dep.right)}
                     }}) AS res""")
             record = result.single()
             if record is not None:
@@ -360,9 +398,9 @@ def normalize(database: Literal["neo4j", "memgraph"], dependencies: list[str], m
         before = time.time_ns()
         norm_res = None
         if method == "graph-native":
-            norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list)
-        elif method == "structural":
-            norm_res = perform_structural_normalization(driver, database, "1GNF")
+            norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list, logger=logger)
+        # elif method == "structural":
+        #     norm_res = perform_structural_normalization(driver, database, "1GNF")
         after = time.time_ns()
 
     duration = after - before
@@ -376,75 +414,101 @@ def normalize(database: Literal["neo4j", "memgraph"], dependencies: list[str], m
 def visualize_nodes(database: Literal["neo4j", "memgraph"]) -> list[dict]:
     with get_driver(database).session() as session:
         if database == "neo4j":
-            result = session.run(f"""MATCH (n) return elementId(n) as id, labels(n) as labels, properties(n) as properties""")
+            result = session.run("""MATCH (n) return elementId(n) as id, labels(n) as labels, properties(n) as properties""")
             return [record for record in result]
-        if database == "memgraph":
-            result = session.run(f"""MATCH (n) return id(n) as id, labels(n) as labels, properties(n) as properties""")
+        elif database == "memgraph":
+            result = session.run("""MATCH (n) return id(n) as id, labels(n) as labels, properties(n) as properties""")
             return [record for record in result]
 
 @app.get("/{database}/visualize/edges")
 def visualize_edges(database: Literal["neo4j", "memgraph"]) -> list[dict]:
     with get_driver(database).session() as session:
         if database == "neo4j":
-            result = session.run(f"""MATCH (n)-[m]->(o) return elementId(n) as src, elementId(m) as id, elementId(o) as tgt, [type(m)] as labels,  properties(m) as properties""")
+            result = session.run("""MATCH (n)-[m]->(o) return elementId(n) as src, elementId(m) as id, elementId(o) as tgt, [type(m)] as labels,  properties(m) as properties""")
             return [record for record in result]
         if database == "memgraph":
-            result = session.run(f"""MATCH (n)-[m]->(o) return id(n) as src, id(m) as id, id(o) as tgt, [type(m)] as labels, properties(m) as properties""")
+            result = session.run("""MATCH (n)-[m]->(o) return id(n) as src, id(m) as id, id(o) as tgt, [type(m)] as labels, properties(m) as properties""")
             return [record for record in result]
 
 @app.post("/{database}/visualize/dependencies")
 def visualize_deps(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> list:
     res_list = []
     for dep_str in dependencies:
-        dep = gnfd.GOFD.from_string(dep_str)
+        dep = gofd.GOFD.from_string(dep_str)
         for left in dep.left:
-            left_prefix = "n" if isinstance(left.get_graph_object(), gnfd.Node) else "re"
+            left_prefix = "n" if isinstance(left.get_graph_object(), gofd.Node) else "re"
             for right in dep.right:
-                right_prefix = "n" if isinstance(right.get_graph_object(), gnfd.Node) else "re"
+                right_prefix = "n" if isinstance(right.get_graph_object(), gofd.Node) else "re"
                 with get_driver(database).session() as session:
                     if left.is_graph_object_variable and right.is_graph_object_variable:
                         result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
-                                    "{left_prefix}"+{str(left.to_query_string(database))} AS left,
-                                    "{right_prefix}"+{str(right.to_query_string(database))} AS right
+                                    "{left_prefix}"+{left.to_query_string(database)!s} AS left,
+                                    "{right_prefix}"+{right.to_query_string(database)!s} AS right
                                     RETURN left, right""")
                     elif left.is_graph_object_variable and right.is_property_variable:
                         if database == "neo4j":
                             result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
-                                                                "{left_prefix}"+{str(left.to_query_string(database))} AS left,
-                                                                "{right_prefix}"+elementId({str(right.get_graph_object().symbol)})+"_{str(right.reference.key)}" AS right
+                                                                "{left_prefix}"+{left.to_query_string(database)!s} AS left,
+                                                                "{right_prefix}"+elementId({right.get_graph_object().symbol!s})+"_{right.reference.key!s}" AS right
                                                                 RETURN left, right""")
                         else:
                             assert database == "memgraph"
                             result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
-                                                                "{left_prefix}"+{str(left.to_query_string(database))} AS left,
-                                                                "{right_prefix}"+id({str(right.get_graph_object().symbol)})+"_{str(right.reference.key)}" AS right
+                                                                "{left_prefix}"+{left.to_query_string(database)!s} AS left,
+                                                                "{right_prefix}"+id({right.get_graph_object().symbol!s})+"_{right.reference.key!s}" AS right
                                                                 RETURN left, right""")
                     elif left.is_property_variable and right.is_graph_object_variable:
                         if database == "neo4j":
                             result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
-                                                                "{left_prefix}"+elementId({str(left.get_graph_object().symbol)})+"_{str(left.reference.key)}" AS left,
-                                                                "{right_prefix}"+{str(right.to_query_string(database))} AS right
+                                                                "{left_prefix}"+elementId({left.get_graph_object().symbol!s})+"_{left.reference.key!s}" AS left,
+                                                                "{right_prefix}"+{right.to_query_string(database)!s} AS right
                                                                 RETURN left, right""")
                         else:
                             assert database == "memgraph"
                             result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
-                                                                "{left_prefix}"+id({str(left.get_graph_object().symbol)})+"_{str(left.reference.key)}" AS left,
-                                                                "{right_prefix}"+{str(right.to_query_string(database))} AS right
+                                                                "{left_prefix}"+id({left.get_graph_object().symbol!s})+"_{left.reference.key!s}" AS left,
+                                                                "{right_prefix}"+{right.to_query_string(database)!s} AS right
                                                                 RETURN left, right""")
                     else:
                         assert left.is_property_variable
                         assert right.is_property_variable
                         if database == "neo4j":
                             result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
-                                                                "{left_prefix}"+elementId({str(left.get_graph_object().symbol)})+"_{str(left.reference.key)}" AS left,
-                                                                "{right_prefix}"+elementId({str(right.get_graph_object().symbol)})+"_{str(right.reference.key)}" AS right
+                                                                "{left_prefix}"+elementId({left.get_graph_object().symbol!s})+"_{left.reference.key!s}" AS left,
+                                                                "{right_prefix}"+elementId({right.get_graph_object().symbol!s})+"_{right.reference.key!s}" AS right
                                                                 RETURN left, right""")
                         else:
                             result = session.run(f"""{dep.pattern.to_gql_match_where_string()} WITH
-                                                                "{left_prefix}"+id({str(left.get_graph_object().symbol)})+"_{str(left.reference.key)}" AS left,
-                                                                "{right_prefix}"+id({str(right.get_graph_object().symbol)})+"_{str(right.reference.key)}" AS right
+                                                                "{left_prefix}"+id({left.get_graph_object().symbol!s})+"_{left.reference.key!s}" AS left,
+                                                                "{right_prefix}"+id({right.get_graph_object().symbol!s})+"_{right.reference.key!s}" AS right
                                                                 RETURN left, right""")
 
                     res_list = res_list + [record for record in result]
 
     return res_list
+
+
+
+
+
+@app.websocket("/ws/log")
+async def ws_log(websocket: WebSocket):
+    await websocket.accept()
+    log_queue = asyncio.Queue(maxsize=100)
+    ws_handler.queues.add(log_queue)
+
+    try:
+        while True:
+            # Awaits until a new log record is available in the queue
+            log_entry = await log_queue.get()
+            await websocket.send_text(log_entry)
+            log_queue.task_done()
+    except (WebSocketDisconnect, asyncio.CancelledError):
+        pass
+    finally:
+        # Clean up queue reference when client disconnects
+        ws_handler.queues.discard(log_queue)
+
+
+
+

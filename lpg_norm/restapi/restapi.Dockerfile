@@ -6,11 +6,12 @@ WORKDIR /app
 
 RUN pip install --upgrade pip
 
-COPY requirements.txt ./
+COPY restapi/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY normalize.py normalize.py
-COPY gofd gofd
+COPY normalize.py lpg_norm/normalize.py
+COPY logger.py lpg_norm/logger.py
+COPY gofd lpg_norm/gofd
 COPY restapi restapi
 
 CMD ["fastapi", "run", "restapi/restapi.py"]
