@@ -119,7 +119,7 @@ def test_graph_merge_exists(graph_merge):
     (["(a:A:x1)-[b:B]->(c:C)::a=>a.x1"],
      "MATCH (a:A)-[b:B]->(c:C) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NOT NULL AND b.y2 IS NOT NULL RETURN count(*) as count"), # Structurally implied --> nothing happens
     (["(a:A:x1&x2)-[b:B]->(c:C)::a.x1=>a.x2"],
-     "MATCH (a:A)-[b:B]->(c:C) MATCH (a)-[:AX1AX2]-(d:Ax1ax2) WHERE a.x1 IS NULL AND a.x2 IS NULL AND b.y1 IS NOT NULL AND b.y2 IS NOT NULL AND d.Ax1=\"x1\" AND d.Ax2=\"x2\" RETURN count(*) as count"), # Nodes of dep. are transformed to a new node
+     "MATCH (a:A)-[b:B]->(c:C) MATCH (a)-[:AX1]-(d:Ax1) WHERE a.x1 IS NULL AND a.x2 IS NULL AND b.y1 IS NOT NULL AND b.y2 IS NOT NULL AND d.Ax1=\"x1\" AND d.Ax2=\"x2\" RETURN count(*) as count"), # Nodes of dep. are transformed to a new node
 
     ## Test within edges
     (["(a:A)-[b:B]->(c:C)::b=>b"],
@@ -129,7 +129,7 @@ def test_graph_merge_exists(graph_merge):
     (["(a:A)-[b:B:y1]->(c:C)::b=>b.y1"],
      "MATCH (a:A)-[b:B]->(c:C) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NOT NULL AND b.y2 IS NOT NULL RETURN count(*) as count"), # Structurally implied --> nothing happens
     (["(a:A)-[b:B:y1&y2]->(c:C)::b.y1=>b.y2"],
-     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1BY2]->(d:By1by2) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NULL AND d.By1=\"y1\" AND d.By2=\"y2\" RETURN count(*) as count"), # Reification + move to new node
+     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1]->(d:By1) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NULL AND d.By1=\"y1\" AND d.By2=\"y2\" RETURN count(*) as count"), # Reification + move to new node
 
     ## Test edge --> node
     (["(a:A)-[b:B]->(c:C)::b=>a"],
@@ -139,7 +139,7 @@ def test_graph_merge_exists(graph_merge):
     (["(a:A)-[b:B:y1]->(c:C)::b.y1=>a"],
      "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1]->(d:By1) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" RETURN count(*) as count"),
     (["(a:A:x1)-[b:B:y1]->(c:C)::b.y1=>a.x1"],
-     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:AX1BY1]->(d:Ax1by1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(*) as count"),
+     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1]->(d:By1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(*) as count"),
 
     ## Test node --> edge
     (["(a:A)-[b:B]->(c:C)::a=>b"],
@@ -166,17 +166,17 @@ def test_graph_simple(graph_simple, dependency_strings, result_query):
 @pytest.mark.parametrize("dependency_strings,result_query", [
     ## Test within nodes
     (["(a:A:x1&x2)-[b:B]->(c:C)::a.x1=>a.x2"],
-     "MATCH (a:A)-[b:B]->(c:C) MATCH (a)-[:AX1AX2]-(d:Ax1ax2) WHERE a.x1 IS NULL AND a.x2 IS NULL AND b.y1 IS NOT NULL AND b.y2 IS NOT NULL AND d.Ax1=\"x1\" AND d.Ax2=\"x2\" RETURN count(DISTINCT d) as count"), # Nodes of dep. are transformed to exactly 1 new node
+     "MATCH (a:A)-[b:B]->(c:C) MATCH (a)-[:AX1]-(d:Ax1) WHERE a.x1 IS NULL AND a.x2 IS NULL AND b.y1 IS NOT NULL AND b.y2 IS NOT NULL AND d.Ax1=\"x1\" AND d.Ax2=\"x2\" RETURN count(DISTINCT d) as count"), # Nodes of dep. are transformed to exactly 1 new node
 
     ## Test within edges
     (["(a:A)-[b:B:y1&y2]->(c:C)::b.y1=>b.y2"],
-     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1BY2]->(d:By1by2) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NULL AND d.By1=\"y1\" AND d.By2=\"y2\" RETURN count(DISTINCT d) as count"), # Reification + move to new node
+     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1]->(d:By1) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NULL AND d.By1=\"y1\" AND d.By2=\"y2\" RETURN count(DISTINCT d) as count"), # Reification + move to new node
 
     ## Test edge --> node
     #(["(a:A)-[b:B:y1]->(c:C)::b.y1=>a"], --> This is not functional, there are two nodes that match a!
     # "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1]->(d:By1) WHERE a.x1 IS NOT NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" RETURN count(DISTINCT d) as count"), # Only limits the endpoint of edges --> nothing happens
     (["(a:A:x1)-[b:B:y1]->(c:C)::b.y1=>a.x1"],
-     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:AX1BY1]->(d:Ax1by1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(DISTINCT d) as count"),
+     "MATCH (a:A)-[:SRC_B]->(b:B)-[:TGT_B]->(c:C) MATCH (b)-[:BY1]->(d:By1) WHERE a.x1 IS NULL AND a.x2 IS NOT NULL AND b.y1 IS NULL AND b.y2 IS NOT NULL AND d.By1=\"y1\" AND d.Ax1=\"x1\" RETURN count(DISTINCT d) as count"),
 
     ## Test node --> edge
     (["(a:A)-[b:B:y1]->(c:C)::a=>b.y1"],

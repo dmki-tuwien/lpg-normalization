@@ -7,6 +7,7 @@ import neo4j
 from caseconverter import camelcase, pascalcase
 from neo4j import Driver
 from tqdm_loggable.auto import tqdm
+from openai import OpenAI
 
 from lpg_norm.gofd import GOFD, DependencySet, Edge, GraphObject, Node, Reference
 from lpg_norm.logger import QueryLogger
@@ -24,6 +25,10 @@ def perform_graph_native_normalization(
         "with-reification",
         "without-reification"] = "all",
         logger: logging.Logger | None = None,
+        useLlm: bool = False,
+        llmUrl: str | None = None,
+        llmKey: str | None = None,
+        llmModel: str | None = None,
 ) -> (DependencySet, list[str]):
     """
     Performs graph-native normalization under consideration of the provided parameters.
@@ -34,7 +39,7 @@ def perform_graph_native_normalization(
     :type: Literal["neo4j",
         "memgraph"]
     :param provided_dependencies: The dependencies to be considered for the normalization
-    :type: gnfd.DependencySet
+    :type provided_dependencies: gnfd.DependencySet
     :param dep_filter: Whether only a subset of dependencies should be used.
     :type: Literal["all",
         "within-node",
@@ -45,6 +50,12 @@ def perform_graph_native_normalization(
         "without-reification"]
     :param logger: Optionally a logger can be provided, if none is provided, an own logger for this method is created and used.
     :type logger: logging.Logger
+    :param useLlm: Whether to use an LLM to generate fresh labels
+    :type useLlm: bool
+    :param llmUrl: URL of an OpenAI API compatible LLM endpoint
+    :type llmUrl: str
+    :param llmKey: API Key for the provided LLM API
+    :type llmKey: str
     :return:
     """
 
@@ -72,6 +83,9 @@ def perform_graph_native_normalization(
 
     """The types of transformations in the order they were applied."""
     applied_transformations: list[str] = []
+
+    """Keeps track of the fresh labels."""
+    labels: dict[str, str] = {}
 
     """Enumerates fresh pattern variables"""
     i = 0
@@ -158,17 +172,19 @@ def perform_graph_native_normalization(
         "between-graph-object",
         "with-reification",
         "without-reification"],
-        deps: DependencySet) -> DependencySet:
+                             deps: DependencySet) -> DependencySet:
         logger.info("Filter dependencies")
         match dep_filter:
+            case "all":
+                deps = DependencySet(filter(lambda dep: not dep.is_trivial, deps))
             case "within-node":
-                deps = DependencySet(filter(lambda dep: dep.is_within_node, deps))
+                deps = DependencySet(filter(lambda dep: dep.is_within_node and not dep.is_trivial, deps))
             case "within-edge":
-                deps = DependencySet(filter(lambda dep: dep.is_within_edge, deps))
+                deps = DependencySet(filter(lambda dep: dep.is_within_edge and not dep.is_trivial, deps))
             case "within-graph-object":
-                deps = DependencySet(filter(lambda dep: dep.is_within_graph_object, deps))
+                deps = DependencySet(filter(lambda dep: dep.is_within_graph_object and not dep.is_trivial, deps))
             case "between-graph-object":
-                deps = DependencySet(filter(lambda dep: dep.is_between_graph_object, deps))
+                deps = DependencySet(filter(lambda dep: dep.is_between_graph_object and not dep.is_trivial, deps))
             case "with-reification":
                 deps = DependencySet(
                     filter(
@@ -188,6 +204,44 @@ def perform_graph_native_normalization(
                 )
         logger.info(f"Dependencies after filtering: {"\n".join({str(dep) for dep in deps})}")
         return deps
+
+    def _get_fresh_labels(merge_key: str, properties: list[str]) -> str:
+        if merge_key in labels.keys():
+            return labels[merge_key]
+
+        if merge_key not in labels.keys():
+            if not useLlm or llmKey == "" or llmKey is None or llmUrl == "" or llmUrl is None or llmModel == "" or llmModel is None:
+                labels[merge_key] = pascalcase(within_merge_key)
+            else:
+                assert useLlm
+
+                existing_labels: list[str] = []
+
+                with driver.session(database=database) as session:
+                    result = session.run("""MATCH (n)
+UNWIND labels(n) AS label
+RETURN DISTINCT label;""")
+                    existing_labels = [record["label"] for record in result]
+    
+                llm_client = OpenAI(
+                    base_url=llmUrl,
+                    api_key=llmKey,
+                )
+
+                response = llm_client.chat.completions.create(
+                    model=llmModel,  # Replace with the model served by your provider
+                    messages=[
+                        {"role": "system", "content": "You are a concise assistant for data modeling purposes."},
+                        {"role": "user", "content": f"Find a label for a node with the following properties: {", ".join(properties)}\n\nThe label must not be one of the following: {", ".join(existing_labels)}\n\nThe Return a single word that starts with an uppercase letter."},
+                    ],
+                    temperature=0.7,
+                )
+
+                # Extract and use the response text
+                reply = response.choices[0].message.content
+                labels[merge_key] = reply.split()[0] # In case the LLM returned more than one word: use only the first one
+
+        return labels[merge_key]
 
     def _get_random_string() -> str:
         return str(uuid.uuid4())[:8]
@@ -217,9 +271,9 @@ def perform_graph_native_normalization(
     deps = _filter_dependencies(dep_filter, deps)
 
     if len(deps) == 0:
-        logger.warning("No dependencies were provided.")
+        logger.warning("No non-trivial dependencies were provided.")
         return (
-            provided_dependencies,
+            deps,
             applied_transformations,
         )  # Nothing will happen --> Return original dependencies
 
@@ -256,14 +310,12 @@ def perform_graph_native_normalization(
                             logger.info("between-ep-np")
                             assert isinstance(right_ref.get_graph_object(), Node)
 
-                            merge_key_elements = list(
-                                map(str, left_property_variables.union({right_ref}))
-                            )
+                            merge_key_elements = [str(left) for left in left_property_variables]
                             merge_key_elements.sort()
                             within_merge_key: str = ",".join(merge_key_elements)
                             new_props = list(left_property_variables.union({right_ref}))
                             new_props.sort(key=str)
-                            new_label: str = pascalcase(within_merge_key)
+                            new_label: str = _get_fresh_labels(within_merge_key, merge_key_elements)
 
 
                             _create_index_for_new_nodes(new_label, left_property_variables)
@@ -345,13 +397,12 @@ REMOVE {", ".join(map(str, left_property_variables))}"""
                         ):
                             logger.info("between-ep-n")
 
-                            merge_key_elements = list(map(str, left_property_variables))
+                            merge_key_elements = [str(left) for left in left_property_variables]
                             merge_key_elements.sort()
                             within_merge_key: str = ",".join(merge_key_elements)
                             new_props = list(left_property_variables)
                             new_props.sort(key=str)
-                            new_label: str = pascalcase(within_merge_key)
-
+                            new_label: str = _get_fresh_labels(within_merge_key, merge_key_elements)
 
                             _create_index_for_new_nodes(new_label, left_property_variables)
                             _create_index_for_edge(edge)
@@ -456,14 +507,12 @@ REMOVE {right_ref}"""
                         ):
                             logger.info("between-np-ep")
 
-                            merge_key_elements = list(
-                                map(str, left_property_variables)
-                            )
+                            merge_key_elements = [str(left) for left in left_property_variables]
                             merge_key_elements.sort()
                             within_merge_key: str = ",".join(merge_key_elements)
                             new_props = list(left_property_variables.union({right_ref}))
                             new_props.sort(key=str)
-                            new_label: str = pascalcase(within_merge_key)
+                            new_label: str = _get_fresh_labels(within_merge_key, [str(prop) for prop in new_props])
 
                             if database == "neo4j":
                                 index_queries.add(
@@ -537,13 +586,13 @@ REMOVE {node.symbol}.`{rand}`
             all_property_variables: set[Reference] = left_property_variables.union(right_property_variables)
 
             # Nodes resulting from transformation are identified tby
-            merge_key_elements: list[str] = [str(v) for v in all_property_variables]
+            merge_key_elements: list[str] = [str(v) for v in left_property_variables]
             merge_key_elements.sort()
 
             within_merge_key: str = ",".join(merge_key_elements)
             new_props = list(right_property_variables.union(left_property_variables))
             new_props.sort(key=str)
-            new_label: str = pascalcase(within_merge_key)
+            new_label: str = _get_fresh_labels(within_merge_key, merge_key_elements)
 
             i += 1
 
@@ -865,7 +914,7 @@ def validate_dependency(driver, database, dep, logger):
     """Validates whether a functional dependency holds"""
     logger.info(f"Validate dependency \"{str(dep)}\"")
     if dep.is_trivial:
-        logger.info(f"\"{str(dep)}\" is trivial.")
+        logger.warning(f"\"{str(dep)}\" is trivial.")
         return  # The dependency is technically valid, although not minimal!
 
     with driver.session(database=database) as session:
@@ -882,6 +931,6 @@ RETURN avg(card)=1 AS res
         logger.query(query)
         record = res.single()
         if record is not None and not record["res"]:
-            raise ValueError(f'The dependency "{dep!s}" is not functional!')
+            logger.error(f'The dependency "{dep}" is not functional!')
 
 

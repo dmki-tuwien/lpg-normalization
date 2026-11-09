@@ -13,6 +13,8 @@ from neo4j import Driver, GraphDatabase, Query
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
+from lpg_norm.gofd import GOFD
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from lpg_norm import gofd
 from lpg_norm.logger import QueryLogger
@@ -153,10 +155,10 @@ def reset(database:  Literal["neo4j", "memgraph"]):
         with get_driver(database).session(database=database) as session:
             query = "MATCH (n) DETACH DELETE n"
             session.run(query)
-            logger.info(f"Reset `{database}`.")
+            logger.info(f"Reset \"{database}\".")
             logger.query(query)
     except Exception as e:
-        logger.error(f"Failed to reset `{database}`: {e}")
+        logger.error(f"Failed to reset \"{database}\": {e}")
 
     return True
 
@@ -258,6 +260,7 @@ REMOVE n.__elementId__;""")
                 with driver.session(database=database) as session:
                     for query in create_graph_queries:
                         #   print(query)
+                        logger.query(query)
                         session.run(query)
         case _:
             with driver.session(database=database) as session:
@@ -334,7 +337,7 @@ RETURN count(DISTINCT component_id) AS res"""
 def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> dict[str, dict[str, float]]:
     res = {}
 
-    for dep_str in dependencies:
+    for dep_str in filter(lambda dep: not GOFD.from_string(dep).is_trivial, dependencies):
         res[dep_str] = {}
         dep = gofd.GOFD.from_string(dep_str)
 
@@ -390,7 +393,13 @@ def get_per_dep_statistics(database: Literal["neo4j", "memgraph"], dependencies:
     return res
 
 @app.post("/{database}/normalize")
-def normalize(database: Literal["neo4j", "memgraph"], dependencies: list[str], method: Literal["graph-native", "structural"] = "graph-native") -> tuple[list[str], list[str], float]:
+def normalize(database: Literal["neo4j", "memgraph"],
+              dependencies: list[str],
+              method: Literal["graph-native", "lp", "structural"] = "graph-native",
+              useLlm: bool = False,
+              llmUrl: str | None = None,
+              llmKey: str | None = None,
+              llmModel: str | None = None) -> tuple[list[str], list[str], float]:
     dependencies_str_list = dependencies
     dependencies_obj_list = gofd.DependencySet.from_string_list(dependencies_str_list)
 
@@ -398,9 +407,12 @@ def normalize(database: Literal["neo4j", "memgraph"], dependencies: list[str], m
         before = time.time_ns()
         norm_res = None
         if method == "graph-native":
-            norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list, logger=logger)
-        # elif method == "structural":
-        #     norm_res = perform_structural_normalization(driver, database, "1GNF")
+            norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list, logger=logger, useLlm=useLlm, llmUrl=llmUrl, llmKey=llmKey, llmModel=llmModel)
+        elif method == "lp":
+            norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list, dep_filter="within-node", logger=logger)
+        elif method == "structural":
+        #    norm_res = perform_structural_normalization(driver, database, "1GNF")
+            pass
         after = time.time_ns()
 
     duration = after - before

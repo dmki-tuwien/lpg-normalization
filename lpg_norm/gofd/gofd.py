@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import logging
 from functools import total_ordering
 
 
@@ -807,13 +809,17 @@ class GOFD:
         return f"{str(self.pattern)}::{",".join(map(str, self.left))}=>{",".join(map(str, self.right))}"
 
     @staticmethod
-    def from_string(string: str):
+    def from_string(string: str) -> GOFD | None:
         """Parse a GO-FD from a string.
 
         :param string: The string representation of the GO-FD to create. Relies on the grammar shown in `gnfd.g4`.
         """
 
         # ANTLR has been run in this folder using the command `antlr4 -Dlanguage=Python3 -visitor gnfd.g4`.
+
+        if string is None or string == "":
+            return
+
         input_stream = InputStream(string)
         lexer = gofdLexer(input_stream)
         stream = CommonTokenStream(lexer)

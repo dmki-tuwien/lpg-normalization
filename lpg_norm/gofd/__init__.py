@@ -12,7 +12,7 @@ class DependencySet(set[GOFD]):
     @classmethod
     def from_string_list(cls, lst: list[str]) -> DependencySet:
         """Creates a :class:`DependencySet` from a list of dependencies encoded as strings."""
-        return cls(map(GOFD.from_string, lst))
+        return cls(filter(lambda dep: dep is not None, map(GOFD.from_string, lst)))
 
 
     def is_in_global_normal_form(self) -> bool:
