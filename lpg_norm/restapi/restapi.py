@@ -223,14 +223,14 @@ def load_scenario(database: Literal["neo4j", "memgraph"], id: str) -> bool:
                         neo4j_uri = "host.docker.internal"
 
                     session.run(f"""
-CALL migrate.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{neo4j_uri}", port: 7687, username: "neo4j", password: "password"}})
+CALL cross_database.neo4j("MATCH (n) RETURN labels(n) AS src_labels, elementId(n) AS src_id, properties(n) AS src_props", {{host: "{neo4j_uri}", port: 7687, username: "neo4j", password: "password"}})
 YIELD row
 MERGE (n:__MigrationNode__ {{__elementId__: row.src_id}})
 SET n:row.src_labels
 SET n += row.src_props; """)
 
                     session.run(f"""
-CALL migrate.neo4j(
+CALL cross_database.neo4j(
   "MATCH (n)-[r]->(m) RETURN type(r) as rel_type, elementId(n) AS src_id, elementId(m) AS dest_id, properties(r) AS edge_props",
   {{host: "{neo4j_uri}", port: 7687, username: "neo4j", password: "password"}})
 YIELD row
@@ -425,22 +425,15 @@ def normalize(database: Literal["neo4j", "memgraph"],
 @app.get("/{database}/visualize/nodes")
 def visualize_nodes(database: Literal["neo4j", "memgraph"]) -> list[dict]:
     with get_driver(database).session() as session:
-        if database == "neo4j":
-            result = session.run("""MATCH (n) return elementId(n) as id, labels(n) as labels, properties(n) as properties""")
-            return [record for record in result]
-        elif database == "memgraph":
-            result = session.run("""MATCH (n) return id(n) as id, labels(n) as labels, properties(n) as properties""")
-            return [record for record in result]
+        result = session.run("""MATCH (n) return elementId(n) as id, labels(n) as labels, properties(n) as properties""")
+        return [record for record in result]
+
 
 @app.get("/{database}/visualize/edges")
 def visualize_edges(database: Literal["neo4j", "memgraph"]) -> list[dict]:
     with get_driver(database).session() as session:
-        if database == "neo4j":
-            result = session.run("""MATCH (n)-[m]->(o) return elementId(n) as src, elementId(m) as id, elementId(o) as tgt, [type(m)] as labels,  properties(m) as properties""")
-            return [record for record in result]
-        if database == "memgraph":
-            result = session.run("""MATCH (n)-[m]->(o) return id(n) as src, id(m) as id, id(o) as tgt, [type(m)] as labels, properties(m) as properties""")
-            return [record for record in result]
+        result = session.run("""MATCH (n)-[m]->(o) return elementId(n) as src, elementId(m) as id, elementId(o) as tgt, [type(m)] as labels,  properties(m) as properties""")
+        return [record for record in result]
 
 @app.post("/{database}/visualize/dependencies")
 def visualize_deps(database: Literal["neo4j", "memgraph"], dependencies: list[str]) -> list:
