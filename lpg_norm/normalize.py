@@ -222,7 +222,7 @@ def perform_graph_native_normalization(
 UNWIND labels(n) AS label
 RETURN DISTINCT label;""")
                     existing_labels = [record["label"] for record in result]
-    
+
                 llm_client = OpenAI(
                     base_url=llmUrl,
                     api_key=llmKey,
@@ -740,174 +740,81 @@ REMOVE {", ".join(map(str, all_property_variables))}"""
 
 
 
-# def perform_structural_normalization(driver: Driver,
-#                                      database: Literal["neo4j", "memgraph"],
-#                                      normal_form: Literal["1GNF", "2GNF", "3GNF", "3+GNF", "EGNF"],
-#                                      provided_dependencies: DependencySet = DependencySet(),
-#                                      dep_filter: str = "all",
-#                                      ):
-#     """
-#     Performs Structural Normalization as described by Egger et al. in https://doi.org/10.14778/3797919.3797943.
-#     Currently, this implementation of Structural Normalization is still incomplete and experimental.
-#     :param driver: A :any:`neo4j.Driver`
-#     :param database: The graph database system containing the graph to be normalized. Currently only Neo4j is supported, Memgraph will follow eventually.
-#     :param normal_form: The normal form the normalized graph should fulfill.
-#     """
-#     if database == "memgraph":
-#         raise NotImplementedError("Structural Normalization is currently only implemented for `Nseo4j`.")
-#
-#     def get_or_create_single_prop(property_name: str, value) -> str:
-#         # Mimics `getOrCreate` from https://doi.org/10.14778/3797919.3797943
-#         return get_or_create_dict(frozendict({property_name: value}))
-#
-#     def get_or_create_dict(d: dict) -> str:
-#         """:returns: the node id"""
-#         query: str = ""
-#
-#         if len(d) > 0:
-#             query = "MERGE (n {"
-#             props = []
-#             for k,v in d.items():
-#                 if v is not None and isinstance(v, bool | int | float):
-#                     props.append(f"`{k}`:{v}")
-#                 elif v is not None:
-#                     props.append(f"`{k}`:\"{v}\"")
-#             query += ", ".join(props)
-#             query += "}) RETURN elementId(n) as nodeId LIMIT 1"
-#         else:
-#             query = """MERGE (n) RETURN elementId(n) as nodeId LIMIT 1"""
-#         res = session.run(query)
-#
-#         for record in res:
-#             return str(record["nodeId"])
-#
-#     match normal_form:
-#         case "1GNF":
-#             with driver.session() as session:
-#
-#                 found_non_atomic = True  # To check whether there are non-atomic properties, we assume there are some!
-#
-#                 # Retrieve all non-atomic values in edges and reify them
-#                 session.run("""
-#                 MATCH (n)-[e]->(m)
-#                 UNWIND keys(e) AS key
-#                 WITH n, m, e, key, e[key] AS propValue
-#                 WHERE propValue IS :: LIST<ANY>
-#                 CREATE (re:$(type(e)))
-#                 CREATE (n)-[:$("SRC_"+type(e))]->(re)
-#                 CREATE (re)-[:$("TGT_"+type(e))]->(m)
-#                 SET re += properties(e)
-#                 DELETE e""")  # happens only once; after this only nodes can have complex property values.
-#
-#                 while found_non_atomic:
-#
-#                     # Retrieve all non-atomic values in nodes (original nodes + reified)
-#                     result = session.run("""
-#     MATCH (n)
-#     UNWIND keys(n) AS key
-#     WITH n, key, n[key] AS propValue
-#     WHERE propValue IS :: LIST<ANY>
-#     RETURN elementId(n) AS nodeId, key AS propName, propValue
-#                     """)
-#
-#                     found_non_atomic = False
-#                     for record in result:
-#                         # The loop is accessed when there were non-atomic values
-#                         found_non_atomic = True  # There were non-atomic values, so we need another iteration!
-#                         i = 0
-#                         for atomic_value in record["propValue"]:
-#                             get_or_create_single_prop(record["propName"], atomic_value)
-#
-#                             if isinstance(atomic_value, bool | int | float):
-#                                 session.run(f"""
-#                                 MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
-#                                 MATCH (m) WHERE size(keys(m)) = 1 AND m.{record["propName"]} = {atomic_value}
-#                                 CREATE (n)-[:`{i}`]->(m)
-#                                 """)
-#                             else:
-#                                 session.run(f"""
-#                                 MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
-#                                 MATCH (m) WHERE size(keys(m)) = 1 AND m.{record["propName"]} = "{atomic_value}"
-#                                 CREATE (n)-[:`{record["propName"]}` {{`{i}`:{i}}}]->(m)
-#                                 """)
-#
-#                             i += 1
-#                         session.run(f"""
-#     MATCH (n) WHERE elementId(n) = "{record["nodeId"]}"
-#     REMOVE n.{record["propName"]}
-#     """)
-#
-#         case "2GNF":
-#             deps: DependencySet
-#             if dep_filter != all:
-#                 deps = filter_dependencies(dep_filter, provided_dependencies)
-#             else:
-#                 deps = provided_dependencies
-#
-#             L: DependencySet = DependencySet()
-#             C: set(tuple[GOFD, GOFD]) = set()
-#             # TODO: use a named tuple for the conflicting deps
-#             for dep in deps:
-#                 if len(set(map(lambda r: r.get_graph_object(), dep.left)).intersection(
-#                         set(map(lambda r: r.get_graph_object(), dep.right)))) == 0:
-#                     # TODO check whether left side is part of a key ...
-#                     L.add(dep)
-#                     for d in deps:
-#                         if dep.is_conflicting_with(d):
-#                             if len(set(filter(lambda tup: tup[0] == d and tup[1] == dep, C))) == 0:
-#                                 C.add((dep, d))
-#                             L.remove(dep)
-#                             L.remove(d)
-#             # this corresponds to the end of line 7 in the pseudo code
-#
-#             with driver.session() as session:
-#                 result = session.run("""
-#                     MATCH (n)
-#                     RETURN elementId(n) as nodeId, labels(n) as nodeLabels
-#                                     """)
-#                 for record in result:
-#                     for c in C:
-#                         # As B should be the same in c0 and c1, we use the one from c0
-#                         a1: set[Reference] = c[0].left
-#                         a2: set[Reference] = c[1].left
-#
-#                         b: set[Reference] = c[0].right
-#                         if next(iter(b)).get_graph_object().labels.issubset(set(record["nodeLabels"])):
-#                             # The algorithm suddenly treats A1, A2 and B as a single reference, so we just assume they are all references of one node each ...
-#                             resB = session.run(f"""
-#                                                 MATCH (n)
-#                                                 WHERE elementId(n) = {record["nodeId"]}
-#                                                 RETURN {", ".join(map(lambda ref: f"n.{ref.reference.key} as {ref.reference.key}", b))}
-#                                                                 """)
-#                             resA1 = session.run(f"""
-#                                                 MATCH (n)
-#                                                 WHERE labels(n) = [{", ".join(next(iter(a1)).get_graph_object().labels)}]
-#                                                 RETURN {", ".join(map(lambda ref: f"n.{ref.reference.key} as {ref.reference.key}", a1))}
-#                                                                 """)
-#                             resA2 = session.run(f"""
-#                                                 MATCH (n)
-#                                                 WHERE labels(n) = [{", ".join(next(iter(a2)).get_graph_object().labels)}]
-#                                                 RETURN {", ".join(map(lambda ref: f"n.{ref.reference.key} as {ref.reference.key}", a2))}
-#                                                                 """)
-#
-#                             bId: dict = get_or_create_dict(resB.single().data())
-#                             a1Id: dict = get_or_create_dict(resA1.single().data())
-#                             a2Id: dict = get_or_create_dict(resA2.single().data())
-#
-#                             session.run(
-#                                 f"MERGE (n)-[m:NO_LABEL_PROVIDED]->(o) WHERE elementId(n) = {a1Id} AND elementId(o) = {bId}")
-#                             session.run(
-#                                 f"MERGE (n)-[m:NO_LABEL_PROVIDED]->(o) WHERE elementId(n) = {a2Id} AND elementId(o) = {bId}")
-#
-#                     for dep in L:
-#                         if len({r.get_graph_object() for r in dep.left}.intersection(
-#                                 {r.get_graph_object() for r in dep.right})) == 0:
-#                             pass
-#
-#         case _:
-#             raise ValueError(f"The normal form \"{normal_form}\" is not supported (yet) for Structural Normalization")
-#
-#     return DependencySet.from_string_list([]), []
+def perform_structural_normalization(driver: Driver,
+                                     database: Literal["neo4j", "memgraph"],
+                                     logger: logging.Logger | None = None) -> (DependencySet, list[str]):
+
+    """A local instance of the logger, if no logger was provided"""
+    if logger is None:
+        logging.setLoggerClass(QueryLogger)
+        logger = logging.getLogger(__name__)
+
+    def _apply_query(query: str) -> list[neo4j.Record]:
+        """Runs a query string on the graph connected through :any:`driver`.
+
+        :param query: The to be run query.
+        :type query: str"""
+        with driver.session(database=database) as session:
+            responsive = False
+            while not responsive:
+                responsive = True
+                try:
+                    logger.query(query)
+                    res = session.run(query)
+                    return list(res)
+                except neo4j.exceptions.TransientError:
+                    # Neo4j may still be busy with the previous query
+                    responsive = False
+                    time.sleep(1)
+
+    # Refiy all non-empty Edges
+    logger.info("Reify all non-empty edges")
+    get_edge_types_query = """
+MATCH ()-[m]-()
+WHERE length(properties(m)) > 0
+RETURN DISTINCT type(m) AS t"""
+    res = _apply_query(get_edge_types_query)
+    for record in res:
+        edge_type = record["t"]
+        reify_query = f"""
+MATCH (s)-[e:{edge_type}]->(t)
+CREATE (x:{edge_type})
+CREATE (s)-[:SRC_{edge_type}]->(x)
+CREATE (x)-[:TGT_{edge_type}]->(t)
+SET x += CASE 
+    WHEN size(keys(properties(e))) > 0 THEN properties(e) 
+    ELSE {{}} 
+END"""
+        _apply_query(reify_query)
+
+        remove_edge_query = f"""
+MATCH ()-[e:{edge_type}]->()
+DELETE e
+"""
+        _apply_query(remove_edge_query)
+
+
+    # Create nodes for all properties
+    get_properties_query = """
+MATCH (n)
+UNWIND keys(n) AS p
+RETURN DISTINCT p"""
+    res = _apply_query(get_properties_query)
+    for record in res:
+        property = record["p"]
+        extract_property_query = f"""
+MATCH (n) 
+WHERE n.{property} IS NOT NULL
+MERGE (m:{property} {{{property}: n.{property}}})
+MERGE (n)-[:{property.upper()}]->(m)
+REMOVE n.{property}
+"""
+        _apply_query(extract_property_query)
+
+
+
+
+    return (DependencySet(), [])
 
 
 def validate_dependency(driver, database, dep, logger):

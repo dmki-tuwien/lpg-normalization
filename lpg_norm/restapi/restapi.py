@@ -19,7 +19,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from lpg_norm import gofd
 from lpg_norm.logger import QueryLogger
 from lpg_norm.normalize import (
-    perform_graph_native_normalization,  # perform_structural_normalization
+    perform_graph_native_normalization, perform_structural_normalization,  # perform_structural_normalization
 )
 
 class WebSocketLogHandler(logging.Handler):
@@ -411,7 +411,7 @@ def normalize(database: Literal["neo4j", "memgraph"],
         elif method == "lp":
             norm_res = perform_graph_native_normalization(driver, database, dependencies_obj_list, dep_filter="within-node", logger=logger)
         elif method == "structural":
-        #    norm_res = perform_structural_normalization(driver, database, "1GNF")
+            norm_res = perform_structural_normalization(driver, database, logger=logger)
             pass
         after = time.time_ns()
 
