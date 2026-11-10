@@ -419,8 +419,8 @@ def normalize(database: Literal["neo4j", "memgraph"],
     duration = duration/(10**9)
     res = (list(map(str, norm_res[0])), norm_res[1], duration)
 
-
     return res
+
 
 @app.get("/{database}/visualize/nodes")
 def visualize_nodes(database: Literal["neo4j", "memgraph"]) -> list[dict]:

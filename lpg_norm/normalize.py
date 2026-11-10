@@ -771,7 +771,7 @@ def perform_structural_normalization(driver: Driver,
     logger.info("Reify all non-empty edges")
     get_edge_types_query = """
 MATCH ()-[m]-()
-WHERE length(properties(m)) > 0
+WHERE length(keys(m)) > 0
 RETURN DISTINCT type(m) AS t"""
     res = _apply_query(get_edge_types_query)
     for record in res:
@@ -812,9 +812,7 @@ REMOVE n.{property}
         _apply_query(extract_property_query)
 
 
-
-
-    return (DependencySet(), [])
+    return DependencySet(), []
 
 
 def validate_dependency(driver, database, dep, logger):
