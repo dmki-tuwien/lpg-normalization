@@ -12,9 +12,9 @@ graphs:
     name_html: "Grana large"
     from_file: "graphs/grana_aging_big.cypher"
     dependencies:
-      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
+      - "(c:Cheese)-[a:agesIn:duration&type]->(r:AgingRoom)::a.type=>a.duration"
     minimal_cover:
-      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
+      - "(c:Cheese)-[a:agesIn:duration&type]->(r:AgingRoom)::a.type=>a.duration"
 
   - id: "grana-s"
     category: "Small graph"
@@ -22,9 +22,9 @@ graphs:
     name_html: "Grana small"
     from_file: "graphs/grana_aging_small.cypher"
     dependencies:
-      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
+      - "(c:Cheese)-[a:agesIn:duration&type]->(r:AgingRoom)::a.type=>a.duration"
     minimal_cover:
-      - "(c:Cheese)-[a:agesIn:duration&goal]->(r:AgingRoom)::a.duration=>a.goal"
+      - "(c:Cheese)-[a:agesIn:duration&type]->(r:AgingRoom)::a.type=>a.duration"
 
   - id: "ts1"
     category: "Real-world data"
@@ -303,18 +303,18 @@ graphs:
     minimal_cover:
       - "(x:L)-[y:E:k2]->()::y.k2=>x"
 
-  - id: "node-prop-list"
-    category: "Egger et al."
-    name: "Node Property List"
-    name_html: "Node Property List"
-    from_file: "graphs/structural/node-prop-list.cypher"
-    dependencies: []
-    minimal_cover: []
-
-  - id: "edge-prop-list"
-    category: "Egger et al."
-    name: "Edge Property List"
-    name_html: "Edge Property List"
-    from_file: "graphs/structural/edge-prop-list.cypher"
-    dependencies: []
-    minimal_cover: []
+#  - id: "node-prop-list"
+#    category: "Egger et al."
+#    name: "Node Property List"
+#    name_html: "Node Property List"
+#    from_file: "graphs/structural/node-prop-list.cypher"
+#    dependencies: []
+#    minimal_cover: []
+#
+#  - id: "edge-prop-list"
+#    category: "Egger et al."
+#    name: "Edge Property List"
+#    name_html: "Edge Property List"
+#    from_file: "graphs/structural/edge-prop-list.cypher"
+#    dependencies: []
+#    minimal_cover: []
