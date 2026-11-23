@@ -3,8 +3,9 @@ extra:
   generator: false
 theme:
   name: material
-  palette:
-    primary: teal
+ # variant: classic
+#  palette:
+ #   primary: teal
   #favicon: assets/favicon.ico
   features:
     - content.tooltips

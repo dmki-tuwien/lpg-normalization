@@ -7,8 +7,6 @@ __pycache__
 _static
 _templates
 
-# The mkdocs build folder
-site
 
 # Copies of the out folder
 "out *"

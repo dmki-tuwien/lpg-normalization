@@ -1,7 +1,7 @@
 # Evaluation Results
 
 
-<div id="loading" style="padding: 1rem; background: #f0f4f8; border-radius: 4px;">
+<div id="loading" style="padding: 1rem; background: rgba(82, 108, 254, 0.1); border-radius: 8.8px;">
   Loading and querying <a href="https://duckdb.org/docs/lts/clients/wasm/overview">DuckDB</a>.
 </div>
 
@@ -25,8 +25,9 @@
     <a href="https://github.com/dmki-tuwien/lpg-normalization/raw/refs/heads/master/out/query_aggregated_classified.csv">Download as CSV<a/>
   </div>
 
-  <p style="font-size: small">
-The visualization utilizes <a href="https://idl.uw.edu/mosaic/vgplot/?lang=js">Mosaic vgplot</a>
+  <p style="font-size: small"><a></a>
+<span>The visualization utilizes </span>
+<a href="https://idl.uw.edu/mosaic/vgplot/?lang=js">Mosaic vgplot</a>
 and <a href="https://duckdb.org/docs/lts/clients/wasm/overview">DuckDB</a>. 
 The data the visualizations are based on are available in the form of a DuckDB on <a href="https://github.com/dmki-tuwien/lpg-normalization/blob/master/out/eval_results.duckdb">GitHub</a>.
 </p>
@@ -125,7 +126,7 @@ import * as duckdb from 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm/+esm';
       const per_graph_metric_plot = vg.plot(
         vg.barY(
           vg.from('current_per_graph_metric', { filterBy: $filter }), 
-          { x: 'metric', y: vg.avg('value'), fx: 'graph', fill: "#009485" , tip: true}
+          { x: 'metric', y: vg.avg('value'), fx: 'graph', fill: "#526CFE" , tip: true}
         ),
         vg.yScale('symlog'),
         vg.marginLeft(60), 
@@ -140,7 +141,7 @@ import * as duckdb from 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm/+esm';
       const per_dep_metric_plot = vg.plot(
         vg.barY(
           vg.from('current_per_dep_metric', { filterBy: $filter }), 
-          { x: 'metric', y: vg.avg('value'), fx: 'graph', fill: "#009485" , tip: true}
+          { x: 'metric', y: vg.avg('value'), fx: 'graph', fill: "#526CFE" , tip: true}
         ),
         vg.yScale('symlog'),
         vg.marginLeft(60), 

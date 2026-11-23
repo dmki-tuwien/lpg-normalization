@@ -1,20 +1,20 @@
 # A Graph-Native Approach to Normalization
 
-Welcome to the online documentation accompanying the paper ["A Graph-Native Approach to Normalization"](http://arxiv.org/abs/2603.02995).
+Welcome to the online documentation accompanying the paper ["A Graph-Native Approach to Normalization"](https://doi.org/10.48786/edbt.2027.06).
 
 This documentation provides details on the performed evaluation and provides a documentation for our
 [Python](https://www.python.org) implementation of LPG normalization.
 
 Details on the repository structure and the source code can be found in the [Source Code Documentation](source_code_documentation.md).
 
-Detailed results of the evaluation presented in the [paper](http://arxiv.org/abs/2603.02995) can be found [here](https://github.com/dmki-tuwien/lpg-normalization/tree/master/out).
+Detailed results of the evaluation presented in the [paper](https://doi.org/10.48786/edbt.2027.06) can be found [here](https://github.com/dmki-tuwien/lpg-normalization/tree/master/out).
 
 ## Getting Started
 
-1. To get started with the evaluation and the implementation of LPG normalization, first clone the repository.
-Since this repository contains a submodule for the 
-[Northwind](https://github.com/neo4j-graph-examples/northwind) graph dataset, 
-the command<br> `git clone https://github.com/dmki-tuwien/lpg-normalization.git --recurse-submodules`<br> needs to be used to *clone* the repository. 
+1. To get started with the evaluation and the implementation of LPG normalization, first *clone the repository*.
+Use the command<br> `git clone https://github.com/dmki-tuwien/lpg-normalization.git --recurse-submodules`<br>
+This is necessary since this repository contains a submodule for the 
+[Northwind](https://github.com/neo4j-graph-examples/northwind) graph dataset.
 
 2. *Download all datasets* as described in the `graphs/` folder before running the evaluation.
 
@@ -42,7 +42,8 @@ can be found in the directory `out/`.
 
 ## REST API
 A REST API service for graph-native normalization can be started using
-`docker compose --profile rest up --build`
+`docker compose --profile rest up --build`.
+This API is used, for example, by the [GraNa-GraNo](https://dmki-tuwien.github.io/grana-grano/) demo.
 
 ## Development
 For the generation of the parser of the dependencies, [ANTLR](https://www.antlr.org/) 
